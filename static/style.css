@@ -1,0 +1,118 @@
+/* Grunddesign (Dark Mode) */
+body {
+    background-color: #111827; /* Dunkles Grau/Blau */
+    color: #f3f4f6;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Der Kasten in der Mitte */
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #1f2937;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+/* Eingabefelder und Buttons */
+input, select, button {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    box-sizing: border-box;
+}
+
+input, select {
+    background-color: #374151;
+    color: white;
+}
+
+button {
+    background-color: #8b5cf6; /* Neon Lila */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background-color: #7c3aed;
+}
+
+/* Liste der fertigen Spieler */
+.spieler-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.spieler-karte {
+    background-color: #374151;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 20px;
+    border: 2px solid #8b5cf6;
+}
+/* Eine kleine Animation für neue Karten */
+@keyframes aufploppen {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.karten-animation {
+    animation: aufploppen 0.3s ease-out;
+}
+/* Styling für die Abstimm-Buttons */
+.aktions-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-erfolg {
+    background-color: #10b981; /* Grün */
+}
+.btn-erfolg:hover { background-color: #059669; }
+
+.btn-fail {
+    background-color: #ef4444; /* Rot */
+}
+.btn-fail:hover { background-color: #dc2626; }
+
+/* Anzeige der Schlücke in der Spieler-Karte */
+.schluck-anzahl {
+    background-color: #111827;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-left: 5px;
+    color: #fca5a5; /* Leichtes Rot */
+}
+/* Macht die Spielerkarten klickbar */
+.spieler-karte {
+    cursor: pointer;
+    transition: 0.2s;
+    user-select: none; /* Verhindert, dass man aus Versehen den Text markiert */
+}
+
+.spieler-karte:hover {
+    transform: scale(1.05);
+}
+
+/* Der Look, wenn jemand auf der Ersatzbank sitzt */
+.spieler-inaktiv {
+    opacity: 0.4;
+    border-color: #4b5563;
+    background-color: #1f2937;
+    filter: grayscale(100%);
+}

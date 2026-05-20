@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        
+        <div class="editor-box">
+            <h1>Garderobe 🎭</h1>
+            <p>Erstelle deinen Party-Charakter!</p>
+            <input type="text" id="nameInput" placeholder="Dein Name..." autocomplete="off">
+            
+            <select id="emojiInput">
+                <option value="😎">😎 Cool</option>
+                <option value="👽">👽 Alien</option>
+                <option value="👻">👻 Geist</option>
+                <option value="🦊">🦊 Fuchs</option>
+                <option value="🤖">🤖 Roboter</option>
+                <option value="🦖">🦖 Dino</option>
+                <option value="🐙">🐙 Oktopus</option>
+                <option value="🤠">🤠 Cowboy</option>
+            </select>
+            
+            <button onclick="erstelleCharakter()">Charakter speichern</button>
+        </div>
+
+        <hr>
+        <h2>Bereite Spieler:</h2>
+        
+        <button onclick="punkteResetten()" style="background-color: #4b5563; width: auto; padding: 8px 15px; font-size: 14px; margin-bottom: 15px;">🔄 Punkte zurücksetzen</button>
+        
+        <div id="spielerListe" class="spieler-grid"></div>
+
+        <hr style="margin-top: 20px;">
+        <h3>Wie hart soll das Spiel werden?</h3>
+        <select id="levelInput">
+            <option value="1">🟢 Level 1: Warm-up (1-2 Schlücke)</option>
+            <option value="2" selected>🟡 Level 2: Standard (2-4 Schlücke)</option>
+            <option value="3">🔴 Level 3: Eskalation (3-6 Schlücke)</option>
+        </select>
+        
+        <button id="startBtn" onclick="spielStarten()" style="margin-top: 30px; background-color: #10b981;">🚀 Spiel Starten!</button>
+
+        <div id="hauptMenue" style="display: none; margin-top: 30px;">
+            <h2>Wähle ein Spiel! 🎲</h2>
+            <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...?</button>
+            <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben & Mutproben</button>
+            <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
+            
+            <button onclick="zurueckZurGarderobe()" style="background-color: #4b5563; margin-top: 20px;">👕 Zurück zur Garderobe</button>
+        </div>
+
+        <div id="spielBereich" style="display: none; margin-top: 40px;">
+            <hr>
+            <h2 id="frageText" style="font-size: 24px; color: #f472b6;">Lade Frage...</h2>
+            <p id="strafeText" style="font-size: 20px; font-weight: bold;">...</p>
+            
+            <div id="entscheidungsBereich" class="aktions-box">
+                <button onclick="niemandTrinkt()" class="btn-erfolg">✅ Niemand trinkt</button>
+                <button id="failBtn" onclick="werMussTrinkenZeigen()" class="btn-fail">🍻 Jemand muss trinken!</button>
+            </div>
+
+            <div id="werTrinktBereich" style="display: none; margin-top: 20px;">
+                <h3>Wer bekommt die Schlücke?</h3>
+                <div id="auswahlListe" class="spieler-grid">
+                    </div>
+            </div>
+
+            <button id="naechsteKarteBtn" onclick="karteZiehen()" style="background-color: #3b82f6; display: none; margin-top: 15px;">Nächste Karte 🃏</button>
+            <button onclick="zurueckZumMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zum Menü ↩️</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
