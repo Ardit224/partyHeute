@@ -1,67 +1,145 @@
 /* Grunddesign (Dark Mode) */
+:root {
+    --primary: linear-gradient(135deg, #8b5cf6, #ec4899);
+    --secondary: linear-gradient(135deg, #3b82f6, #2dd4bf);
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #f8fafc;
+}
+
 body {
-    background-color: #111827; /* Dunkles Grau/Blau */
-    color: #f3f4f6;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+    color: var(--text);
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
     margin: 0;
-    padding: 20px;
+    padding: 10px;
+    min-height: 100vh;
 }
 
 /* Der Kasten in der Mitte */
 .container {
     max-width: 500px;
-    margin: 0 auto;
-    background-color: #1f2937;
-    padding: 30px;
-    border-radius: 15px;
+    margin: 20px auto;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    padding: 25px;
+    border-radius: 24px;
+    border: 1px solid var(--border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
 /* Eingabefelder und Buttons */
 input, select, button {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     margin-bottom: 15px;
     border: none;
-    border-radius: 8px;
-    font-size: 18px;
+    border-radius: 12px;
+    font-size: 16px;
     box-sizing: border-box;
 }
 
 input, select {
-    background-color: #374151;
+    background-color: rgba(0, 0, 0, 0.2);
     color: white;
+    border: 1px solid var(--border);
 }
 
 button {
-    background-color: #8b5cf6; /* Neon Lila */
+    background: var(--primary);
     color: white;
     font-weight: bold;
     cursor: pointer;
-    transition: 0.2s;
+    transition: transform 0.2s, filter 0.2s;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 button:hover {
-    background-color: #7c3aed;
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+button:active {
+    transform: translateY(0);
 }
 
 /* Liste der fertigen Spieler */
+/* Das Gitter, in dem die Spieler stehen */
 .spieler-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
     margin-top: 20px;
 }
 
+/* Die neue Profil-Karte */
 .spieler-karte {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 10px;
+    text-align: center;
+    transition: 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Hover-Effekt: Karte hebt sich ab */
+.spieler-karte:hover {
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 15px rgba(244, 114, 182, 0.3);
+}
+
+/* Das Foto oder Emoji in der Karte */
+.avatar-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 8px auto;
+    border-radius: 50%;
+    border: 2px solid #f472b6;
+    overflow: hidden;
     background-color: #374151;
-    padding: 10px 20px;
-    border-radius: 50px;
+}
+
+.avatar-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Name des Spielers */
+.spieler-name {
+    display: block;
     font-weight: bold;
-    font-size: 20px;
-    border: 2px solid #8b5cf6;
+    font-size: 14px;
+    color: white;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Schluck-Anzahl Badge */
+.schluck-anzahl {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fcd34d;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Look für inaktive Spieler (Ersatzbank) */
+.spieler-inaktiv {
+    opacity: 0.5;
+    filter: grayscale(80%);
+    border-color: #111827;
 }
 /* Eine kleine Animation für neue Karten */
 @keyframes aufploppen {
@@ -74,20 +152,19 @@ button:hover {
 }
 /* Styling für die Abstimm-Buttons */
 .aktions-box {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin-top: 20px;
 }
 
 .btn-erfolg {
-    background-color: #10b981; /* Grün */
+    background: linear-gradient(135deg, #10b981, #059669);
 }
-.btn-erfolg:hover { background-color: #059669; }
 
 .btn-fail {
-    background-color: #ef4444; /* Rot */
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
 }
-.btn-fail:hover { background-color: #dc2626; }
 
 /* Anzeige der Schlücke in der Spieler-Karte */
 .schluck-anzahl {
@@ -115,4 +192,84 @@ button:hover {
     border-color: #4b5563;
     background-color: #1f2937;
     filter: grayscale(100%);
+}
+.camera-section {
+    margin: 20px 0;
+    padding: 15px;
+    background: #111827;
+    border-radius: 20px;
+    border: 1px dashed #4b5563;
+}
+
+#video, #photoPreview {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    margin-bottom: 15px;
+}
+
+.spieler-karte {
+    position: relative; /* Wichtig für die Positionierung der Buttons */
+}
+
+.charakter-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+    opacity: 0; /* Standardmäßig unsichtbar */
+    transition: opacity 0.2s;
+}
+
+.spieler-karte:hover .charakter-actions {
+    opacity: 1; /* Erscheint nur beim Drüberfahren */
+}
+
+.action-btn {
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    padding: 2px 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.action-btn.delete:hover { background: #ef4444; }
+.action-btn.edit:hover { background: #3b82f6; }
+
+/* Spezieller Style für die Auswahl-Buttons beim Trinken */
+.strafe-btn {
+    width: auto !important;
+    margin: 5px !important;
+    padding: 10px 20px !important;
+}
+
+/* Styling für den Spieler innerhalb des Fragetextes (Karte) */
+.spieler-anzeige {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 5px 10px;
+}
+
+.spieler-anzeige img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+    margin-bottom: 5px;
+}
+
+.spieler-anzeige .emoji-display {
+    font-size: 50px;
+    margin-bottom: 5px;
+}
+
+.spieler-name-display {
+    font-weight: bold;
+    color: #f472b6;
+    font-size: 1.1em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
