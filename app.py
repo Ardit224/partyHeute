@@ -19,6 +19,12 @@ fragen_pools = {
         "Ich hab noch nie so getan, als würde ich telefonieren, um jemandem aus dem Weg zu gehen.",
         "Ich hab noch nie eine Nachricht an die falsche Person geschickt und es sofort bereut.",
         "Ich hab noch nie gegoogelt, wie man einen Kater loswird."
+    ],
+    "paranoia": [
+        "Wer in der Runde würde am ehesten [SPIELER] im Stich lassen?",
+        "Wer hier ist am ehesten in [SPIELER] verknallt?",
+        "Wer würde am ehesten das letzte Bier von [SPIELER] klauen?",
+        "Wer ist die vertrauenswürdigste Person für [SPIELER]?"
     ]
 }
 

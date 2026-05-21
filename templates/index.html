@@ -73,6 +73,7 @@
             <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
             <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
             <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
+            <button onclick="starteParanoia()" style="background-color: #10b981;">🕵️ Paranoia</button>
             <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown Spiel</button>
             <button onclick="geheZuStartMenue()" style="background-color: #4b5563;">Zurück zum Menü</button>
         </div>
@@ -98,13 +99,45 @@
             <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zur Spielauswahl</button>
         </div>
 
+        <!-- 4b. PARANOIA BEREICH -->
+        <div id="paranoiaBereich" style="display: none;">
+            <div id="paranoiaStart">
+                <h2>🕵️ Wer ist dran?</h2>
+                <div id="paranoiaAktiverSpielerAnzeige" style="margin: 20px 0;"></div>
+                <p>Gib das Handy an diese Person weiter!</p>
+                <button onclick="paranoiaFrageLaden()" style="background-color: #10b981;">Ich habe das Handy 📱</button>
+            </div>
+
+            <div id="paranoiaFrageAnsicht" style="display: none;">
+                <h3 id="paranoiaText" style="min-height: 60px; margin-bottom: 20px;"></h3>
+                <p>Beantworte die Frage, indem du auf jemanden zeigst. Wenn die Person wissen will warum, muss sie trinken!</p>
+                <div class="aktions-box">
+                    <button onclick="paranoiaTrinkenAuswaehlen()" style="background-color: #ef4444;">🍺 Jemand trinkt</button>
+                    <button onclick="naechsteParanoiaRunde()" style="background-color: #4b5563;">Nächste Runde 🃏</button>
+                </div>
+            </div>
+
+            <div id="paranoiaTrinkAuswahl" style="display: none;">
+                <h3>Wer hat getrunken?</h3>
+                <div id="paranoiaSpielerListe" class="spieler-grid"></div>
+            </div>
+
+            <button onclick="zurueckZumHauptMenue()" style="background-color: #374151; margin-top: 20px;">Spiel verlassen</button>
+        </div>
+
         <!-- 5. COUNTDOWN BEREICH (Roulette) -->
         <div id="countdownBereich" style="display: none;">
             <h2>Countdown Spiel</h2>
             <p id="countdownStatus"></p>
-            <div class="wheel-wrapper">
-                <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="300" height="300"></canvas>
+            <div class="wheel-wrapper" style="width: 300px; height: 300px; margin: 30px auto; position: relative;">
+                <canvas id="rouletteWheel" width="300" height="300" style="display: none;"></canvas> <!-- Canvas versteckt -->
+                
+                <!-- Schuss Animation Overlay -->
+                <div id="shotOverlay" class="shot-overlay">
+                    <div id="revolver" class="revolver">🔫</div>
+                    <div id="targetPlayerAvatar" class="target-player-avatar"></div>
+                    <div id="bullet" class="bullet"><div id="bulletContent"></div></div>
+                </div>
             </div>
             <p id="countdownErgebnis" style="font-weight: bold; font-size: 1.2em;"></p>
             <button id="countdownZiehenBtn" onclick="radDrehen()" style="background-color: #ef4444;">Ziehen!</button>
@@ -124,6 +157,7 @@
     <script src="{{ url_for('static', filename='camera.js') }}"></script>
     <script src="{{ url_for('static', filename='storage.js') }}"></script>
     <script src="{{ url_for('static', filename='roulette.js') }}"></script>
+    <script src="{{ url_for('static', filename='paranoia.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <div id="statistikBereich" style="display: none;"></div>
 </body>

@@ -30,7 +30,8 @@ function erstelleCharakter() {
         emoji: bildOderEmoji,
         schluecke: 0,
         aktiv: true,
-        ausgewaehltCount: 0
+        ausgewaehltCount: 0,
+        getraenkeCount: 0
     };
 
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
@@ -64,6 +65,9 @@ function listeAnzeigen() {
     
     // Prüfen, ob wir uns in der Garderobe befinden
     const istGarderobe = document.getElementById('editor-box') && document.getElementById('editor-box').style.display !== 'none';
+    // Prüfen, ob wir in einem aktiven Spielmodus sind
+    const istImSpiel = ['spielBereich', 'countdownBereich', 'paranoiaBereich'].includes(
+        document.querySelector('.container > div[style*="display: block"]')?.id);
 
     gespeicherteSpieler.forEach((spieler, index) => {
         let extraKlasse = (spieler.aktiv !== false) ? "" : "spieler-inaktiv";
@@ -75,6 +79,12 @@ function listeAnzeigen() {
                 <button class="action-btn delete" onclick="event.stopPropagation(); charakterLoeschen(${index})">🗑️</button>
             </div>` : "";
 
+        // Getränke-Plus-Button nur im Spiel anzeigen
+        const drinkPlusBtn = istImSpiel ? `
+            <button class="drink-plus-btn" onclick="event.stopPropagation(); window.getraenkHinzufuegen(${index})">
+                +🍺
+            </button>` : "";
+
         listenBereich.innerHTML += `
             <div class="spieler-karte ${extraKlasse}" onclick="spielerTogglen(${index})">
                 ${actionButtons}
@@ -82,6 +92,7 @@ function listeAnzeigen() {
                     ${spieler.emoji}
                 </div>
                 <span class="spieler-name">${spieler.name}</span>
+                ${drinkPlusBtn}
                 <span class="schluck-anzahl">${spieler.schluecke || 0} 🍺</span>
             </div>
         `;
@@ -129,6 +140,7 @@ function punkteResetten() {
         spielerListe.forEach(s => {
             s.schluecke = 0;
             s.ausgewaehltCount = 0;
+            s.getraenkeCount = 0;
         });
         localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
         listeAnzeigen();

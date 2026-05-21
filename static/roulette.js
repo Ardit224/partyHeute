@@ -3,7 +3,7 @@
 let countdownPot = [];
 let aktuelleCountdownSchluecke = 0;
 let aktuellerWinkel = 0; // Merkt sich, wie das Rad gerade steht
-let preloadedPlayerAvatars = []; // Speichert geladene Bilder oder Emojis
+// preloadedPlayerAvatars ist nicht mehr direkt für das Rad nötig, aber die Avatare müssen geladen sein für die Kugel
 const farben = ["#ef4444", "#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"];
 
 async function starteCountdownSpiel() { // Funktion ist jetzt asynchron
@@ -14,25 +14,6 @@ async function starteCountdownSpiel() { // Funktion ist jetzt asynchron
         customAlert("Roulette braucht mindestens 2 Spieler! 🎰");
         return;
     }
-
-    // Avatare vorab laden (Bilder oder Emojis speichern)
-    preloadedPlayerAvatars = await Promise.all(countdownPot.map(async (spieler) => {
-        if (spieler.emoji.startsWith('<img src="')) {
-            const srcMatch = spieler.emoji.match(/src="([^"]+)"/);
-            if (srcMatch && srcMatch[1]) {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => resolve(img);
-                    img.onerror = () => {
-                        console.error("Fehler beim Laden des Spielerbildes:", spieler.name);
-                        resolve(null); // Bei Fehler null zurückgeben
-                    };
-                    img.src = srcMatch[1];
-                });
-            }
-        }
-        return spieler.emoji; // Wenn es ein Emoji-String ist, direkt zurückgeben
-    }));
 
     // Schlücke berechnen: Max 8, sonst so viele wie Spieler da sind
     aktuelleCountdownSchluecke = Math.min(countdownPot.length, 8);
@@ -45,69 +26,13 @@ async function starteCountdownSpiel() { // Funktion ist jetzt asynchron
     document.getElementById('countdownZiehenBtn').style.display = 'inline-block';
     
     statusUpdaten();
-    radZeichnen();
+    // Sicherstellen, dass das Canvas-Element versteckt ist
+    const canvas = document.getElementById('rouletteWheel');
+    if (canvas) canvas.style.display = 'none';
 }
 
 function statusUpdaten() {
     document.getElementById('countdownStatus').innerText = `Noch ${countdownPot.length} Spieler im Pot. Das Opfer trinkt ${aktuelleCountdownSchluecke} 🍺!`;
-}
-
-// Malt das Rad auf das Canvas
-function radZeichnen() {
-    const canvas = document.getElementById('rouletteWheel');
-    const ctx = canvas.getContext('2d');
-    const mitte = canvas.width / 2;
-    const radius = mitte;
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height); // Rad säubern
-    
-    let stueckWinkel = (2 * Math.PI) / countdownPot.length;
-    
-    for (let i = 0; i < countdownPot.length; i++) {
-        ctx.beginPath();
-        ctx.fillStyle = farben[i % farben.length]; // Farbe abwechselnd wählen
-        ctx.moveTo(mitte, mitte);
-        // Stücke so malen, dass das erste Stück oben in der Mitte (bei -90 Grad) beginnt
-        ctx.arc(mitte, mitte, radius, i * stueckWinkel - Math.PI/2, (i + 1) * stueckWinkel - Math.PI/2);
-        ctx.fill();
-        ctx.stroke();
-        
-        // Text (Name) in das Stück schreiben
-        ctx.save();
-        ctx.translate(mitte, mitte);
-        ctx.rotate(i * stueckWinkel + stueckWinkel / 2 - Math.PI/2);
-        
-        ctx.textAlign = "center"; // Text/Bild horizontal zentrieren
-        ctx.textBaseline = "middle";
-        ctx.fillStyle = "white";
-        
-        const avatarContent = preloadedPlayerAvatars[i];
-
-        const avatarSize = 70; // Deutlich größer für bessere Sichtbarkeit
-        const xPos = radius * 0.65; // Positionierung im äußeren Drittel des Rads
-
-        if (avatarContent instanceof Image && avatarContent.complete && avatarContent.naturalHeight !== 0) {
-            // Bild rund zeichnen mittels Maskierung (Clipping)
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(xPos, 0, avatarSize / 2, 0, Math.PI * 2);
-            ctx.clip();
-            ctx.drawImage(avatarContent, xPos - avatarSize / 2, -avatarSize / 2, avatarSize, avatarSize);
-            ctx.restore();
-
-            // Weißer Rahmen um das runde Bild für "Sauberkeit"
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(xPos, 0, avatarSize / 2, 0, Math.PI * 2);
-            ctx.stroke();
-        } else {
-            // Emojis ebenfalls deutlich größer darstellen
-            ctx.font = "60px Arial"; // Emojis auch größer machen
-            ctx.fillText(avatarContent || "❓", xPos, 0);
-        }
-        ctx.restore();
-    }
 }
 
 // Dreht das Rad
@@ -124,38 +49,69 @@ function radDrehen() {
     let opferIndex = Math.floor(Math.random() * countdownPot.length);
     let opfer = countdownPot[opferIndex];
 
-    // 2. Berechnen, wo das Rad anhalten muss, damit das Opfer unter dem Pfeil steht (Pfeil ist oben, also 0 Grad)
-    let stueckGrad = 360 / countdownPot.length;
-    // Die exakte Gradzahl für die Mitte des Opfer-Tortenstücks
-    // Der Pfeil ist oben (0 Grad). Die Segmente sind von -90 Grad bis ...
-    // Wenn das erste Segment bei -90 bis -90 + stueckWinkel ist,
-    // dann ist die Mitte des ersten Segments bei -90 + stueckWinkel/2.
-    // Um das Segment unter den Pfeil zu bekommen, muss der Mittelpunkt des Segments auf 0 Grad zeigen.
-    let zielGrad = 360 - (opferIndex * stueckGrad) - (stueckGrad / 2);
-    
-    // Wir fügen 8 volle Umdrehungen (2880 Grad) für mehr Action bei 6 Sek. hinzu
-    let drehWinkel = zielGrad + 2880;
-    aktuellerWinkel += drehWinkel;
-
-    // 3. CSS-Animation starten
+    // UI-Updates
     document.getElementById('countdownZiehenBtn').style.display = 'none'; // Button während des Drehens verstecken
     document.getElementById('countdownErgebnis').innerText = "Spannung...";
     document.getElementById('countdownErgebnis').style.color = "white";
+
+    // Sicherstellen, dass das Canvas-Element versteckt ist
+    const canvas = document.getElementById('rouletteWheel');
+    if (canvas) canvas.style.display = 'none';
+
+    // Gesamtzeit für die Animation (Drumroll + Schuss)
+    const totalAnimationDuration = 3000; // Gesamtzeit auf 3 Sekunden
+    const cannonStartDelay = 400; // Revolver erscheint nach 0.4 Sekunden
+    const targetPlayerAppearDelay = 200; // Zielspieler erscheint 0.2s nach Revolver
 
     if (typeof playBackgroundMusic === "function") {
         // Spannende Musik (Drumroll/Spannungs-Sound) starten
         playBackgroundMusic('https://assets.mixkit.co/active_storage/sfx/514/514-preview.mp3', 0.6); 
     }
 
-    const canvas = document.getElementById('rouletteWheel');
-    canvas.style.transition = 'transform 6s cubic-bezier(0.2, 0.1, 0.15, 1)'; // Länger und weicherer Auslauf
-    canvas.style.transform = `rotate(${aktuellerWinkel}deg)`;
-
-    // 4. Warten, bis das Rad steht (6 Sekunden), dann Ergebnis verarbeiten
+    // Start der Revolver-Animation nach einer Verzögerung innerhalb der Gesamtzeit
     setTimeout(() => {
+        // --- SCHUSS ANIMATION START ---
+        const overlay = document.getElementById('shotOverlay');
+        const revolver = document.getElementById('revolver');
+        const bullet = document.getElementById('bullet');
+        const targetPlayerAvatar = document.getElementById('targetPlayerAvatar');
+
+        // Zielspieler-Avatar setzen und einblenden
+        targetPlayerAvatar.innerHTML = opfer.emoji.includes('<img') ? opfer.emoji : `<span class="emoji-display">${opfer.emoji}</span>`;
+        targetPlayerAvatar.style.opacity = 1;
+        
+        overlay.style.display = 'block';
+        revolver.classList.add('active');
+
+        // Kurze Verzögerung, dann Schuss
+        setTimeout(() => {
+            // Trigger Screen Shake
+            document.querySelector('.container').classList.add('screen-shake');
+            playSound('shot');
+            bullet.classList.add('fly');
+
+            // Treffer-Effekt auf dem Spieler-Avatar, wenn die Kugel ankommt
+            setTimeout(() => {
+                targetPlayerAvatar.classList.add('hit');
+                setTimeout(() => stopBackgroundMusic(), 200)
+            }, 400); // bulletFly Dauer
+
+        }, targetPlayerAppearDelay); // Zielspieler erscheint, dann Schuss
+
+    }, cannonStartDelay); // Revolver-Animation startet nach cannonStartDelay
+
+    // Ergebnis anzeigen und aufräumen
+    // Dieser Timeout wird nach der gesamten Animation + einer kleinen Pufferzeit ausgelöst
+    setTimeout(() => {
+        // Hintergrundmusik stoppen
+        
+
+        // --- ERGEBNIS ANZEIGEN ---
         // Ergebnis anzeigen
         document.getElementById('countdownErgebnis').innerText = `💥 ${getAvatarForTextDisplay(opfer)} ${opfer.name} trinkt ${aktuelleCountdownSchluecke} 🍺!`;
         document.getElementById('countdownErgebnis').style.color = "#ef4444";
+        document.getElementById('countdownErgebnis').style.opacity = 0; // Startet unsichtbar für Pop-In
+        document.getElementById('countdownErgebnis').classList.add('result-pop-in'); // Animation für Ergebnis
 
         // Schlücke buchen
         let alleSpieler = JSON.parse(localStorage.getItem('partySpieler'));
@@ -184,22 +140,27 @@ function radDrehen() {
             }
             document.getElementById('countdownErgebnis').innerText = `🏆 ${getAvatarForTextDisplay(gewinner)} ${gewinner.name} hat überlebt!`;
             document.getElementById('countdownErgebnis').style.color = "#10b981";
-            radZeichnen(); // Letztes Rad malen (ein einziges riesiges Tortenstück)
+            document.getElementById('countdownErgebnis').classList.add('result-pop-in'); // Animation für Ergebnis
         } else {
             statusUpdaten();
-            radZeichnen(); // Rad mit den verbleibenden Spielern neu malen
             document.getElementById('countdownZiehenBtn').style.display = 'inline-block';
         }
         
-        // Rotation für das nächste Mal zurücksetzen (ohne Animation), damit es nicht unendlich hochzählt
-        canvas.style.transition = 'none';
-        aktuellerWinkel = zielGrad;
-        canvas.style.transform = `rotate(${aktuellerWinkel}deg)`;
+        // --- CLEANUP ANIMATION ---
+        const overlay = document.getElementById('shotOverlay');
+        const revolver = document.getElementById('revolver');
+        const bullet = document.getElementById('bullet');
+        const targetPlayerAvatar = document.getElementById('targetPlayerAvatar');
         
-        // Musik stoppen, sobald das Rad steht
-        if (typeof stopBackgroundMusic === "function") stopBackgroundMusic();
-        
-    }, 6000); // Auf 6000 Millisekunden erhöht
+        document.querySelector('.container').classList.remove('screen-shake'); // Shake entfernen
+        document.getElementById('countdownErgebnis').classList.remove('result-pop-in'); // Animation zurücksetzen
+        overlay.style.display = 'none';
+        revolver.classList.remove('active');
+        bullet.classList.remove('fly');
+        targetPlayerAvatar.classList.remove('hit'); // Hit-Effekt zurücksetzen
+        targetPlayerAvatar.style.opacity = 0; // Zielspieler wieder unsichtbar machen
+
+    }, totalAnimationDuration); // Dies ist der Haupt-Timeout für die gesamte Sequenz
 }
 
 function zurueckZumMenueAusCountdown() {

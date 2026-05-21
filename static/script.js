@@ -4,7 +4,11 @@ let aktuellerSpielerIndex = -1;
 let backgroundMusic = null; // Globale Variable für die Hintergrundmusik
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich'];
+    
+    // Musik stoppen, sobald der Bereich gewechselt wird (Knopf gedrückt)
+    stopBackgroundMusic();
+
     bereiche.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -32,7 +36,8 @@ function playSound(type) {
     const sounds = {
         'click': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
         'win': 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
-        'card': 'https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3'
+        'card': 'https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3',
+        'shot': 'https://assets.mixkit.co/active_storage/sfx/1655/1655-preview.mp3'
     };
     if (sounds[type]) new Audio(sounds[type]).play().catch(() => {});
 }
@@ -56,6 +61,10 @@ function playBackgroundMusic(url, volume = 0.3) {
  */
 function stopBackgroundMusic() {
     if (backgroundMusic) backgroundMusic.pause();
+    if (backgroundMusic) {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0; // Setzt den Song an den Anfang zurück
+    }
 }
 
 /**
@@ -108,6 +117,16 @@ style.innerHTML = `
     .btn-confirm { background: #ef4444 !important; }
     .btn-cancel { background: #6b7280 !important; }
     .custom-modal button:hover { opacity: 0.8; }
+
+    /* Podium / Siegertreppchen */
+    .podium-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 40px 0; height: 200px; }
+    .podium-place { display: flex; flex-direction: column; align-items: center; width: 80px; transition: height 1s ease-out; }
+    .podium-bar { width: 100%; border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
+    .place-1 { height: 120px; background: linear-gradient(to top, #f59e0b, #fbbf24); order: 2; }
+    .place-2 { height: 90px; background: linear-gradient(to top, #94a3b8, #cbd5e1); order: 1; }
+    .place-3 { height: 60px; background: linear-gradient(to top, #92400e, #b45309); order: 3; }
+    .podium-avatar { width: 50px; height: 50px; border-radius: 50%; border: 3px solid white; margin-bottom: 5px; background: #1e293b; overflow: hidden; }
+    .podium-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     /* Statistik Animationen */
     .stats-container { padding: 20px; color: white; }
@@ -182,11 +201,20 @@ function zurueckZumHauptMenue() {
     zeigeBereich('hauptMenue');
 }
 
+window.getraenkHinzufuegen = function(index) {
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    spielerListe[index].getraenkeCount = (spielerListe[index].getraenkeCount || 0) + 1;
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+    playSound('click');
+    if (typeof window.listeAnzeigen === "function") window.listeAnzeigen();
+};
+
 async function karteZiehen() {
     const entscheidung = document.getElementById('entscheidungsBereich');
     const naechsteBtn = document.getElementById('naechsteKarteBtn');
     document.getElementById('werTrinktBereich').style.display = 'none';
 
+    stopBackgroundMusic(); // Musik stoppen, wenn eine neue Karte gezogen wird
     playSound('card'); // Sound beim Ziehen der Karte abspielen
 
     const gewähltesLevel = document.getElementById('levelInput').value;
@@ -302,10 +330,43 @@ function zeigeStatistiken() {
     const amHaeufigstenGezogen = [...aktiveSpieler].sort((a, b) => (b.ausgewaehltCount || 0) - (a.ausgewaehltCount || 0))[0];
     const gesamtSchluecke = aktiveSpieler.reduce((sum, s) => sum + (s.schluecke || 0), 0);
 
+    // Effizienz berechnen (Schlücke pro Getränk) - Weniger ist besser
+    const effizienzListe = aktiveSpieler
+        .filter(s => s.getraenkeCount > 0)
+        .map(s => ({
+            ...s,
+            schnitt: (s.schluecke / s.getraenkeCount).toFixed(1)
+        }))
+        .sort((a, b) => a.schnitt - b.schnitt); // Aufsteigend sortieren
+
+    let podiumHtml = "";
+    if (effizienzListe.length > 0) {
+        podiumHtml = `
+            <h3>🏆 Effizienz-Ranking</h3>
+            <p style="font-size: 0.8rem; opacity: 0.7;">(Schlücke pro Getränk - Weniger ist besser!)</p>
+            <div class="podium-wrapper">
+                ${effizienzListe.slice(0, 3).map((s, i) => `
+                    <div class="podium-place">
+                        <div class="podium-avatar">
+                            ${s.emoji.includes('<img') ? s.emoji : `<span style="font-size: 30px;">${s.emoji}</span>`}
+                        </div>
+                        <div class="podium-bar place-${i+1}">
+                            ${i+1}.
+                        </div>
+                        <div style="font-size: 0.7rem; margin-top: 5px;">${s.name}</div>
+                        <div style="font-size: 0.8rem; font-weight: bold;">${s.schnitt}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
     const statsHtml = `
         <div class="stats-container">
             <h2 class="stats-title">🏆 Abend-Resümee</h2>
             
+            ${podiumHtml}
+
             <div class="stat-card reveal-1">
                 <div class="stat-icon">🍻</div>
                 <div class="stat-info">
