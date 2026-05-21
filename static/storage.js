@@ -1,4 +1,8 @@
-// Variable für das Kamera-Foto (wird von camera.js befüllt)
+// Globale Variablen sicher deklarieren
+if (typeof aktuellesFoto === 'undefined') {
+    window.aktuellesFoto = null;
+}
+let aktuellEditIndex = -1;
 
 function erstelleCharakter() {
     const nameInput = document.getElementById('nameInput');
@@ -7,14 +11,18 @@ function erstelleCharakter() {
     const emoji = emojiInput.value;
 
     if (name.trim() === "") {
-        alert("Bitte gib einen Namen ein!");
+        customAlert("Wer bist du? Bitte gib einen Namen ein! ✍️");
         return;
     }
 
     // Entscheidung: Foto oder Emoji?
-    let bildOderEmoji = emoji;
-    if (aktuellesFoto) {
-        bildOderEmoji = `<img src="${aktuellesFoto}">`;
+    let bildOderEmoji;
+    if (window.aktuellesFoto) {
+        // Bild hat Priorität
+        bildOderEmoji = `<img src="${window.aktuellesFoto}">`;
+    } else {
+        // Emoji ist der Fallback
+        bildOderEmoji = emoji || "👤"; 
     }
 
     const neuerSpieler = {
@@ -25,14 +33,22 @@ function erstelleCharakter() {
     };
 
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
-    spielerListe.push(neuerSpieler);
+    
+    if (aktuellEditIndex > -1) {
+        // Bestehenden Spieler aktualisieren statt neu erstellen
+        spielerListe[aktuellEditIndex] = neuerSpieler;
+        aktuellEditIndex = -1; 
+    } else {
+        spielerListe.push(neuerSpieler);
+    }
+    
     localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
 
     // Felder leeren
     nameInput.value = "";
     
     // Kamera zurücksetzen
-    aktuellesFoto = null;
+    window.aktuellesFoto = null;
     if(document.getElementById('photoPreview')) document.getElementById('photoPreview').style.display = "none";
     if(document.getElementById('video')) document.getElementById('video').style.display = "none";
     if(document.getElementById('startCameraBtn')) document.getElementById('startCameraBtn').innerText = "📸 Kamera öffnen";
@@ -46,16 +62,23 @@ function listeAnzeigen() {
     listenBereich.innerHTML = ""; 
 
     let gespeicherteSpieler = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    
+    // Prüfen, ob wir uns in der Garderobe befinden
+    const istGarderobe = document.getElementById('editor-box') && document.getElementById('editor-box').style.display !== 'none';
 
     gespeicherteSpieler.forEach((spieler, index) => {
         let extraKlasse = (spieler.aktiv !== false) ? "" : "spieler-inaktiv";
 
+        // Buttons nur anzeigen, wenn wir in der Garderobe sind
+        const actionButtons = istGarderobe ? `
+            <div class="charakter-actions">
+                <button class="action-btn edit" onclick="event.stopPropagation(); charakterBearbeiten(${index})">✏️</button>
+                <button class="action-btn delete" onclick="event.stopPropagation(); charakterLoeschen(${index})">🗑️</button>
+            </div>` : "";
+
         listenBereich.innerHTML += `
             <div class="spieler-karte ${extraKlasse}" onclick="spielerTogglen(${index})">
-                <div class="charakter-actions">
-                    <button class="action-btn edit" onclick="event.stopPropagation(); charakterBearbeiten(${index})">✏️</button>
-                    <button class="action-btn delete" onclick="event.stopPropagation(); charakterLoeschen(${index})">🗑️</button>
-                </div>
+                ${actionButtons}
                 <div class="avatar-wrapper">
                     ${spieler.emoji}
                 </div>
@@ -67,6 +90,8 @@ function listeAnzeigen() {
 }
 
 function spielerTogglen(index) {
+    if (document.getElementById('editor-box') && document.getElementById('editor-box').style.display === 'none') return;
+
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler'));
     spielerListe[index].aktiv = !spielerListe[index].aktiv;
     localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
@@ -74,12 +99,14 @@ function spielerTogglen(index) {
 }
 
 function charakterLoeschen(index) {
-    if (confirm("Charakter wirklich löschen?")) {
+    
+         customConfirm("Soll dieser Charakter wirklich gelöscht werden? 🗑️", () => {
         let spielerListe = JSON.parse(localStorage.getItem('partySpieler'));
         spielerListe.splice(index, 1);
         localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
         listeAnzeigen();
-    }
+    
+    });
 }
 
 function charakterBearbeiten(index) {
@@ -88,19 +115,20 @@ function charakterBearbeiten(index) {
 
     document.getElementById('nameInput').value = spieler.name;
     
-    // Wir löschen ihn aus der Liste, damit er beim "Speichern" neu angelegt wird
-    spielerListe.splice(index, 1);
-    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
-    
+    if (!spieler.emoji.includes('<img')) {
+        document.getElementById('emojiInput').value = spieler.emoji;
+    }
+
+    aktuellEditIndex = index; 
     window.scrollTo({ top: 0, behavior: 'smooth' });
     listeAnzeigen();
 }
 
 function punkteResetten() {
-    if (confirm("Alle Schlücke auf 0 setzen?")) {
+    customConfirm("Alle Schlücke auf 0 setzen? Seid ihr wieder nüchtern? 🍺", () => {
         let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
         spielerListe.forEach(s => s.schluecke = 0);
         localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
         listeAnzeigen();
-    }
+      });
 }

@@ -1,4 +1,5 @@
-let aktuellesFoto = null;
+// Globales Foto-Objekt initialisieren, falls noch nicht geschehen
+if (!window.aktuellesFoto) window.aktuellesFoto = null;
 
 async function kameraStarten() {
     const video = document.getElementById('video');
@@ -15,7 +16,7 @@ async function kameraStarten() {
         snapBtn.style.display = "inline-block";
     } catch (err) {
         console.error("Kamera-Fehler: ", err);
-        alert("Kamera konnte nicht geöffnet werden. (Evtl. keine Berechtigung?)");
+        customAlert("Kamera-Fehler 📸: Bitte erlaube den Zugriff in den Browser-Einstellungen.");
     }
 }
 
@@ -31,10 +32,10 @@ function fotoMachen() {
     context.drawImage(video, 0, 0, 150, 150);
 
     // Das Bild aus dem Canvas als Text (Base64) extrahieren
-    aktuellesFoto = canvas.toDataURL('image/png');
+    window.aktuellesFoto = canvas.toDataURL('image/png');
 
     // Vorschau anzeigen, Video stoppen
-    preview.src = aktuellesFoto;
+    preview.src = window.aktuellesFoto;
     preview.style.display = "inline-block";
     video.style.display = "none";
     snapBtn.style.display = "none";
@@ -45,5 +46,5 @@ function fotoMachen() {
     const stream = video.srcObject;
     const tracks = stream.getTracks();
     tracks.forEach(track => track.stop());
-    console.log("Foto wurde generiert:", aktuellesFoto.substring(0, 50) + "...");
+    console.log("Foto wurde generiert und global gespeichert.");
 }

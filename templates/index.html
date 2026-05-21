@@ -3,30 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Party App - Deluxe</title>
+    <title>Party App</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Google Fonts für das schicke Design -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
         
-        <div class="editor-box">
-            <h1>Garderobe 🎭</h1>
-            <p>Erstelle deinen Party-Charakter!</p>
-            
-            <input type="text" id="nameInput" placeholder="Dein Name..." autocomplete="off">
-            
-            <div class="camera-section" style="text-align: center; margin: 15px 0;">
-                <video id="video" width="150" height="150" autoplay playsinline style="display: none; border-radius: 50%; object-fit: cover; border: 3px solid #f472b6; margin: 0 auto;"></video>
-                <canvas id="canvas" width="150" height="150" style="display:none;"></canvas>
-                <img id="photoPreview" src="" style="display: none; width: 150px; height: 150px; border-radius: 50%; border: 3px solid #10b981; margin: 0 auto;">
-
-                <div class="camera-controls" style="margin-top: 10px;">
-                    <button id="startCameraBtn" onclick="kameraStarten()" style="background-color: #6366f1; padding: 8px 15px;">📸 Kamera öffnen</button>
-                    <button id="snapBtn" onclick="fotoMachen()" style="display: none; background-color: #ef4444; padding: 8px 15px;">📸 Foto schießen!</button>
-                </div>
+        <!-- 1. HAUPTMENÜ (Landing Page / Startbildschirm) -->
+        <div id="startMenue" class="menu-screen">
+            <h1 class="title-glow">🍹 Party App</h1>
+            <p>Bereit für die Eskalation?</p>
+            <div class="main-nav">
+                <button class="nav-btn" onclick="geheZuGarderobe()">👗 Garderobe <br><small>Spieler verwalten</small></button>
+                <button class="nav-btn" onclick="geheZuSpiele()">🎮 Spiele starten <br><small>Viel Spaß!</small></button>
             </div>
+        </div>
 
-            <p style="margin-top: 15px;">Oder wähle ein Emoji:</p>
+        <!-- 2. GARDEROBE (Charakter-Editor) -->
+        <div id="editor-box" style="display: none;">
+            <h2>Charakter erstellen / bearbeiten</h2>
+            <input type="text" id="nameInput" placeholder="Name des Spielers" autocomplete="off">
+            
+            <label for="emojiInput" style="display:block; margin: 10px 0 5px 0; text-align: left; font-size: 0.9em;">Wähle ein Emoji:</label>
             <select id="emojiInput">
                 <option value="😎">😎 Cool</option>
                 <option value="👽">👽 Alien</option>
@@ -38,76 +38,85 @@
                 <option value="🤠">🤠 Cowboy</option>
             </select>
             
-            <button onclick="erstelleCharakter()" style="margin-top: 20px; background-color: #10b981;">Charakter speichern</button>
+            <p style="font-size: 0.9em; color: #94a3b8; margin-top: 15px;">Oder mach ein Foto:</p>
+            <div class="camera-section">
+                <video id="video" width="150" height="150" autoplay style="display: none; border-radius: 50%; object-fit: cover; margin: 0 auto;"></video>
+                <canvas id="canvas" width="150" height="150" style="display: none;"></canvas>
+                <img id="photoPreview" src="" alt="Foto Vorschau" style="display: none; width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto;">
+                
+                <div style="margin-top: 10px;">
+                    <button id="startCameraBtn" onclick="kameraStarten()" style="background-color: #6366f1; width: auto; padding: 8px 15px;">📸 Kamera öffnen</button>
+                    <button id="snapBtn" onclick="fotoMachen()" style="display: none; background-color: #ef4444; width: auto; padding: 8px 15px;">📸 Foto machen</button>
+                </div>
+            </div>
+
+            <button id="startBtn" onclick="erstelleCharakter()" style="background-color: #10b981;">Charakter speichern</button>
+            <button onclick="punkteResetten()" style="background-color: #4b5563;">Alle Schlücke auf 0 setzen</button>
+            <button onclick="geheZuStartMenue()" style="background-color: #374151;">Zurück zum Menü</button>
         </div>
 
-        <hr>
-
-        <h2>Bereite Spieler:</h2>
-        <button onclick="punkteResetten()" style="background-color: #4b5563; width: auto; padding: 8px 15px; font-size: 14px; margin-bottom: 15px;">🔄 Punkte zurücksetzen</button>
-        
-        <div id="spielerListe" class="spieler-grid"></div>
-
-        <hr style="margin-top: 20px;">
-
-        <h3>Wie hart soll das Spiel werden?</h3>
-        <select id="levelInput">
-            <option value="1">🟢 Level 1: Warm-up</option>
-            <option value="2" selected>🟡 Level 2: Standard</option>
-            <option value="3">🔴 Level 3: Eskalation</option>
-        </select>
-        
-        <button id="startBtn" onclick="spielStarten()" style="margin-top: 30px; background-color: #10b981;">🚀 Spiel Starten!</button>
-
-        <div id="hauptMenue" style="display: none; margin-top: 30px;">
-            <h2>Wähle ein Spiel! 🎲</h2>
-            <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...?</button>
-            <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben & Mutproben</button>
+        <!-- 3. SPIELAUSWAHL (Welches Spiel?) -->
+        <div id="hauptMenue" style="display: none;">
+            <h2>Wähle ein Spiel</h2>
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label for="levelInput" style="display:block; margin-bottom:5px; font-size: 0.9em;">Schwierigkeit:</label>
+                <select id="levelInput">
+                    <option value="1">Soft (1-2 Schlücke)</option>
+                    <option value="2" selected>Normal (2-4 Schlücke)</option>
+                    <option value="3">Hardcore (3-6 Schlücke)</option>
+                </select>
+            </div>
+            <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
+            <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
             <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
-            <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">⏳ Todes-Countdown</button>
-            
-            <button onclick="zurueckZurGarderobe()" style="background-color: #4b5563; margin-top: 20px;">👕 Zurück zur Garderobe</button>
+            <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown Spiel</button>
+            <button onclick="geheZuStartMenue()" style="background-color: #4b5563;">Zurück zum Menü</button>
         </div>
 
-        <div id="spielBereich" style="display: none; margin-top: 40px;">
-            <hr>
-            <h2 id="frageText" style="font-size: 24px; color: #f472b6;">Lade Frage...</h2>
-            <p id="strafeText" style="font-size: 20px; font-weight: bold;">...</p>
-            
-            <div id="entscheidungsBereich" class="aktions-box" style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="niemandTrinkt()" style="background-color: #10b981;">✅ Niemand trinkt</button>
-                <button id="failBtn" onclick="werMussTrinkenZeigen()" style="background-color: #ef4444;">🍻 Jemand trinkt!</button>
+        <!-- 4. SPIELBEREICH (Karten-Anzeige) -->
+        <div id="spielBereich" style="display: none;">
+            <h2 id="frageText" style="min-height: 60px;"></h2>
+            <p id="strafeText" style="font-weight: bold; color: #f472b6;"></p>
+
+            <div id="entscheidungsBereich" class="aktions-box">
+                <button class="btn-erfolg" onclick="niemandTrinkt()">✅ Niemand trinkt</button>
+                <button id="failBtn" class="btn-fail" onclick="werMussTrinkenZeigen()">🍻 Jemand trinkt</button>
             </div>
 
             <div id="werTrinktBereich" style="display: none; margin-top: 20px;">
-                <h3>Wer bekommt die Schlücke?</h3>
-                <div id="auswahlListe" class="spieler-grid"></div>
-            </div>
-
-            <button id="naechsteKarteBtn" onclick="karteZiehen()" style="background-color: #3b82f6; display: none; margin-top: 15px;">Nächste Karte 🃏</button>
-            <button onclick="zurueckZumMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zum Menü ↩️</button>
-        </div>
-
-        <div id="countdownBereich" style="display: none; margin-top: 40px; text-align: center;">
-            <hr>
-            <h2 style="font-size: 24px; color: #a78bfa;">🎡 Roulette des Todes</h2>
-            <p id="countdownStatus" style="font-size: 18px; margin-bottom: 20px;">Lade Pot...</p>
-            
-            <div style="position: relative; width: 300px; margin: 0 auto;">
-                <div style="font-size: 40px; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">🔻</div>
-                <div style="width: 300px; height: 300px; overflow: hidden; border-radius: 50%; box-shadow: 0 0 15px rgba(0,0,0,0.5);">
-                    <canvas id="rouletteWheel" width="300" height="300"></canvas>
+                <h3>Wer muss trinken?</h3>
+                <div id="auswahlListe" class="spieler-grid">
+                    <!-- Spieler-Buttons werden hier dynamisch eingefügt -->
                 </div>
             </div>
-            
-            <h3 id="countdownErgebnis" style="font-size: 22px; margin: 40px 0 20px 0; min-height: 30px;"></h3>
-            
-            <button id="countdownZiehenBtn" onclick="radDrehen()" style="background-color: #ef4444; width: 200px;">Rad drehen! 🎯</button>
-            <br>
-            <button onclick="zurueckZumMenueAusCountdown()" style="background-color: #4b5563; margin-top: 15px;">Zurück zum Menü ↩️</button>
+
+            <button id="naechsteKarteBtn" onclick="karteZiehen()" style="display: none; background-color: #3b82f6; margin-top: 20px;">Nächste Karte 🃏</button>
+            <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zur Spielauswahl</button>
         </div>
 
-    </div> <script src="{{ url_for('static', filename='camera.js') }}"></script>
+        <!-- 5. COUNTDOWN BEREICH (Roulette) -->
+        <div id="countdownBereich" style="display: none;">
+            <h2>Countdown Spiel</h2>
+            <p id="countdownStatus"></p>
+            <div style="margin: 20px auto; width: 300px; height: 300px;">
+                <canvas id="rouletteWheel" width="300" height="300"></canvas>
+            </div>
+            <p id="countdownErgebnis" style="font-weight: bold; font-size: 1.2em;"></p>
+            <button id="countdownZiehenBtn" onclick="radDrehen()" style="background-color: #ef4444;">Ziehen!</button>
+            <button onclick="zurueckZumMenueAusCountdown()" style="background-color: #4b5563;">Zurück zur Spielauswahl</button>
+        </div>
+
+        <hr style="margin-top: 30px; border: 0; border-top: 1px solid var(--border);">
+
+        <!-- GLOBALE SPIELERLISTE (Wird immer unten drunter angezeigt) -->
+        <h3>Aktive Party-Gäste:</h3>
+        <div class="spieler-grid" id="spielerListe">
+            <!-- Spieler-Karten werden hier von storage.js eingefügt -->
+        </div>
+    </div>
+
+    <!-- SKRIPTE -->
+    <script src="{{ url_for('static', filename='camera.js') }}"></script>
     <script src="{{ url_for('static', filename='storage.js') }}"></script>
     <script src="{{ url_for('static', filename='roulette.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>

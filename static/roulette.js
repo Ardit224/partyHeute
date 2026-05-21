@@ -11,7 +11,7 @@ async function starteCountdownSpiel() { // Funktion ist jetzt asynchron
     countdownPot = spielerListe.filter(s => s.aktiv !== false);
 
     if (countdownPot.length < 2) {
-        alert("Ihr braucht mindestens 2 aktive Spieler!");
+        customAlert("Roulette braucht mindestens 2 Spieler! 🎰");
         return;
     }
 
@@ -37,8 +37,9 @@ async function starteCountdownSpiel() { // Funktion ist jetzt asynchron
     // Schlücke berechnen: Max 8, sonst so viele wie Spieler da sind
     aktuelleCountdownSchluecke = Math.min(countdownPot.length, 8);
     
-    document.getElementById('hauptMenue').style.display = 'none';
-    document.getElementById('countdownBereich').style.display = 'block';
+    if (typeof zeigeBereich === "function") {
+        zeigeBereich('countdownBereich');
+    }
     
     document.getElementById('countdownErgebnis').innerText = "";
     document.getElementById('countdownZiehenBtn').style.display = 'inline-block';
@@ -81,7 +82,6 @@ function radZeichnen() {
         ctx.fillStyle = "white";
         
         const avatarContent = preloadedPlayerAvatars[i];
-        const nameToDisplay = countdownPot[i].name;
 
         const avatarSize = 55; // Deutlich größer für bessere Sichtbarkeit
         const xPos = radius * 0.65; // Positionierung im äußeren Drittel des Rads
@@ -106,14 +106,6 @@ function radZeichnen() {
             ctx.font = "50px Arial";
             ctx.fillText(avatarContent || "❓", xPos, 0);
         }
-
-        // Name "sauber" über das Bild/Emoji setzen
-        ctx.font = "bold 16px Arial";
-        ctx.shadowColor = "rgba(0,0,0,0.8)";
-        ctx.shadowBlur = 4; // Schatten macht weißen Text auf buntem Grund lesbar
-        ctx.fillText(nameToDisplay, xPos, -(avatarSize / 2) - 15);
-        ctx.shadowBlur = 0;
-
         ctx.restore();
     }
 }
@@ -189,6 +181,7 @@ function radDrehen() {
 }
 
 function zurueckZumMenueAusCountdown() {
-    document.getElementById('countdownBereich').style.display = 'none';
-    document.getElementById('hauptMenue').style.display = 'block';
+    if (typeof zurueckZumHauptMenue === "function") {
+        zurueckZumHauptMenue();
+    }
 }

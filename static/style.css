@@ -18,7 +18,6 @@ body {
     min-height: 100vh;
 }
 
-/* Der Kasten in der Mitte */
 .container {
     max-width: 500px;
     margin: 20px auto;
@@ -30,7 +29,6 @@ body {
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
 }
 
-/* Eingabefelder und Buttons */
 input, select, button {
     width: 100%;
     padding: 14px;
@@ -65,8 +63,6 @@ button:active {
     transform: translateY(0);
 }
 
-/* Liste der fertigen Spieler */
-/* Das Gitter, in dem die Spieler stehen */
 .spieler-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -74,7 +70,6 @@ button:active {
     margin-top: 20px;
 }
 
-/* Die neue Profil-Karte */
 .spieler-karte {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border);
@@ -84,15 +79,15 @@ button:active {
     transition: 0.3s;
     cursor: pointer;
     position: relative;
+    user-select: none;
 }
 
-/* Hover-Effekt: Karte hebt sich ab */
 .spieler-karte:hover {
+    transform: scale(1.05);
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 5px 15px rgba(244, 114, 182, 0.3);
 }
 
-/* Das Foto oder Emoji in der Karte */
 .avatar-wrapper {
     display: flex;
     align-items: center;
@@ -112,7 +107,6 @@ button:active {
     object-fit: cover;
 }
 
-/* Name des Spielers */
 .spieler-name {
     display: block;
     font-weight: bold;
@@ -124,7 +118,6 @@ button:active {
     text-overflow: ellipsis;
 }
 
-/* Schluck-Anzahl Badge */
 .schluck-anzahl {
     background: rgba(251, 191, 36, 0.2);
     color: #fcd34d;
@@ -135,13 +128,13 @@ button:active {
     font-weight: bold;
 }
 
-/* Look für inaktive Spieler (Ersatzbank) */
 .spieler-inaktiv {
-    opacity: 0.5;
-    filter: grayscale(80%);
-    border-color: #111827;
+    opacity: 0.4;
+    border-color: #4b5563;
+    background-color: #1f2937;
+    filter: grayscale(100%);
 }
-/* Eine kleine Animation für neue Karten */
+
 @keyframes aufploppen {
     0% { transform: scale(0.9); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
@@ -150,7 +143,7 @@ button:active {
 .karten-animation {
     animation: aufploppen 0.3s ease-out;
 }
-/* Styling für die Abstimm-Buttons */
+
 .aktions-box {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -166,33 +159,6 @@ button:active {
     background: linear-gradient(135deg, #ef4444, #b91c1c);
 }
 
-/* Anzeige der Schlücke in der Spieler-Karte */
-.schluck-anzahl {
-    background-color: #111827;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 14px;
-    margin-left: 5px;
-    color: #fca5a5; /* Leichtes Rot */
-}
-/* Macht die Spielerkarten klickbar */
-.spieler-karte {
-    cursor: pointer;
-    transition: 0.2s;
-    user-select: none; /* Verhindert, dass man aus Versehen den Text markiert */
-}
-
-.spieler-karte:hover {
-    transform: scale(1.05);
-}
-
-/* Der Look, wenn jemand auf der Ersatzbank sitzt */
-.spieler-inaktiv {
-    opacity: 0.4;
-    border-color: #4b5563;
-    background-color: #1f2937;
-    filter: grayscale(100%);
-}
 .camera-section {
     margin: 20px 0;
     padding: 15px;
@@ -206,22 +172,18 @@ button:active {
     margin-bottom: 15px;
 }
 
-.spieler-karte {
-    position: relative; /* Wichtig für die Positionierung der Buttons */
-}
-
 .charakter-actions {
     position: absolute;
     top: 5px;
     right: 5px;
     display: flex;
     gap: 5px;
-    opacity: 0; /* Standardmäßig unsichtbar */
+    opacity: 0;
     transition: opacity 0.2s;
 }
 
 .spieler-karte:hover .charakter-actions {
-    opacity: 1; /* Erscheint nur beim Drüberfahren */
+    opacity: 1;
 }
 
 .action-btn {
@@ -237,14 +199,12 @@ button:active {
 .action-btn.delete:hover { background: #ef4444; }
 .action-btn.edit:hover { background: #3b82f6; }
 
-/* Spezieller Style für die Auswahl-Buttons beim Trinken */
 .strafe-btn {
     width: auto !important;
     margin: 5px !important;
     padding: 10px 20px !important;
 }
 
-/* Styling für den Spieler innerhalb des Fragetextes (Karte) */
 .spieler-anzeige {
     display: inline-flex;
     flex-direction: column;
@@ -272,4 +232,30 @@ button:active {
     color: #f472b6;
     font-size: 1.1em;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Hauptmenü Styling */
+.menu-screen {
+    padding: 10px 0;
+}
+
+.title-glow {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    background: var(--primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(236, 72, 153, 0.5));
+}
+
+.main-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.nav-btn {
+    height: 80px;
+    font-size: 1.2rem;
 }
