@@ -1,13 +1,20 @@
 let aktuelleKategorie = ""; 
 let aktuelleSchluecke = 0; 
 let aktuellerSpielerIndex = -1; 
+let backgroundMusic = null; // Globale Variable für die Hintergrundmusik
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich'];
     bereiche.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             // Nutze 'flex' oder 'block' je nach Bedarf, hier ist 'block' sicher
+            // Wenn der Editor-Bereich ausgeblendet wird, Kamera stoppen
+            if (id === 'editor-box' && bereichId !== 'editor-box') {
+                if (typeof stopCameraStream === 'function') { // Sicherstellen, dass die Funktion existiert
+                    stopCameraStream();
+                }
+            }
             el.style.display = (id === bereichId) ? 'block' : 'none';
         }
     });
@@ -16,6 +23,39 @@ function zeigeBereich(bereichId) {
     if (typeof window.listeAnzeigen === "function") {
         listeAnzeigen();
     }
+}
+
+/**
+ * Spielt kurze Soundeffekte ab
+ */
+function playSound(type) {
+    const sounds = {
+        'click': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+        'win': 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3',
+        'card': 'https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3'
+    };
+    if (sounds[type]) new Audio(sounds[type]).play().catch(() => {});
+}
+
+/**
+ * Spielt Hintergrundmusik ab.
+ */
+function playBackgroundMusic(url, volume = 0.3) {
+    if (backgroundMusic) {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+    }
+    backgroundMusic = new Audio(url);
+    backgroundMusic.loop = true; // Musik soll sich wiederholen
+    backgroundMusic.volume = volume;
+    backgroundMusic.play().catch(e => console.warn("Hintergrundmusik Autoplay blockiert:", e));
+}
+
+/**
+ * Stoppt die Hintergrundmusik.
+ */
+function stopBackgroundMusic() {
+    if (backgroundMusic) backgroundMusic.pause();
 }
 
 /**
@@ -68,6 +108,32 @@ style.innerHTML = `
     .btn-confirm { background: #ef4444 !important; }
     .btn-cancel { background: #6b7280 !important; }
     .custom-modal button:hover { opacity: 0.8; }
+
+    /* Statistik Animationen */
+    .stats-container { padding: 20px; color: white; }
+    .stats-title { font-size: 2rem; margin-bottom: 30px; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+    .stat-card { 
+        background: rgba(255,255,255,0.1); 
+        margin-bottom: 15px; 
+        padding: 15px; 
+        border-radius: 15px; 
+        display: flex; 
+        align-items: center; 
+        gap: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    .stat-icon { font-size: 2.5rem; }
+    .stat-label { display: block; font-size: 0.9rem; color: #cbd5e1; }
+    .stat-value { display: block; font-size: 1.3rem; font-weight: bold; }
+    .stat-sub { font-size: 0.8rem; opacity: 0.7; }
+
+    .reveal-1 { animation: slideIn 0.5s ease forwards 0.2s; }
+    .reveal-2 { animation: slideIn 0.5s ease forwards 0.5s; }
+    .reveal-3 { animation: slideIn 0.5s ease forwards 0.8s; }
+    @keyframes slideIn { to { transform: translateY(0); opacity: 1; } }
 `;
 document.head.appendChild(style);
 
@@ -121,6 +187,8 @@ async function karteZiehen() {
     const naechsteBtn = document.getElementById('naechsteKarteBtn');
     document.getElementById('werTrinktBereich').style.display = 'none';
 
+    playSound('card'); // Sound beim Ziehen der Karte abspielen
+
     const gewähltesLevel = document.getElementById('levelInput').value;
     const antwort = await fetch(`/neue_karte?level=${gewähltesLevel}&kategorie=${aktuelleKategorie}`); 
     const daten = await antwort.json();
@@ -147,6 +215,10 @@ async function karteZiehen() {
     }
     
     let zufallsSpieler = spielerListe[aktuellerSpielerIndex];
+
+    // Statistik: Zähler für Auswahl erhöhen
+    zufallsSpieler.ausgewaehltCount = (zufallsSpieler.ausgewaehltCount || 0) + 1;
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
 
     let spielerHtml = `<span class="spieler-anzeige">`;
     if (zufallsSpieler.emoji.includes('<img')) {
@@ -201,6 +273,70 @@ function strafSchluckeVerteilen(gewaehlterIndex) {
     
     document.getElementById('werTrinktBereich').style.display = 'none';
     document.getElementById('naechsteKarteBtn').style.display = 'block';
+}
+
+function feierKonfetti() {
+    confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ef4444', '#3b82f6', '#10b981', '#f59e0b']
+    });
+}
+
+function zeigeStatistiken() {
+    const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
+
+    if (aktiveSpieler.length === 0) {
+        customAlert("Keine aktiven Spieler für Statistiken gefunden!");
+        return;
+    }
+
+    // Sound und Konfetti!
+    playSound('win');
+    feierKonfetti();
+
+    // Berechnungen für Awards
+    const meisteSchluecke = [...aktiveSpieler].sort((a, b) => (b.schluecke || 0) - (a.schluecke || 0))[0];
+    const amHaeufigstenGezogen = [...aktiveSpieler].sort((a, b) => (b.ausgewaehltCount || 0) - (a.ausgewaehltCount || 0))[0];
+    const gesamtSchluecke = aktiveSpieler.reduce((sum, s) => sum + (s.schluecke || 0), 0);
+
+    const statsHtml = `
+        <div class="stats-container">
+            <h2 class="stats-title">🏆 Abend-Resümee</h2>
+            
+            <div class="stat-card reveal-1">
+                <div class="stat-icon">🍻</div>
+                <div class="stat-info">
+                    <span class="stat-label">Promille-König</span>
+                    <span class="stat-value">${meisteSchluecke.emoji} ${meisteSchluecke.name}</span>
+                    <span class="stat-sub">${meisteSchluecke.schluecke || 0} Schlücke</span>
+                </div>
+            </div>
+
+            <div class="stat-card reveal-2">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-info">
+                    <span class="stat-label">Hauptziel</span>
+                    <span class="stat-value">${amHaeufigstenGezogen.emoji} ${amHaeufigstenGezogen.name}</span>
+                    <span class="stat-sub">${amHaeufigstenGezogen.ausgewaehltCount || 0} Mal dran gewesen</span>
+                </div>
+            </div>
+
+            <div class="stat-card reveal-3">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-info">
+                    <span class="stat-label">Gruppenleistung</span>
+                    <span class="stat-value">Eskalation pur</span>
+                    <span class="stat-sub">Insgesamt ${gesamtSchluecke} Schlücke vernichtet</span>
+                </div>
+            </div>
+            <button class="nav-btn" style="margin-top:20px;" onclick="geheZuStartMenue()">Neue Runde</button>
+        </div>
+    `;
+    document.getElementById('statistikBereich').innerHTML = statsHtml;
+    zeigeBereich('statistikBereich');
 }
 
 window.onload = initialisiereApp;

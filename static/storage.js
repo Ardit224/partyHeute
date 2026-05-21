@@ -29,7 +29,8 @@ function erstelleCharakter() {
         name: name,
         emoji: bildOderEmoji,
         schluecke: 0,
-        aktiv: true
+        aktiv: true,
+        ausgewaehltCount: 0
     };
 
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
@@ -48,11 +49,9 @@ function erstelleCharakter() {
     nameInput.value = "";
     
     // Kamera zurücksetzen
-    window.aktuellesFoto = null;
-    if(document.getElementById('photoPreview')) document.getElementById('photoPreview').style.display = "none";
-    if(document.getElementById('video')) document.getElementById('video').style.display = "none";
-    if(document.getElementById('startCameraBtn')) document.getElementById('startCameraBtn').innerText = "📸 Kamera öffnen";
-
+    if (typeof stopCameraStream === 'function') {
+        stopCameraStream(); // Stoppt den Stream und setzt die UI zurück
+    }
     listeAnzeigen();
 }
 
@@ -127,7 +126,10 @@ function charakterBearbeiten(index) {
 function punkteResetten() {
     customConfirm("Alle Schlücke auf 0 setzen? Seid ihr wieder nüchtern? 🍺", () => {
         let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
-        spielerListe.forEach(s => s.schluecke = 0);
+        spielerListe.forEach(s => {
+            s.schluecke = 0;
+            s.ausgewaehltCount = 0;
+        });
         localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
         listeAnzeigen();
       });

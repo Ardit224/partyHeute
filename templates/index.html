@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Google Fonts für das schicke Design -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Konfetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -19,6 +21,7 @@
                 <button class="nav-btn" onclick="geheZuGarderobe()">👗 Garderobe <br><small>Spieler verwalten</small></button>
                 <button class="nav-btn" onclick="geheZuSpiele()">🎮 Spiele starten <br><small>Viel Spaß!</small></button>
             </div>
+            
         </div>
 
         <!-- 2. GARDEROBE (Charakter-Editor) -->
@@ -40,7 +43,7 @@
             
             <p style="font-size: 0.9em; color: #94a3b8; margin-top: 15px;">Oder mach ein Foto:</p>
             <div class="camera-section">
-                <video id="video" width="150" height="150" autoplay style="display: none; border-radius: 50%; object-fit: cover; margin: 0 auto;"></video>
+                <video id="video" width="150" height="150" autoplay playsinline muted style="display: none; border-radius: 50%; object-fit: cover; margin: 0 auto;"></video>
                 <canvas id="canvas" width="150" height="150" style="display: none;"></canvas>
                 <img id="photoPreview" src="" alt="Foto Vorschau" style="display: none; width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto;">
                 
@@ -65,6 +68,7 @@
                     <option value="2" selected>Normal (2-4 Schlücke)</option>
                     <option value="3">Hardcore (3-6 Schlücke)</option>
                 </select>
+                <button onclick="zeigeStatistiken()">Spiel beenden & Stats zeigen</button>
             </div>
             <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
             <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
@@ -98,7 +102,8 @@
         <div id="countdownBereich" style="display: none;">
             <h2>Countdown Spiel</h2>
             <p id="countdownStatus"></p>
-            <div style="margin: 20px auto; width: 300px; height: 300px;">
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
                 <canvas id="rouletteWheel" width="300" height="300"></canvas>
             </div>
             <p id="countdownErgebnis" style="font-weight: bold; font-size: 1.2em;"></p>
@@ -120,5 +125,6 @@
     <script src="{{ url_for('static', filename='storage.js') }}"></script>
     <script src="{{ url_for('static', filename='roulette.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div id="statistikBereich" style="display: none;"></div>
 </body>
 </html>

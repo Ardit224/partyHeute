@@ -83,7 +83,7 @@ function radZeichnen() {
         
         const avatarContent = preloadedPlayerAvatars[i];
 
-        const avatarSize = 55; // Deutlich größer für bessere Sichtbarkeit
+        const avatarSize = 70; // Deutlich größer für bessere Sichtbarkeit
         const xPos = radius * 0.65; // Positionierung im äußeren Drittel des Rads
 
         if (avatarContent instanceof Image && avatarContent.complete && avatarContent.naturalHeight !== 0) {
@@ -103,7 +103,7 @@ function radZeichnen() {
             ctx.stroke();
         } else {
             // Emojis ebenfalls deutlich größer darstellen
-            ctx.font = "50px Arial";
+            ctx.font = "60px Arial"; // Emojis auch größer machen
             ctx.fillText(avatarContent || "❓", xPos, 0);
         }
         ctx.restore();
@@ -111,6 +111,14 @@ function radZeichnen() {
 }
 
 // Dreht das Rad
+// Helper function to get a displayable avatar for text content (not HTML)
+function getAvatarForTextDisplay(player) {
+    if (player.emoji && player.emoji.startsWith('<img src="')) {
+        return "📸"; // Use a camera emoji as a placeholder for images in text
+    }
+    return player.emoji || "❓"; // Return the emoji itself, or a default if none
+}
+
 function radDrehen() {
     // 1. Opfer per Zufall bestimmen
     let opferIndex = Math.floor(Math.random() * countdownPot.length);
@@ -125,8 +133,8 @@ function radDrehen() {
     // Um das Segment unter den Pfeil zu bekommen, muss der Mittelpunkt des Segments auf 0 Grad zeigen.
     let zielGrad = 360 - (opferIndex * stueckGrad) - (stueckGrad / 2);
     
-    // Wir fügen 5 volle Umdrehungen (1800 Grad) als Show-Effekt hinzu
-    let drehWinkel = zielGrad + 1800;
+    // Wir fügen 8 volle Umdrehungen (2880 Grad) für mehr Action bei 6 Sek. hinzu
+    let drehWinkel = zielGrad + 2880;
     aktuellerWinkel += drehWinkel;
 
     // 3. CSS-Animation starten
@@ -134,14 +142,19 @@ function radDrehen() {
     document.getElementById('countdownErgebnis').innerText = "Spannung...";
     document.getElementById('countdownErgebnis').style.color = "white";
 
+    if (typeof playBackgroundMusic === "function") {
+        // Spannende Musik (Drumroll/Spannungs-Sound) starten
+        playBackgroundMusic('https://assets.mixkit.co/active_storage/sfx/514/514-preview.mp3', 0.6); 
+    }
+
     const canvas = document.getElementById('rouletteWheel');
-    canvas.style.transition = 'transform 4s cubic-bezier(0.25, 0.1, 0.25, 1)'; // Wird am Ende langsamer
+    canvas.style.transition = 'transform 6s cubic-bezier(0.2, 0.1, 0.15, 1)'; // Länger und weicherer Auslauf
     canvas.style.transform = `rotate(${aktuellerWinkel}deg)`;
 
-    // 4. Warten, bis das Rad steht (4 Sekunden), dann Ergebnis verarbeiten
+    // 4. Warten, bis das Rad steht (6 Sekunden), dann Ergebnis verarbeiten
     setTimeout(() => {
         // Ergebnis anzeigen
-        document.getElementById('countdownErgebnis').innerText = `💥 ${opfer.emoji} ${opfer.name} trinkt ${aktuelleCountdownSchluecke} 🍺!`;
+        document.getElementById('countdownErgebnis').innerText = `💥 ${getAvatarForTextDisplay(opfer)} ${opfer.name} trinkt ${aktuelleCountdownSchluecke} 🍺!`;
         document.getElementById('countdownErgebnis').style.color = "#ef4444";
 
         // Schlücke buchen
@@ -149,6 +162,7 @@ function radDrehen() {
         let echterSpieler = alleSpieler.find(s => s.name === opfer.name && s.emoji === opfer.emoji);
         if(echterSpieler) {
             echterSpieler.schluecke += aktuelleCountdownSchluecke;
+            echterSpieler.ausgewaehltCount = (echterSpieler.ausgewaehltCount || 0) + 1;
             localStorage.setItem('partySpieler', JSON.stringify(alleSpieler));
             listeAnzeigen(); 
         }
@@ -163,7 +177,12 @@ function radDrehen() {
         if (countdownPot.length === 1) {
             let gewinner = countdownPot[0];
             document.getElementById('countdownStatus').innerText = "Spiel vorbei!";
-            document.getElementById('countdownErgebnis').innerText = `🏆 ${gewinner.emoji} ${gewinner.name} hat überlebt!`;
+            
+            if (typeof feierKonfetti === "function") {
+                feierKonfetti();
+                playSound('win');
+            }
+            document.getElementById('countdownErgebnis').innerText = `🏆 ${getAvatarForTextDisplay(gewinner)} ${gewinner.name} hat überlebt!`;
             document.getElementById('countdownErgebnis').style.color = "#10b981";
             radZeichnen(); // Letztes Rad malen (ein einziges riesiges Tortenstück)
         } else {
@@ -177,11 +196,15 @@ function radDrehen() {
         aktuellerWinkel = zielGrad;
         canvas.style.transform = `rotate(${aktuellerWinkel}deg)`;
         
-    }, 4000); // 4000 Millisekunden = 4 Sekunden Wartezeit
+        // Musik stoppen, sobald das Rad steht
+        if (typeof stopBackgroundMusic === "function") stopBackgroundMusic();
+        
+    }, 6000); // Auf 6000 Millisekunden erhöht
 }
 
 function zurueckZumMenueAusCountdown() {
     if (typeof zurueckZumHauptMenue === "function") {
+        if (typeof stopBackgroundMusic === "function") stopBackgroundMusic();
         zurueckZumHauptMenue();
     }
 }
