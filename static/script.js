@@ -5,7 +5,7 @@ let backgroundMusic = null; // Globale Variable für die Hintergrundmusik
 let isMuted = localStorage.getItem('partyMuted') === 'true';
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich'];
     
     // Musik stoppen, sobald der Bereich gewechselt wird (Knopf gedrückt)
     stopBackgroundMusic();
@@ -66,7 +66,6 @@ function playBackgroundMusic(url, volume = 0.15) {
  * Stoppt die Hintergrundmusik.
  */
 function stopBackgroundMusic() {
-    if (backgroundMusic) backgroundMusic.pause();
     if (backgroundMusic) {
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0; // Setzt den Song an den Anfang zurück
@@ -173,6 +172,38 @@ style.innerHTML = `
     .reveal-2 { animation: slideIn 0.5s ease forwards 0.5s; }
     .reveal-3 { animation: slideIn 0.5s ease forwards 0.8s; }
     @keyframes slideIn { to { transform: translateY(0); opacity: 1; } }
+
+    /* Shot Roulette Card Design */
+    .shot-card { background: rgba(255, 255, 255, 0.1); border: 2px solid #ef4444; border-radius: 20px; padding: 30px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2); max-width: 400px; margin: 0 auto; }
+    .shot-task-box { min-height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; line-height: 1.4; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); border-top: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
+
+    /* Rad-Zentrierung & Fix für den schwarzen Kreis */
+    .wheel-wrapper { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        position: relative; 
+        margin: 30px auto; 
+        width: 300px; 
+        height: 300px; 
+        background: transparent;
+    }
+    #rouletteWheel { 
+        border-radius: 50%; 
+        background: transparent; 
+        box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+    }
+
+    /* Getränke-Steuerung auf der Karte */
+    .drink-controls { display: flex; justify-content: center; gap: 8px; margin-top: 8px; }
+    .drink-btn { border: none; border-radius: 8px; padding: 4px 10px; color: white; cursor: pointer; font-weight: bold; font-size: 0.9rem; transition: transform 0.1s; }
+    .drink-btn.plus { background-color: #10b981; }
+    .drink-btn.minus { background-color: #ef4444; }
+    .drink-btn:active { transform: scale(0.9); }
+
+    /* Globale Avatar-Anpassung für die Auswahlmenüs */
+    .avatar-wrapper { display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin: 0 auto; }
+    .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 `;
 document.head.appendChild(style);
 
@@ -225,7 +256,8 @@ function zufallsSpielWaehlen() {
         { name: "🎯 Aufgaben", color: "#3b82f6", action: () => kategorieWaehlen('aufgaben') },
         { name: "🤫 Ich hab noch nie...", color: "#f59e0b", action: () => kategorieWaehlen('ich_hab_noch_nie') },
         { name: "🕵️ Paranoia", color: "#10b981", action: () => typeof starteParanoia === 'function' ? starteParanoia() : null },
-        { name: "🎡 Countdown", color: "#8b5cf6", action: () => typeof starteCountdownSpiel === 'function' ? starteCountdownSpiel() : null }
+        { name: "🎡 Countdown", color: "#8b5cf6", action: () => typeof starteCountdownSpiel === 'function' ? starteCountdownSpiel() : null },
+        { name: "🥃 Shot Roulette", color: "#ef4444", action: () => typeof starteShotRoulette === 'function' ? starteShotRoulette() : null }
     ];
 
     const overlay = document.getElementById('randomSelectionOverlay');
@@ -272,6 +304,18 @@ function zurueckZumHauptMenue() {
 window.getraenkHinzufuegen = function(index) {
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
     spielerListe[index].getraenkeCount = (spielerListe[index].getraenkeCount || 0) + 1;
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+    playSound('click');
+    if (typeof window.listeAnzeigen === "function") window.listeAnzeigen();
+};
+
+window.getraenkAbziehen = function(index) {
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    if (spielerListe[index].getraenkeCount > 0) {
+        spielerListe[index].getraenkeCount -= 1;
+    } else {
+        spielerListe[index].getraenkeCount = 0;
+    }
     localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
     playSound('click');
     if (typeof window.listeAnzeigen === "function") window.listeAnzeigen();

@@ -83,6 +83,7 @@
                 <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
                 <button onclick="starteParanoia()" style="background-color: #10b981;">🕵️ Paranoia</button>
                 <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown</button>
+                <button onclick="starteShotRoulette()" style="background-color: #ef4444;">🥃 Shot Roulette</button>
                 <button onclick="zufallsSpielWaehlen()" style="background: var(--secondary);">🎲 Zufall</button>
             </div>
             <button onclick="geheZuStartMenue()" style="background-color: #4b5563;">Zurück zum Menü</button>
@@ -148,6 +149,28 @@
             <button onclick="zurueckZumMenueAusCountdown()" style="background-color: #4b5563;">Zurück zur Spielauswahl</button>
         </div>
 
+        <!-- SHOT ROULETTE BEREICH -->
+        <div id="shotRouletteBereich" style="display: none;">
+            <div class="shot-card">
+                <h1 style="margin-bottom: 20px;">🎰 Shot-Roulette 🎰</h1>
+                
+                <div id="shotTaskContainer" class="shot-task-box">
+                    <p id="shotTaskText">Lade Schicksal...</p>
+                </div>
+
+                <!-- Bereich für die manuelle Auswahl der Trinker -->
+                <div id="shotSelectionArea" style="display: none; margin-top: 15px;">
+                    <p style="font-size: 0.8rem; margin-bottom: 8px; opacity: 0.8;">Wer hat getrunken? (Anklicken zum Buchen)</p>
+                    <div id="shotPlayerGrid" class="spieler-grid" style="max-height: 250px; overflow-y: auto; padding: 5px;"></div>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 10px;">
+                    <button id="shotNextBtn" class="nav-btn" style="background-color: #ef4444; font-size: 1.2rem; padding: 15px;" onclick="naechsteShotRunde()">Nächste Runde 🃏</button>
+                    <button class="nav-btn" style="background-color: #4b5563;" onclick="zurueckZumHauptMenue()">Spiel beenden</button>
+                </div>
+            </div>
+        </div>
+
         <hr style="margin-top: 30px; border: 0; border-top: 1px solid var(--border);">
 
         <!-- GLOBALE SPIELERLISTE (Wird immer unten drunter angezeigt) -->
@@ -162,6 +185,7 @@
     <script src="{{ url_for('static', filename='storage.js') }}"></script>
     <script src="{{ url_for('static', filename='roulette.js') }}"></script>
     <script src="{{ url_for('static', filename='paranoia.js') }}"></script>
+    <script src="{{ url_for('static', filename='shot_roulette.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <div id="statistikBereich" style="display: none;"></div>
 </body>

@@ -65,25 +65,15 @@ function listeAnzeigen() {
     
     // Prüfen, ob wir uns in der Garderobe befinden
     const istGarderobe = document.getElementById('editor-box') && document.getElementById('editor-box').style.display !== 'none';
-    // Prüfen, ob wir in einem aktiven Spielmodus sind
-    const istImSpiel = ['spielBereich', 'countdownBereich', 'paranoiaBereich'].includes(
-        document.querySelector('.container > div[style*="display: block"]')?.id);
 
     gespeicherteSpieler.forEach((spieler, index) => {
         let extraKlasse = (spieler.aktiv !== false) ? "" : "spieler-inaktiv";
 
-        // Buttons nur anzeigen, wenn wir in der Garderobe sind
         const actionButtons = istGarderobe ? `
             <div class="charakter-actions">
                 <button class="action-btn edit" onclick="event.stopPropagation(); charakterBearbeiten(${index})">✏️</button>
                 <button class="action-btn delete" onclick="event.stopPropagation(); charakterLoeschen(${index})">🗑️</button>
             </div>` : "";
-
-        // Getränke-Plus-Button nur im Spiel anzeigen
-        const drinkPlusBtn = istImSpiel ? `
-            <button class="drink-plus-btn" onclick="event.stopPropagation(); window.getraenkHinzufuegen(${index})">
-                +🍺
-            </button>` : "";
 
         listenBereich.innerHTML += `
             <div class="spieler-karte ${extraKlasse}" onclick="spielerTogglen(${index})">
@@ -92,7 +82,10 @@ function listeAnzeigen() {
                     ${spieler.emoji}
                 </div>
                 ${spieler.emoji.includes('<img') ? '' : `<span class="spieler-name">${spieler.name}</span>`}
-                ${drinkPlusBtn}
+                <div class="drink-controls">
+                    <button class="drink-btn minus" onclick="event.stopPropagation(); window.getraenkAbziehen(${index})">-</button>
+                    <button class="drink-btn plus" onclick="event.stopPropagation(); window.getraenkHinzufuegen(${index})">+🍺</button>
+                </div>
                 <div style="display: flex; justify-content: center; gap: 4px; margin-top: 5px;">
                     <span class="schluck-anzahl" title="Schlücke">${spieler.schluecke || 0} 🥤</span>
                     <span class="getraenke-anzahl" title="Getränke">${spieler.getraenkeCount || 0} 🍺</span>

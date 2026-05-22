@@ -23,6 +23,7 @@ function starteCountdownSpiel() {
     
     document.getElementById('countdownErgebnis').innerText = "";
     document.getElementById('countdownZiehenBtn').style.display = 'inline-block';
+    document.getElementById('countdownZiehenBtn').innerText = "Rad drehen! 🎡";
     
     statusUpdaten();
     zeichneRad();
@@ -49,7 +50,7 @@ function zeichneRad() {
         // Segment zeichnen
         ctx.beginPath();
         ctx.moveTo(radius, radius);
-        ctx.arc(radius, radius, radius - 5, startWinkel, endWinkel);
+        ctx.arc(radius, radius, radius, startWinkel, endWinkel);
         ctx.fillStyle = farben[i % farben.length];
         ctx.fill();
         ctx.strokeStyle = "rgba(255,255,255,0.2)";
@@ -62,19 +63,37 @@ function zeichneRad() {
         ctx.rotate(startWinkel + winkelProSegment / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "white";
-        ctx.font = "bold 14px Inter";
-        const nameText = spieler.name.length > 8 ? spieler.name.substring(0, 7) + ".." : spieler.name;
-        const displayStr = spieler.emoji.includes('<img') ? "📸" : `${spieler.emoji} ${nameText}`;
-        ctx.fillText(displayStr, radius - 20, 5);
+        if (spieler.emoji.includes('<img')) {
+            const imgSrcMatch = spieler.emoji.match(/src=["']([^"']+)["']/);
+            if (imgSrcMatch && imgSrcMatch[1]) {
+                const img = new Image();
+                img.src = imgSrcMatch[1];
+                try {
+                    // Bild deutlich größer auf dem Rad (50x50)
+                    ctx.drawImage(img, radius - 65, -25, 50, 50);
+                } catch(e) {}
+            }
+        } else {
+            // Name auch bei Emojis entfernt, dafür Emojis größer
+            ctx.font = "30px Inter";
+            ctx.fillText(spieler.emoji, radius - 25, 10);
+        }
         ctx.restore();
     });
 }
 
 function getSpielerDisplayHtml(player) {
-    if (player.emoji && player.emoji.includes('<img')) {
-        return `<span class="spieler-anzeige">${player.emoji}</span>`;
-    }
-    return `<span class="spieler-anzeige"><span class="emoji-display">${player.emoji}</span> <span class="spieler-name-display">${player.name}</span></span>`;
+    const istFoto = player.emoji && player.emoji.includes('<img');
+    return `
+        <div style="display: flex; flex-direction: column; align-items: center; margin: 15px 0;">
+            <div class="avatar-wrapper" style="width: 120px; height: 120px; font-size: 4rem;">
+                ${player.emoji}
+            </div>
+            ${istFoto ? '' : `
+                <span class="spieler-name-display" style="font-size: 1.2rem; font-weight: bold; margin-top: 8px;">${player.name}</span>
+            `}
+        </div>
+    `;
 }
 
 function radDrehen() {
@@ -103,7 +122,7 @@ function radDrehen() {
         playSound('win');
         document.getElementById('countdownErgebnis').innerHTML = `🎯 ${getSpielerDisplayHtml(opfer)} muss trinken!`;
         document.getElementById('countdownErgebnis').style.color = "#ef4444";
-        
+
         // Schlucke buchen
         bucheSchluecke(opfer);
 
