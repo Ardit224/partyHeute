@@ -5,9 +5,29 @@ let backgroundMusic = null; // Globale Variable für die Hintergrundmusik
 let isMuted = localStorage.getItem('partyMuted') === 'true';
 let isGemischteRunde = false;
 let aktiveRundenAufgaben = [];
+let taskIndexForDrinkSelection = -1; // Trackt, für welche laufende Regel gerade Schlücke verteilt werden
+let mixedModePool = []; // Der Stapel für die gemischte Runde
+let handyWechselCounter = 0;
+
+const suddenEvents = [
+    "🚨 EX UND HOPP! Alle Spieler leeren sofort ihr aktuelles Getränk ohne Ausnahme!",
+    "💀 KRIEGSERKLÄRUNG! {p1} muss ein neues, volles Getränk auf Ex leeren ODER eine Person bestimmen, die stattdessen 2 Shots trinkt.",
+    "⚡ BLITZ-KRIEG! Der Letzte, der aufsteht und strammsteht, muss 5 Schlücke trinken!",
+    "🔄 GLÄSER-TAUSCH! Alle müssen ihr Getränk sofort mit der Person zu ihrer Linken tauschen und dieses in den nächsten 3 Runden trinken.",
+    "💣 BOMBEN-ALARM! {p1} ist die Bombe. Die Person muss 2 Runden lang schweigen. Wer sie zum Reden bringt, darf 10 Schlücke verteilen!",
+    "🤴 KÖNIGSWORT! {p1} ist für die nächsten 5 Runden der König. Alle müssen bei Antworten 'Eure Majestät' sagen, sonst: 2 Schlücke!",
+    "🎭 MIME-MEISTER! {p1} darf ab jetzt 3 Runden lang nicht mehr sprechen. Alles muss mit Händen und Füßen erklärt werden. Wer ihn anspricht, trinkt 2 Schlücke!",
+    "📵 HANDY-VERBOT! Alle Handys müssen in die Mitte. Wer seins als Erster berührt, bevor 4 Runden um sind, leert sein Glas!",
+    "🤫 FLÜSTER-POST! Ab jetzt darf für 4 Runden nur noch geflüstert werden. Wer laut spricht: 3 Schlücke!",
+    "👯 ZWILLINGS-FLUCH! {p1} wählt einen Zwilling. Wann immer einer von beiden trinkt, muss der andere auch trinken (für 5 Runden)!",
+    "🧊 EISZEIT! Alle müssen einfrieren (Freeze), sobald {p1} das Wort 'Eis' sagt. Der Letzte, der sich bewegt, trinkt 4 Schlücke (3 Runden aktiv)!",
+    "👺 BELEIDIGUNGS-MODUS! {p1} muss 3 Runden lang jeden Satz mit einer netten Beleidigung gegen die Gruppe beenden, sonst: 2 Schlücke!",
+    "🕺 TANZZWANG! {p1} muss jedes Mal, wenn jemand 'Prost' sagt, kurz aufstehen und tanzen (für 4 Runden). Versäumnis: 3 Schlücke!",
+    "🧐 DER PROFESSOR! {p1} darf 3 Runden lang keine Fragen mehr beantworten. Wer ihn trotzdem fragt, trinkt 2 Schlücke!"
+];
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich'];
     
     // Musik stoppen, sobald der Bereich gewechselt wird (Knopf gedrückt)
     stopBackgroundMusic();
@@ -46,6 +66,13 @@ function playSound(type) {
         const audio = new Audio(sounds[type]);
         audio.volume = 0.4; // Lautstärke für Effekte reduziert
         audio.play().catch(() => {});
+        
+        // Haptisches Feedback für mobile Geräte
+        if ("vibrate" in navigator) {
+            if (type === 'shot') navigator.vibrate([100, 50, 100]); // Doppel-Vibration
+            else if (type === 'win') navigator.vibrate(50);         // Kurzer Stoß
+            else if (type === 'card') navigator.vibrate(20);        // Fast unmerklich
+        }
     }
 }
 
@@ -219,6 +246,33 @@ style.innerHTML = `
     .runden-badge { background: #f59e0b; color: #1e293b; padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; display: inline-block; margin-bottom: 8px; }
     .runden-fail-btn { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; padding: 8px; cursor: pointer; font-size: 0.85rem; margin-top: 10px; width: 100%; transition: all 0.2s; }
     .runden-fail-btn:hover { background: rgba(239, 68, 68, 0.4); color: white; }
+
+    /* Karten-Animationen */
+    .card-enter-anim {
+        animation: cardSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes cardSlideUp {
+        from { opacity: 0; transform: translateY(30px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .special-card-pulse {
+        animation: pulseBorder 2s infinite;
+    }
+    @keyframes pulseBorder {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Zeitbombe & Explosion */
+    .theme-zeitbombe { background: radial-gradient(circle, #450a0a, #000) !important; border: 2px solid #f97316 !important; }
+    .explosion-flash { animation: flashScreen 0.2s 5; }
+    @keyframes flashScreen { 0%, 100% { background: transparent; } 50% { background: #ef4444; } }
+    
+    .bomb-category-box { background: rgba(249, 115, 22, 0.1); border: 2px dashed #f97316; border-radius: 15px; padding: 20px; margin: 20px 0; font-size: 1.2rem; }
+
+    /* Handy Wechsel */
+    .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: 20px; padding: 40px; text-align: center; }
 `;
 document.head.appendChild(style);
 
@@ -266,8 +320,44 @@ function kategorieWaehlen(kategorie) {
     karteZiehen();
 }
 
+/**
+ * Füllt den Stapel für die gemischte Runde neu und mischt ihn,
+ * um eine gleichmäßige Verteilung der Spiele zu garantieren.
+ */
+function refillMixedModePool() {
+    // Alle Spiele werden mit absolut gleicher Häufigkeit in den Pool gelegt
+    const categories = [
+        'aufgaben', 
+        'wer_wuerde_eher', 
+        'ich_hab_noch_nie', 
+        'paranoia',
+        'countdown',
+        'shot_roulette',
+        'virus',
+        'sudden_event',
+        'tribunal'
+    ];
+    
+    // Wir erstellen einen größeren Pool (z.B. 24 Karten), damit die Mischung besser ist
+    let fullPool = [];
+    for(let i = 0; i < 3; i++) {
+        fullPool = fullPool.concat(categories);
+    }
+    
+    // Fisher-Yates Shuffle für echten Zufall ohne Wiederholungs-Pech
+    mixedModePool = fullPool.sort(() => Math.random() - 0.5);
+}
+
 function starteGemischteRunde() {
     isGemischteRunde = true;
+    zeigeBereich('spielBereich');
+    karteZiehen();
+}
+
+/**
+ * Hilfsfunktion um aus Spezial-Modi wieder in den Mix zu springen
+ */
+function geheZurueckZumMix() {
     zeigeBereich('spielBereich');
     karteZiehen();
 }
@@ -278,13 +368,17 @@ function aktualisiereKartenOptik(kat) {
     const labelEl = document.getElementById('gameTypeLabel');
 
     // Alle Themes entfernen
-    spielBox.classList.remove('theme-wer_wuerde_eher', 'theme-aufgaben', 'theme-ich_hab_noch_nie', 'theme-paranoia');
+    spielBox.classList.remove('theme-wer_wuerde_eher', 'theme-aufgaben', 'theme-ich_hab_noch_nie', 'theme-paranoia', 'theme-sudden-event', 'theme-virus', 'theme-tribunal', 'theme-zeitbombe');
 
     const configs = {
         'wer_wuerde_eher': { icon: '🤔', label: 'Wer würde eher...', class: 'theme-wer_wuerde_eher' },
         'aufgaben': { icon: '🎯', label: 'Aufgabe', class: 'theme-aufgaben' },
         'ich_hab_noch_nie': { icon: '🤫', label: 'Ich hab noch nie...', class: 'theme-ich_hab_noch_nie' },
-        'paranoia': { icon: '🕵️', label: 'Paranoia', class: 'theme-paranoia' }
+        'paranoia': { icon: '🕵️', label: 'Paranoia', class: 'theme-paranoia' },
+        'virus': { icon: '☣️', label: 'INFEKTION!', class: 'theme-virus' },
+        'tribunal': { icon: '⚖️', label: 'DAS TRIBUNAL', class: 'theme-tribunal' },
+        'zeitbombe': { icon: '💣', label: 'ZEITBOMBE', class: 'theme-zeitbombe' },
+        'sudden_event': { icon: '🚨', label: '⚠️ EXTREM-EVENT!', class: 'theme-sudden-event' }
     };
 
     const current = configs[kat] || configs['aufgaben'];
@@ -372,22 +466,61 @@ async function karteZiehen() {
     // Jede neue Karte verringert die Runden der aktiven Aufgaben
     verarbeiteRundenTick();
 
+    // Sudden Explosion Chance (ca. 4% - passiert unvorhersehbar)
+    if (isGemischteRunde && Math.random() < 0.04) {
+        if (typeof triggerSuddenExplosion === 'function') {
+            triggerSuddenExplosion();
+            return;
+        }
+    }
+
+    // Handy-Wechsel alle 8 Karten
+    handyWechselCounter++;
+    if (isGemischteRunde && handyWechselCounter >= 8) {
+        handyWechselCounter = 0;
+        if (typeof zeigeHandyWechsel === 'function') {
+            zeigeHandyWechsel();
+            return;
+        }
+    }
+
     if (isGemischteRunde) {
-        // Master-Zufallsgenerator für die gemischte Runde
-        const rand = Math.random();
-        if (rand < 0.35) {
-            aktuelleKategorie = 'aufgaben';
-        } else if (rand < 0.65) {
-            aktuelleKategorie = 'wer_wuerde_eher';
-        } else if (rand < 0.85) {
-            aktuelleKategorie = 'ich_hab_noch_nie';
-        } else {
-            // 15% Chance auf Shot Roulette
-            if (typeof starteShotRoulette === 'function') {
-                starteShotRoulette();
-                return; // Beendet karteZiehen, da Shot Roulette eigenen Screen hat
+        // Prüfen ob der Stapel leer ist
+        if (mixedModePool.length === 0) {
+            refillMixedModePool();
+        }
+
+        // Karte vom Stapel ziehen
+        aktuelleKategorie = mixedModePool.pop();
+
+        // Spezial-Logik für Spiele mit eigenem UI oder speziellen Start-Funktionen
+        if (aktuelleKategorie === 'virus') {
+            if (typeof zeigeVirusEventAufKarte === 'function') {
+                const virus = neuerVirus(true);
+                if (virus) {
+                    zeigeVirusEventAufKarte(virus);
+                    return;
+                }
             }
-            aktuelleKategorie = 'aufgaben';
+            aktuelleKategorie = 'aufgaben'; 
+        } else if (aktuelleKategorie === 'sudden_event') {
+            zeigeSuddenEvent();
+            return;
+        } else if (aktuelleKategorie === 'shot_roulette') {
+            starteShotRoulette();
+            return;
+        } else if (aktuelleKategorie === 'paranoia') {
+            starteParanoia();
+            return;
+        } else if (aktuelleKategorie === 'tribunal') {
+            if (typeof starteTribunalMixed === 'function') {
+                starteTribunalMixed();
+                return;
+            }
+            aktuelleKategorie = 'wer_wuerde_eher';
+        } else if (aktuelleKategorie === 'countdown') {
+            starteCountdownSpiel();
+            return;
         }
     }
 
@@ -439,6 +572,12 @@ async function karteZiehen() {
     const frageElement = document.getElementById('frageText');
     frageElement.innerHTML = fertigeFrage;
     
+    // Animation triggern
+    const spielBox = document.getElementById('spielBereich');
+    spielBox.classList.remove('card-enter-anim');
+    void spielBox.offsetWidth; // Reflow
+    spielBox.classList.add('card-enter-anim');
+
     frageElement.classList.remove('karten-animation');
     void frageElement.offsetWidth; 
     frageElement.classList.add('karten-animation');
@@ -458,6 +597,86 @@ async function karteZiehen() {
 }
 
 /**
+ * Zeigt den Screen zum Handy-Weitergeben
+ */
+function zeigeHandyWechsel() {
+    const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
+    const zielSpieler = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
+    
+    zeigeBereich('handyWechselBereich');
+    playSound('card');
+
+    const display = document.getElementById('handyWechselDisplay');
+    const avatar = zielSpieler.emoji.includes('<img') ? zielSpieler.emoji : `<span style="font-size: 5rem;">${zielSpieler.emoji}</span>`;
+    
+    display.innerHTML = `
+        <div class="avatar-wrapper" style="width: 150px; height: 150px; margin-bottom: 20px;">${avatar}</div>
+        <h1 style="font-size: 2.5rem;">ÜBERGABE!</h1>
+        <p style="font-size: 1.5rem;">Reich das Handy weiter an:</p>
+        <h2 style="color: #6366f1; font-size: 3rem;">${zielSpieler.name}</h2>
+    `;
+}
+
+function starteZeitbombeMixed() {
+    isGemischteRunde = true;
+    zeigeBereich('zeitbombeBereich');
+    resetBombUI();
+    startBombLogic();
+}
+
+/**
+ * Zeigt ein Sudden Event (Extrem-Ereignis) an mit Jump-Scare Effekt
+ */
+function zeigeSuddenEvent() {
+    const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
+    
+    const eventTemplate = suddenEvents[Math.floor(Math.random() * suddenEvents.length)];
+    const p1 = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
+    
+    const renderName = (s) => `<span style="color: #ef4444; font-weight: bold;">${s.name}</span>`;
+    let fertigesEvent = eventTemplate.replace(/{p1}/g, renderName(p1));
+
+    aktualisiereKartenOptik('sudden_event');
+    playSound('shot');
+    
+    // Jump-Scare Screen Shake Effekt
+    const container = document.querySelector('.container');
+    container.classList.add('shake-anim');
+    setTimeout(() => container.classList.remove('shake-anim'), 500);
+
+    const frageElement = document.getElementById('frageText');
+    frageElement.innerHTML = fertigesEvent;
+
+    // Runden & Schlücke für das Tracking extrahieren
+    const rundenMatch = fertigesEvent.match(/(\d+)\s*Runden/i);
+    const schlueckeMatch = fertigesEvent.match(/(\d+)\s*Schlücke/i);
+    const gefundeneSchluecke = schlueckeMatch ? parseInt(schlueckeMatch[1]) : 2;
+
+    if (rundenMatch) {
+        const rundenAnzahl = parseInt(rundenMatch[1]);
+        document.getElementById('entscheidungsBereich').style.display = 'flex';
+        document.getElementById('failBtn').innerHTML = `🔥 Regel aktivieren!`;
+        document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(p1, fertigesEvent, rundenAnzahl, gefundeneSchluecke, true);
+        document.getElementById('naechsteKarteBtn').style.display = 'none';
+        document.getElementById('strafeText').innerText = `⚠️ Regel aktiv für ${rundenAnzahl} Runden!`;
+    } else {
+        document.getElementById('entscheidungsBereich').style.display = 'none';
+        document.getElementById('naechsteKarteBtn').style.display = 'block';
+        document.getElementById('strafeText').innerText = "🚨 ALARM! KEINE AUSREDEN!";
+    }
+    
+    // Card Animation triggern
+    const spielBox = document.getElementById('spielBereich');
+    spielBox.classList.remove('card-enter-anim');
+    void spielBox.offsetWidth; // Reflow
+    spielBox.classList.add('card-enter-anim');
+
+    if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 500]);
+}
+
+/**
  * Entscheidet je nach Kategorie, ob eine Liste gezeigt wird oder direkt gebucht wird
  */
 function trinkenBestätigen() {
@@ -471,15 +690,16 @@ function trinkenBestätigen() {
     }
 }
 
-function rundenAufgabeStarten(spieler, text, runden, schluecke) {
+function rundenAufgabeStarten(spieler, text, runden, schluecke, isGlobal = false) {
     playSound('win');
     const aufgabe = {
         id: Date.now(),
         spielerName: spieler.name,
         spielerEmoji: spieler.emoji,
-        text: text.replace("[SPIELER]", spieler.name),
+        text: isGlobal ? text : text.replace("[SPIELER]", spieler.name),
         restRunden: runden,
-        schluecke: schluecke
+        schluecke: schluecke,
+        isGlobal: isGlobal
     };
     aktiveRundenAufgaben.push(aufgabe);
     
@@ -496,6 +716,9 @@ function verarbeiteRundenTick() {
     // Automatisch entfernen, wenn die Zeit um ist
     aktiveRundenAufgaben = aktiveRundenAufgaben.filter(task => task.restRunden > 0);
     updateRundenAufgabenUI();
+    
+    // Viren ticken lassen
+    if (typeof virusTick === 'function') virusTick();
 }
 
 function updateRundenAufgabenUI() {
@@ -506,16 +729,43 @@ function updateRundenAufgabenUI() {
     
     aktiveRundenAufgaben.forEach((task, index) => {
         const statusText = `${task.restRunden} ${task.restRunden === 1 ? 'Runde' : 'Runden'} übrig`;
-        
+        const isGlobal = task.isGlobal === true;
+
         container.innerHTML += `
-            <div class="runden-task-card">
-                <span class="runden-badge">${statusText}</span>
-                <div style="margin-bottom: 5px;"><strong>${task.spielerEmoji} ${task.spielerName}</strong></div>
+            <div class="runden-task-card" style="${isGlobal ? 'border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1);' : ''}">
+                <span class="runden-badge" style="${isGlobal ? 'background: #ef4444; color: white;' : ''}">${statusText}</span>
+                <div style="margin-bottom: 5px;">
+                    <strong>${isGlobal ? '🚨 GLOBALE REGEL' : `${task.spielerEmoji} ${task.spielerName}`}</strong>
+                </div>
                 <div style="opacity: 0.9; line-height: 1.4;">${task.text}</div>
-                <button class="runden-fail-btn" onclick="rundenTaskFehlgeschlagen(${index})">❌ Versagt (+${task.schluecke} 🥤)</button>
+                <button class="runden-fail-btn" onclick="${isGlobal ? `rundenTaskGlobalVersagt(${index})` : `rundenTaskFehlgeschlagen(${index})`}">
+                    ${isGlobal ? '❌ Jemand hat versagt' : '❌ Versagt'} (+${task.schluecke} 🥤)
+                </button>
             </div>
         `;
     });
+}
+
+/**
+ * Zeigt einen Virus speziell auf der Hauptkarte an (Mixed Mode)
+ */
+function zeigeVirusEventAufKarte(virus) {
+    aktualisiereKartenOptik('virus');
+    playSound('shot');
+
+    const frageElement = document.getElementById('frageText');
+    frageElement.innerHTML = virus.text;
+    document.getElementById('strafeText').innerText = `☣️ INFEKTIONS-ALARM! Aktiv für ${virus.runden} Runden.`;
+    
+    document.getElementById('entscheidungsBereich').style.display = 'none';
+    document.getElementById('naechsteKarteBtn').style.display = 'block';
+    
+    const spielBox = document.getElementById('spielBereich');
+    spielBox.classList.remove('card-enter-anim');
+    void spielBox.offsetWidth;
+    spielBox.classList.add('card-enter-anim');
+
+    if ("vibrate" in navigator) navigator.vibrate([100, 50, 100, 50, 300]);
 }
 
 function rundenTaskFehlgeschlagen(index) {
@@ -532,6 +782,27 @@ function rundenTaskFehlgeschlagen(index) {
         // Nach dem Versagen die Aufgabe direkt entfernen
         rundenTaskEntfernen(index);
     }
+}
+
+/**
+ * Öffnet das Trink-Raster für eine globale Regel (z.B. Königsevent)
+ */
+function rundenTaskGlobalVersagt(index) {
+    taskIndexForDrinkSelection = index;
+    aktuelleSchluecke = aktiveRundenAufgaben[index].schluecke;
+    werMussTrinkenZeigen();
+}
+
+/**
+ * Bucht Schlücke aus einer laufenden globalen Regel
+ */
+function strafSchluckAusTaskVerteilen(index) {
+    if (taskIndexForDrinkSelection === -1) return;
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler'));
+    spielerListe[index].schluecke += aktuelleSchluecke;
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+    playSound('click');
+    if (typeof listeAnzeigen === "function") listeAnzeigen();
 }
 
 function rundenTaskEntfernen(index) {
@@ -555,10 +826,13 @@ function werMussTrinkenZeigen() {
     
     spielerListe.forEach((spieler, index) => {
         if (spieler.aktiv !== false) {
-            // Bei "Ich hab noch nie" nutzen wir die neue Funktion für Mehrfachauswahl
-            const aktion = (aktuelleKategorie === 'ich_hab_noch_nie') 
-                ? `strafSchluckHinzufuegen(${index}, this)` 
-                : `strafSchluckeVerteilen(${index})`;
+            // Logik wählen: Entweder aus einer Regel, Mehrfachwahl (Ich hab noch nie / Tribunal) oder Einzelwahl
+            let aktion = `strafSchluckeVerteilen(${index})`;
+            if (taskIndexForDrinkSelection !== -1) {
+                aktion = `strafSchluckAusTaskVerteilen(${index})`;
+            } else if (aktuelleKategorie === 'ich_hab_noch_nie' || aktuelleKategorie === 'tribunal') {
+                aktion = `strafSchluckHinzufuegen(${index}, this)`;
+            }
 
             auswahlBereich.innerHTML += `
                 <button class="strafe-btn btn-fail" onclick="${aktion}">
@@ -567,16 +841,21 @@ function werMussTrinkenZeigen() {
         }
     });
 
-    // Button zum Beenden der Auswahl (nur für den Mehrfach-Modus)
-    if (aktuelleKategorie === 'ich_hab_noch_nie') {
+    // Button zum Beenden der Auswahl (für Mehrfach-Modus, Tribunal oder laufende Regeln)
+    if (aktuelleKategorie === 'ich_hab_noch_nie' || aktuelleKategorie === 'tribunal' || taskIndexForDrinkSelection !== -1) {
         const fertigBtn = document.createElement('button');
-        fertigBtn.innerHTML = "✅ Fertig gewählt";
+        fertigBtn.innerHTML = "✅ Auswahl beenden";
         fertigBtn.className = "nav-btn";
         fertigBtn.style.gridColumn = "1 / -1";
         fertigBtn.style.marginTop = "15px";
         fertigBtn.onclick = () => {
             document.getElementById('werTrinktBereich').style.display = 'none';
-            document.getElementById('naechsteKarteBtn').style.display = 'block';
+            if (aktuelleKategorie === 'tribunal' && !isGemischteRunde) {
+                document.getElementById('tribunalNextBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('naechsteKarteBtn').style.display = 'block';
+            }
+            taskIndexForDrinkSelection = -1;
         };
         auswahlBereich.appendChild(fertigBtn);
     }
@@ -682,7 +961,12 @@ function zeigeStatistiken() {
                 <div class="stat-icon">🍻</div>
                 <div class="stat-info">
                     <span class="stat-label">Promille-König</span>
-                    <span class="stat-value">${meisteSchluecke.emoji} ${meisteSchluecke.name}</span>
+                    <span class="stat-value" style="display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar-wrapper" style="width: 60px; height: 60px; margin: 0; font-size: 2rem;">
+                            ${meisteSchluecke.emoji}
+                        </div>
+                        ${meisteSchluecke.name}
+                    </span>
                     <span class="stat-sub">${meisteSchluecke.schluecke || 0} Schlücke</span>
                 </div>
             </div>
@@ -691,7 +975,12 @@ function zeigeStatistiken() {
                 <div class="stat-icon">🎯</div>
                 <div class="stat-info">
                     <span class="stat-label">Hauptziel</span>
-                    <span class="stat-value">${amHaeufigstenGezogen.emoji} ${amHaeufigstenGezogen.name}</span>
+                    <span class="stat-value" style="display: flex; align-items: center; gap: 10px;">
+                        <div class="avatar-wrapper" style="width: 60px; height: 60px; margin: 0; font-size: 2rem;">
+                            ${amHaeufigstenGezogen.emoji}
+                        </div>
+                        ${amHaeufigstenGezogen.name}
+                    </span>
                     <span class="stat-sub">${amHaeufigstenGezogen.ausgewaehltCount || 0} Mal dran gewesen</span>
                 </div>
             </div>

@@ -5,6 +5,18 @@ let paranoiaSchluecke = 0;
 function starteParanoia() {
     zeigeBereich('paranoiaBereich');
     naechsteParanoiaRunde();
+
+    // UI Button für das Verlassen anpassen
+    const exitBtn = document.querySelector('#paranoiaBereich button[onclick="zurueckZumHauptMenue()"]');
+    if (exitBtn) {
+        if (isGemischteRunde) {
+            exitBtn.innerText = "Weiter im Mix 🚀";
+            exitBtn.setAttribute('onclick', 'geheZurueckZumMix()');
+        } else {
+            exitBtn.innerText = "Spiel verlassen";
+            exitBtn.setAttribute('onclick', 'zurueckZumHauptMenue()');
+        }
+    }
 }
 
 function naechsteParanoiaRunde() {

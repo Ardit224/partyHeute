@@ -31,11 +31,6 @@ function starteShotRoulette() {
     naechsteShotRunde();
 }
 
-function geheZurueckZumMix() {
-    zeigeBereich('spielBereich');
-    karteZiehen();
-}
-
 function naechsteShotRunde() {
     const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
     const pool = spielerListe.filter(s => s.aktiv !== false);

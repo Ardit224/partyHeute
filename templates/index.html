@@ -12,6 +12,9 @@
 </head>
 <body>
     <div class="container">
+        <!-- Statusleiste für aktive Viren in der gemischten Runde -->
+        <div id="activeVirusBar" class="virus-status-bar" style="display: none;"></div>
+
         <!-- Random Auswahl Screen -->
         <div id="randomSelectionOverlay" class="random-overlay">
             <p style="font-size: 1.2rem; opacity: 0.7;">Schicksal wird gewählt...</p>
@@ -92,6 +95,9 @@
                 <button onclick="starteParanoia()" style="background-color: #10b981;">🕵️ Paranoia</button>
                 <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown</button>
                 <button onclick="starteShotRoulette()" style="background-color: #ef4444;">🥃 Shot Roulette</button>
+                <button onclick="starteTribunalSpiel()" style="background-color: #475569;">⚖️ Das Tribunal</button>
+                <button onclick="starteZeitbombeSpiel()" style="background-color: #f97316;">💣 Die Zeitbombe</button>
+                <button onclick="starteVirusSpiel()" style="background-color: #22c55e;">🦠 Virus-Spiel</button>
                 <button onclick="zufallsSpielWaehlen()" style="background: var(--secondary);">🎲 Zufall</button>
             </div>
             <button onclick="geheZuStartMenue()" style="background-color: #4b5563;">Zurück zum Menü</button>
@@ -99,6 +105,7 @@
 
         <!-- 4. SPIELBEREICH (Karten-Anzeige) -->
         <div id="spielBereich" style="display: none;">
+            <div id="tribunalCountdownMixed" class="tribunal-countdown-box"></div>
             <div id="gameIconHeader" style="font-size: 2.5rem; margin-bottom: 5px;"></div>
             <p id="gameTypeLabel" style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; margin-bottom: 15px; opacity: 0.6; font-weight: bold;"></p>
             <h2 id="frageText" style="min-height: 60px;"></h2>
@@ -106,6 +113,7 @@
 
             <div id="entscheidungsBereich" class="aktions-box-vertical">
                 <button id="failBtn" class="btn-drink-huge" onclick="trinkenBestätigen()">🍻 Trinken!</button>
+                <button id="tribunalBtn" class="btn-drink-huge" style="display: none; background-color: #ef4444;" onclick="starteTribunalCountdown('tribunalCountdownMixed', 'tribunalBtn')">⚖️ Countdown starten!</button>
                 <button class="btn-skip-tiny" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
             </div>
 
@@ -122,6 +130,59 @@
 
         <!-- Bereich für aktive Runden-Herausforderungen -->
         <div id="rundenAufgabenContainer" style="margin-top: 20px;"></div>
+
+        <!-- ZEITBOMBE SPIEL BEREICH -->
+        <div id="zeitbombeBereich" style="display: none; text-align: center;">
+            <div class="shot-card theme-zeitbombe">
+                <h1 style="color: #f97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);">💣 Zeitbombe</h1>
+                
+                <div id="bombCategoryBox" class="bomb-category-box">Bereit?</div>
+                
+                <div id="bombPlayerDisplay" style="margin: 20px 0; min-height: 150px;"></div>
+
+                <div id="bombExplosionBox" style="display: none; margin: 20px 0;"></div>
+
+                <button id="bombStartBtn" class="nav-btn" style="background-color: #f97316;" onclick="startBombLogic()">Spiel starten! 🔥</button>
+                <button id="bombPassBtn" class="nav-btn" style="background-color: #3b82f6; display: none; padding: 25px; font-size: 1.5rem;" onclick="bombeWeitergeben()">WEITERGEBEN! ➡️</button>
+                
+                <button id="bombBackBtn" class="nav-btn" style="background-color: #4b5563; margin-top: 15px;" onclick="zurueckZumHauptMenue()">Zurück zum Menü</button>
+            </div>
+        </div>
+
+        <!-- HANDY WECHSEL BEREICH -->
+        <div id="handyWechselBereich" style="display: none;">
+            <div class="handy-wechsel-card">
+                <div id="handyWechselDisplay"></div>
+                <button class="nav-btn" style="background-color: #10b981; margin-top: 30px;" onclick="geheZurueckZumMix()">Ich habe das Handy! 📱</button>
+            </div>
+        </div>
+
+        <!-- TRIBUNAL SPIEL BEREICH (Einzelmodus) -->
+        <div id="tribunalBereich" style="display: none; text-align: center;">
+            <h1 style="color: #94a3b8; text-shadow: 0 0 10px rgba(148, 163, 184, 0.5);">⚖️ Das Tribunal</h1>
+            <p>Das Gericht tagt. Die Gruppe fällt das Urteil!</p>
+            
+            <div id="tribunalCard" class="shot-card theme-tribunal" style="margin: 20px auto; min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 25px;">
+                <p id="tribunalTaskText" style="font-size: 1.4rem; line-height: 1.4; color: white;"></p>
+            </div>
+            
+            <div id="tribunalCountdownStandalone" class="tribunal-countdown-box"></div>
+
+            <button id="tribunalStandaloneBtn" class="nav-btn" style="background-color: #ef4444;" onclick="starteTribunalCountdown('tribunalCountdownStandalone', 'tribunalStandaloneBtn')">⚖️ Countdown starten!</button>
+            <button id="tribunalNextBtn" class="nav-btn" style="background-color: #3b82f6; display:none;" onclick="naechsteTribunalRunde()">Nächste Anklage ⚖️</button>
+            <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 15px;">Zurück zum Menü</button>
+        </div>
+
+        <!-- VIRUS SPIEL BEREICH -->
+        <div id="virusBereich" style="display: none; text-align: center;">
+            <h1 style="color: #22c55e; text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);">☣️ Virus-Labor</h1>
+            <p>Setze permanente Regeln frei. Wer sie bricht, trinkt!</p>
+            
+            <div id="aktiveVirenListe" style="margin: 25px 0; max-height: 300px; overflow-y: auto;"></div>
+            
+            <button class="nav-btn" onclick="neuerVirus(false)" style="background-color: #22c55e; padding: 20px; font-size: 1.2rem;">🦠 Virus freisetzen</button>
+            <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 15px;">Zurück zum Menü</button>
+        </div>
 
         <!-- 4b. PARANOIA BEREICH -->
         <div id="paranoiaBereich" style="display: none;">
@@ -199,6 +260,9 @@
     <script src="{{ url_for('static', filename='roulette.js') }}"></script>
     <script src="{{ url_for('static', filename='paranoia.js') }}"></script>
     <script src="{{ url_for('static', filename='shot_roulette.js') }}"></script>
+    <script src="{{ url_for('static', filename='virusspiel.js') }}"></script>
+    <script src="{{ url_for('static', filename='tribunalspiel.js') }}"></script>
+    <script src="{{ url_for('static', filename='zeitbombespiel.js') }}"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <div id="statistikBereich" style="display: none;"></div>
 </body>

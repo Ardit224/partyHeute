@@ -27,6 +27,12 @@ function starteCountdownSpiel() {
     
     statusUpdaten();
     zeichneRad();
+
+    // Button Text anpassen, falls wir in der gemischten Runde sind
+    const exitBtn = document.querySelector('#countdownBereich button[onclick="zurueckZumMenueAusCountdown()"]');
+    if (exitBtn) {
+        exitBtn.innerText = isGemischteRunde ? "Weiter im Mix 🚀" : "Zurück zur Spielauswahl";
+    }
 }
 
 function statusUpdaten() {
@@ -69,8 +75,12 @@ function zeichneRad() {
                 const img = new Image();
                 img.src = imgSrcMatch[1];
                 try {
-                    // Bild deutlich größer auf dem Rad (50x50)
-                    ctx.drawImage(img, radius - 65, -25, 50, 50);
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(radius - 40, 0, 40, 0, Math.PI * 2); // Clip-Kreisradius auf 40 erhöht
+                    ctx.clip();
+                    ctx.drawImage(img, radius - 80, -40, 80, 80); // Bildgröße auf 80x80 erhöht
+                    ctx.restore();
                 } catch(e) {}
             }
         } else {
@@ -86,7 +96,7 @@ function getSpielerDisplayHtml(player) {
     const istFoto = player.emoji && player.emoji.includes('<img');
     return `
         <div style="display: flex; flex-direction: column; align-items: center; margin: 15px 0;">
-            <div class="avatar-wrapper" style="width: 120px; height: 120px; font-size: 4rem;">
+            <div class="avatar-wrapper" style="width: 180px; height: 180px; font-size: 6rem;">
                 ${player.emoji}
             </div>
             ${istFoto ? '' : `
@@ -160,8 +170,13 @@ function bucheSchluecke(opfer) {
 }
 
 function zurueckZumMenueAusCountdown() {
-    if (typeof zurueckZumHauptMenue === "function") {
-        if (typeof stopBackgroundMusic === "function") stopBackgroundMusic();
-        zurueckZumHauptMenue();
+    if (typeof stopBackgroundMusic === "function") stopBackgroundMusic();
+    if (isGemischteRunde) {
+        zeigeBereich('spielBereich');
+        karteZiehen();
+    } else {
+        if (typeof zurueckZumHauptMenue === "function") {
+            zurueckZumHauptMenue();
+        }
     }
 }
