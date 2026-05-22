@@ -27,6 +27,7 @@ body {
     border-radius: 24px;
     border: 1px solid var(--border);
     box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    position: relative;
 }
 
 input, select, button {
@@ -128,6 +129,16 @@ button:active {
     font-weight: bold;
 }
 
+.getraenke-anzahl {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
 .spieler-inaktiv {
     opacity: 0.4;
     border-color: #4b5563;
@@ -200,9 +211,26 @@ button:active {
 .action-btn.edit:hover { background: #3b82f6; }
 
 .strafe-btn {
-    width: auto !important;
+
+    width: 90px !important; /* Feste Breite für den Button */
+    height: 90px !important; /* Feste Höhe für den Button */
     margin: 5px !important;
-    padding: 10px 20px !important;
+   
+    padding: 0 !important; /* Innenabstand entfernen, damit der Inhalt besser passt */
+    display: flex;
+    flex-direction: column; /* Inhalt vertikal anordnen */
+    align-items: center; /* Horizontal zentrieren */
+    justify-content: center; /* Vertikal zentrieren */
+    font-size: 40px; /* Standardgröße für Emojis im Button */
+    line-height: 1; /* Zeilenhöhe für Emojis anpassen */
+}
+
+.strafe-btn img {
+    width: 70px; /* Feste Größe für Bilder im Button */
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.5); /* Kleiner Rand für Bilder */
 }
 
 .spieler-anzeige {
@@ -260,52 +288,60 @@ button:active {
     font-size: 1.2rem;
 }
 
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.game-grid button {
+    height: 100px;
+    margin-bottom: 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    padding: 10px;
+    line-height: 1.2;
+}
+
 /* Roulette Pfeil Styling */
 .wheel-wrapper {
     position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 30px auto;
+    width: 320px;
+    height: 320px;
+    margin: 40px auto;
+    border: 10px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(139, 92, 246, 0.3), inset 0 0 20px rgba(0,0,0,0.5);
+    background: #1e293b;
 }
 
 .wheel-pointer {
     position: absolute;
-    top: -30px;
+    top: -20px;
     left: 50%;
     transform: translateX(-50%);
     width: 30px;
     height: 50px;
     z-index: 10;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.8));
 }
 
 /* Die Nadel (Weißes Dreieck) */
 .wheel-pointer::before {
     content: "";
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-top: 40px solid #ffffff;
-}
-
-/* Der Haltepunkt (Roter Knopf oben) */
-.wheel-pointer::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 20px;
-    background: #ef4444;
-    border: 3px solid white;
-    border-radius: 50%;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    border-top: 35px solid #ef4444;
 }
 
 .drink-plus-btn {
@@ -386,4 +422,78 @@ button:active {
 @keyframes bulletFly {
     0% { left: 80px; opacity: 1; transform: translateY(-50%) scale(0.5); }
     100% { left: 400px; opacity: 0; transform: translateY(-50%) scale(2); }
+}
+
+.mute-toggle {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 50% !important;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px !important;
+}
+
+.random-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.selected-game-animation {
+    animation: celebrate 0.5s ease infinite alternate;
+}
+
+@keyframes celebrate {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.2); filter: brightness(1.5); }
+}
+
+.aktions-box-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-drink-huge {
+    background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+    font-size: 1.6rem !important;
+    padding: 25px !important;
+    height: auto !important;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-skip-tiny {
+    background: #4b5563 !important;
+    font-size: 0.9rem !important;
+    padding: 10px !important;
+    width: 50% !important;
+    opacity: 0.7;
+    box-shadow: none !important;
+}
+
+.selected-for-drink {
+    opacity: 0.3 !important;
+    filter: grayscale(100%);
+    pointer-events: none;
 }

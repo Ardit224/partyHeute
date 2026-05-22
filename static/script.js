@@ -2,6 +2,7 @@ let aktuelleKategorie = "";
 let aktuelleSchluecke = 0; 
 let aktuellerSpielerIndex = -1; 
 let backgroundMusic = null; // Globale Variable für die Hintergrundmusik
+let isMuted = localStorage.getItem('partyMuted') === 'true';
 
 function zeigeBereich(bereichId) {
     const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich'];
@@ -39,13 +40,18 @@ function playSound(type) {
         'card': 'https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3',
         'shot': 'https://assets.mixkit.co/active_storage/sfx/1655/1655-preview.mp3'
     };
-    if (sounds[type]) new Audio(sounds[type]).play().catch(() => {});
+    if (sounds[type] && !isMuted) {
+        const audio = new Audio(sounds[type]);
+        audio.volume = 0.4; // Lautstärke für Effekte reduziert
+        audio.play().catch(() => {});
+    }
 }
 
 /**
  * Spielt Hintergrundmusik ab.
  */
-function playBackgroundMusic(url, volume = 0.3) {
+function playBackgroundMusic(url, volume = 0.15) {
+    if (isMuted) return;
     if (backgroundMusic) {
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0;
@@ -65,6 +71,20 @@ function stopBackgroundMusic() {
         backgroundMusic.pause();
         backgroundMusic.currentTime = 0; // Setzt den Song an den Anfang zurück
     }
+}
+
+/**
+ * Schaltet alle Sounds stumm oder an.
+ */
+function toggleMute() {
+    isMuted = !isMuted;
+    localStorage.setItem('partyMuted', isMuted);
+    
+    const muteBtn = document.getElementById('muteBtn');
+    if (muteBtn) muteBtn.innerText = isMuted ? "🔇" : "🔊";
+    
+    if (isMuted) stopBackgroundMusic();
+    playSound('click');
 }
 
 /**
@@ -162,6 +182,10 @@ function initialisiereApp() {
     if (document.getElementById('naechsteKarteBtn')) {
         document.getElementById('naechsteKarteBtn').style.display = 'none';
     }
+    
+    const muteBtn = document.getElementById('muteBtn');
+    if (muteBtn) muteBtn.innerText = isMuted ? "🔇" : "🔊";
+
     zeigeBereich('startMenue');
 }
 
@@ -193,6 +217,50 @@ function kategorieWaehlen(kategorie) {
     aktuelleKategorie = kategorie; 
     zeigeBereich('spielBereich');
     karteZiehen();
+}
+
+function zufallsSpielWaehlen() {
+    const spiele = [
+        { name: "🤔 Wer würde eher...", color: "#ec4899", action: () => kategorieWaehlen('wer_wuerde_eher') },
+        { name: "🎯 Aufgaben", color: "#3b82f6", action: () => kategorieWaehlen('aufgaben') },
+        { name: "🤫 Ich hab noch nie...", color: "#f59e0b", action: () => kategorieWaehlen('ich_hab_noch_nie') },
+        { name: "🕵️ Paranoia", color: "#10b981", action: () => typeof starteParanoia === 'function' ? starteParanoia() : null },
+        { name: "🎡 Countdown", color: "#8b5cf6", action: () => typeof starteCountdownSpiel === 'function' ? starteCountdownSpiel() : null }
+    ];
+
+    const overlay = document.getElementById('randomSelectionOverlay');
+    const textEl = document.getElementById('randomGameText');
+    
+    if (!overlay || !textEl) return;
+
+    overlay.style.display = 'flex';
+    let counter = 0;
+    const maxRounds = 12;
+    
+    const interval = setInterval(() => {
+        const tempIndex = Math.floor(Math.random() * spiele.length);
+        textEl.innerText = spiele[tempIndex].name;
+        textEl.style.color = spiele[tempIndex].color;
+        playSound('click');
+        counter++;
+        
+        if (counter >= maxRounds) {
+            clearInterval(interval);
+            const finalIndex = Math.floor(Math.random() * spiele.length);
+            const selected = spiele[finalIndex];
+            
+            textEl.innerText = selected.name;
+            textEl.style.color = selected.color;
+            textEl.classList.add('selected-game-animation');
+            playSound('win');
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                textEl.classList.remove('selected-game-animation');
+                selected.action();
+            }, 1500);
+        }
+    }, 100);
 }
 
 function zurueckZumHauptMenue() {
@@ -248,13 +316,12 @@ async function karteZiehen() {
     zufallsSpieler.ausgewaehltCount = (zufallsSpieler.ausgewaehltCount || 0) + 1;
     localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
 
-    let spielerHtml = `<span class="spieler-anzeige">`;
+    let spielerHtml = "";
     if (zufallsSpieler.emoji.includes('<img')) {
-        spielerHtml += zufallsSpieler.emoji;
+        spielerHtml = `<span class="spieler-anzeige">${zufallsSpieler.emoji}</span>`;
     } else {
-        spielerHtml += `<span class="emoji-display">${zufallsSpieler.emoji}</span>`;
+        spielerHtml = `<span class="spieler-anzeige"><span class="emoji-display">${zufallsSpieler.emoji}</span> <span class="spieler-name-display">${zufallsSpieler.name}</span></span>`;
     }
-    spielerHtml += `</span>`;
 
     let fertigeFrage = daten.frage.replace("[SPIELER]", spielerHtml);
 
@@ -265,11 +332,26 @@ async function karteZiehen() {
     void frageElement.offsetWidth; 
     frageElement.classList.add('karten-animation');
 
-    document.getElementById('failBtn').innerText = `🍻 Jemand trinkt (+${aktuelleSchluecke} 🍺)`;
+    document.getElementById('failBtn').innerHTML = `🍻 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
     document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
 }
 
+/**
+ * Entscheidet je nach Kategorie, ob eine Liste gezeigt wird oder direkt gebucht wird
+ */
+function trinkenBestätigen() {
+    playSound('click');
+    // Bei Aufgaben direkt buchen, bei "Ich hab noch nie" die Mehrfachauswahl zeigen
+    if (aktuelleKategorie === 'aufgaben') {
+        document.getElementById('entscheidungsBereich').style.display = 'none';
+        strafSchluckeVerteilen(aktuellerSpielerIndex);
+    } else {
+        werMussTrinkenZeigen();
+    }
+}
+
 function niemandTrinkt() {
+    playSound('click');
     document.getElementById('entscheidungsBereich').style.display = 'none';
     document.getElementById('naechsteKarteBtn').style.display = 'block';
 }
@@ -284,12 +366,31 @@ function werMussTrinkenZeigen() {
     
     spielerListe.forEach((spieler, index) => {
         if (spieler.aktiv !== false) {
+            // Bei "Ich hab noch nie" nutzen wir die neue Funktion für Mehrfachauswahl
+            const aktion = (aktuelleKategorie === 'ich_hab_noch_nie') 
+                ? `strafSchluckHinzufuegen(${index}, this)` 
+                : `strafSchluckeVerteilen(${index})`;
+
             auswahlBereich.innerHTML += `
-                <button class="strafe-btn btn-fail" onclick="strafSchluckeVerteilen(${index})">
+                <button class="strafe-btn btn-fail" onclick="${aktion}">
                     ${spieler.emoji}
                 </button>`;
         }
     });
+
+    // Button zum Beenden der Auswahl (nur für den Mehrfach-Modus)
+    if (aktuelleKategorie === 'ich_hab_noch_nie') {
+        const fertigBtn = document.createElement('button');
+        fertigBtn.innerHTML = "✅ Fertig gewählt";
+        fertigBtn.className = "nav-btn";
+        fertigBtn.style.gridColumn = "1 / -1";
+        fertigBtn.style.marginTop = "15px";
+        fertigBtn.onclick = () => {
+            document.getElementById('werTrinktBereich').style.display = 'none';
+            document.getElementById('naechsteKarteBtn').style.display = 'block';
+        };
+        auswahlBereich.appendChild(fertigBtn);
+    }
 }
 
 function strafSchluckeVerteilen(gewaehlterIndex) {
@@ -301,6 +402,27 @@ function strafSchluckeVerteilen(gewaehlterIndex) {
     
     document.getElementById('werTrinktBereich').style.display = 'none';
     document.getElementById('naechsteKarteBtn').style.display = 'block';
+}
+
+/**
+ * Fügt Schlücke hinzu, ohne den Bereich zu schließen (für Mehrfachauswahl)
+ */
+function strafSchluckHinzufuegen(index, btnElement) {
+    if (btnElement.classList.contains('selected-for-drink')) return;
+
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler'));
+    spielerListe[index].schluecke += aktuelleSchluecke;
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+    
+    playSound('click');
+    if (typeof listeAnzeigen === "function") listeAnzeigen();
+
+    // Button als ausgewählt markieren (deaktiviert ihn über CSS)
+    btnElement.classList.add('selected-for-drink');
+
+    // Kurzes visuelles Feedback am Button
+    btnElement.style.transform = "scale(0.9)";
+    setTimeout(() => btnElement.style.transform = "scale(1)", 100);
 }
 
 function feierKonfetti() {

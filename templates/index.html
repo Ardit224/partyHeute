@@ -12,6 +12,13 @@
 </head>
 <body>
     <div class="container">
+        <!-- Random Auswahl Screen -->
+        <div id="randomSelectionOverlay" class="random-overlay">
+            <p style="font-size: 1.2rem; opacity: 0.7;">Schicksal wird gewählt...</p>
+            <h1 id="randomGameText" style="font-size: 2.5rem; margin: 20px 0;"></h1>
+        </div>
+
+        <button id="muteBtn" onclick="toggleMute()" class="mute-toggle" title="Sound an/aus">🔊</button>
         
         <!-- 1. HAUPTMENÜ (Landing Page / Startbildschirm) -->
         <div id="startMenue" class="menu-screen">
@@ -68,13 +75,16 @@
                     <option value="2" selected>Normal (2-4 Schlücke)</option>
                     <option value="3">Hardcore (3-6 Schlücke)</option>
                 </select>
-                <button onclick="zeigeStatistiken()">Spiel beenden & Stats zeigen</button>
+                <button onclick="zeigeStatistiken()" style="background-color: #4b5563;">📊 Spiel beenden & Stats</button>
             </div>
-            <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
-            <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
-            <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
-            <button onclick="starteParanoia()" style="background-color: #10b981;">🕵️ Paranoia</button>
-            <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown Spiel</button>
+            <div class="game-grid">
+                <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
+                <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
+                <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
+                <button onclick="starteParanoia()" style="background-color: #10b981;">🕵️ Paranoia</button>
+                <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown</button>
+                <button onclick="zufallsSpielWaehlen()" style="background: var(--secondary);">🎲 Zufall</button>
+            </div>
             <button onclick="geheZuStartMenue()" style="background-color: #4b5563;">Zurück zum Menü</button>
         </div>
 
@@ -83,9 +93,9 @@
             <h2 id="frageText" style="min-height: 60px;"></h2>
             <p id="strafeText" style="font-weight: bold; color: #f472b6;"></p>
 
-            <div id="entscheidungsBereich" class="aktions-box">
-                <button class="btn-erfolg" onclick="niemandTrinkt()">✅ Niemand trinkt</button>
-                <button id="failBtn" class="btn-fail" onclick="werMussTrinkenZeigen()">🍻 Jemand trinkt</button>
+            <div id="entscheidungsBereich" class="aktions-box-vertical">
+                <button id="failBtn" class="btn-drink-huge" onclick="trinkenBestätigen()">🍻 Trinken!</button>
+                <button class="btn-skip-tiny" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
             </div>
 
             <div id="werTrinktBereich" style="display: none; margin-top: 20px;">
@@ -129,15 +139,9 @@
         <div id="countdownBereich" style="display: none;">
             <h2>Countdown Spiel</h2>
             <p id="countdownStatus"></p>
-            <div class="wheel-wrapper" style="width: 300px; height: 300px; margin: 30px auto; position: relative;">
-                <canvas id="rouletteWheel" width="300" height="300" style="display: none;"></canvas> <!-- Canvas versteckt -->
-                
-                <!-- Schuss Animation Overlay -->
-                <div id="shotOverlay" class="shot-overlay">
-                    <div id="revolver" class="revolver">🔫</div>
-                    <div id="targetPlayerAvatar" class="target-player-avatar"></div>
-                    <div id="bullet" class="bullet"><div id="bulletContent"></div></div>
-                </div>
+            <div class="wheel-wrapper">
+                <div class="wheel-pointer"></div>
+                <canvas id="rouletteWheel" width="300" height="300"></canvas>
             </div>
             <p id="countdownErgebnis" style="font-weight: bold; font-size: 1.2em;"></p>
             <button id="countdownZiehenBtn" onclick="radDrehen()" style="background-color: #ef4444;">Ziehen!</button>

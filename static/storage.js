@@ -91,9 +91,12 @@ function listeAnzeigen() {
                 <div class="avatar-wrapper">
                     ${spieler.emoji}
                 </div>
-                <span class="spieler-name">${spieler.name}</span>
+                ${spieler.emoji.includes('<img') ? '' : `<span class="spieler-name">${spieler.name}</span>`}
                 ${drinkPlusBtn}
-                <span class="schluck-anzahl">${spieler.schluecke || 0} 🍺</span>
+                <div style="display: flex; justify-content: center; gap: 4px; margin-top: 5px;">
+                    <span class="schluck-anzahl" title="Schlücke">${spieler.schluecke || 0} 🥤</span>
+                    <span class="getraenke-anzahl" title="Getränke">${spieler.getraenkeCount || 0} 🍺</span>
+                </div>
             </div>
         `;
     });
