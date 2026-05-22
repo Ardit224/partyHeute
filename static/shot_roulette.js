@@ -16,9 +16,24 @@ function starteShotRoulette() {
 
     zeigeBereich('shotRouletteBereich');
     
+    const exitBtn = document.querySelector('#shotRouletteBereich .nav-btn[onclick="zurueckZumHauptMenue()"]');
+    
+    if (isGemischteRunde) {
+        exitBtn.innerText = "Weiter im Mix 🚀";
+        exitBtn.setAttribute('onclick', 'geheZurueckZumMix()');
+    } else {
+        exitBtn.innerText = "Spiel beenden";
+        exitBtn.onclick = () => zurueckZumHauptMenue();
+    }
+
     // UI Reset
     document.getElementById('shotSelectionArea').style.display = 'none';
     naechsteShotRunde();
+}
+
+function geheZurueckZumMix() {
+    zeigeBereich('spielBereich');
+    karteZiehen();
 }
 
 function naechsteShotRunde() {

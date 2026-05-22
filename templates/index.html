@@ -67,17 +67,25 @@
 
         <!-- 3. SPIELAUSWAHL (Welches Spiel?) -->
         <div id="hauptMenue" style="display: none;">
-            <h2>Wähle ein Spiel</h2>
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label for="levelInput" style="display:block; margin-bottom:5px; font-size: 0.9em;">Schwierigkeit:</label>
+            <h1 class="title-glow" style="font-size: 2rem;">Spielmodus</h1>
+            
+            <!-- Großer Haupt-Button für die gemischte Runde -->
+            <button class="nav-btn mixed-mode-btn" onclick="starteGemischteRunde()" style="margin-bottom: 25px; height: auto; padding: 25px; border: 2px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);">
+                <span style="font-size: 1.5rem; display: block;">🚀 Gemischte Runde</span>
+                <small style="opacity: 0.8; font-size: 0.9rem;">Alles wild zusammengewürfelt</small>
+            </button>
+
+            <div style="margin-bottom: 20px;">
+                <label for="levelInput" style="display:block; margin-bottom:8px; font-size: 0.9em; opacity: 0.8;">Härtegrad wählen:</label>
                 <select id="levelInput">
-                    <option value="1">Soft (1-2 Schlücke)</option>
+                    <option value="1">Soft (1-2 Schlücke) 🥤</option>
                     <option value="2" selected>Normal (2-4 Schlücke)</option>
-                    <option value="3">Hardcore (3-6 Schlücke)</option>
+                    <option value="3">Hardcore (3-6 Schlücke) 🔥</option>
                 </select>
-                <button onclick="zeigeStatistiken()" style="background-color: #4b5563;">📊 Spiel beenden & Stats</button>
             </div>
-            <div class="game-grid">
+
+            <h3 style="margin-top: 30px; opacity: 0.7; font-size: 1rem;">Einzelne Spiele:</h3>
+            <div class="game-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
                 <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
                 <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
@@ -91,6 +99,8 @@
 
         <!-- 4. SPIELBEREICH (Karten-Anzeige) -->
         <div id="spielBereich" style="display: none;">
+            <div id="gameIconHeader" style="font-size: 2.5rem; margin-bottom: 5px;"></div>
+            <p id="gameTypeLabel" style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; margin-bottom: 15px; opacity: 0.6; font-weight: bold;"></p>
             <h2 id="frageText" style="min-height: 60px;"></h2>
             <p id="strafeText" style="font-weight: bold; color: #f472b6;"></p>
 
@@ -109,6 +119,9 @@
             <button id="naechsteKarteBtn" onclick="karteZiehen()" style="display: none; background-color: #3b82f6; margin-top: 20px;">Nächste Karte 🃏</button>
             <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zur Spielauswahl</button>
         </div>
+
+        <!-- Bereich für aktive Runden-Herausforderungen -->
+        <div id="rundenAufgabenContainer" style="margin-top: 20px;"></div>
 
         <!-- 4b. PARANOIA BEREICH -->
         <div id="paranoiaBereich" style="display: none;">

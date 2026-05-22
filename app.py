@@ -13,7 +13,8 @@ fragen_pools = {
     "aufgaben": [
         "[SPIELER], mache 10 Liegestütze oder trinke!",
         "[SPIELER], zeige das letzte Foto auf deinem Handy oder trinke!",
-        "[SPIELER], du darfst 5 Minuten nicht 'Ja' oder 'Nein' sagen."
+        "[SPIELER], du darfst 3 Runden lang nicht 'Ja' oder 'Nein' sagen.",
+        "[SPIELER], du darfst für 2 Runden nur noch flüstern!"
     ],
     "ich_hab_noch_nie": [
         "Ich hab noch nie so getan, als würde ich telefonieren, um jemandem aus dem Weg zu gehen.",

@@ -3,6 +3,8 @@ let aktuelleSchluecke = 0;
 let aktuellerSpielerIndex = -1; 
 let backgroundMusic = null; // Globale Variable für die Hintergrundmusik
 let isMuted = localStorage.getItem('partyMuted') === 'true';
+let isGemischteRunde = false;
+let aktiveRundenAufgaben = [];
 
 function zeigeBereich(bereichId) {
     const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich'];
@@ -204,6 +206,19 @@ style.innerHTML = `
     /* Globale Avatar-Anpassung für die Auswahlmenüs */
     .avatar-wrapper { display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin: 0 auto; }
     .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Karten-Themes für die gemischte Runde */
+    .theme-wer_wuerde_eher { border: 2px solid #ec4899 !important; box-shadow: 0 0 20px rgba(236, 72, 153, 0.3) !important; }
+    .theme-aufgaben { border: 2px solid #3b82f6 !important; box-shadow: 0 0 20px rgba(59, 130, 246, 0.3) !important; }
+    .theme-ich_hab_noch_nie { border: 2px solid #f59e0b !important; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3) !important; }
+    .theme-paranoia { border: 2px solid #10b981 !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important; }
+
+    /* Verbessertes Runden Aufgaben UI */
+    .runden-task-card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 0.95rem; backdrop-filter: blur(10px); animation: fadeInTask 0.3s ease-out; }
+    @keyframes fadeInTask { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+    .runden-badge { background: #f59e0b; color: #1e293b; padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; display: inline-block; margin-bottom: 8px; }
+    .runden-fail-btn { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; padding: 8px; cursor: pointer; font-size: 0.85rem; margin-top: 10px; width: 100%; transition: all 0.2s; }
+    .runden-fail-btn:hover { background: rgba(239, 68, 68, 0.4); color: white; }
 `;
 document.head.appendChild(style);
 
@@ -246,8 +261,36 @@ const geheZuHauptMenue = geheZuSpiele;
 
 function kategorieWaehlen(kategorie) {
     aktuelleKategorie = kategorie; 
+    isGemischteRunde = false;
     zeigeBereich('spielBereich');
     karteZiehen();
+}
+
+function starteGemischteRunde() {
+    isGemischteRunde = true;
+    zeigeBereich('spielBereich');
+    karteZiehen();
+}
+
+function aktualisiereKartenOptik(kat) {
+    const spielBox = document.getElementById('spielBereich');
+    const iconEl = document.getElementById('gameIconHeader');
+    const labelEl = document.getElementById('gameTypeLabel');
+
+    // Alle Themes entfernen
+    spielBox.classList.remove('theme-wer_wuerde_eher', 'theme-aufgaben', 'theme-ich_hab_noch_nie', 'theme-paranoia');
+
+    const configs = {
+        'wer_wuerde_eher': { icon: '🤔', label: 'Wer würde eher...', class: 'theme-wer_wuerde_eher' },
+        'aufgaben': { icon: '🎯', label: 'Aufgabe', class: 'theme-aufgaben' },
+        'ich_hab_noch_nie': { icon: '🤫', label: 'Ich hab noch nie...', class: 'theme-ich_hab_noch_nie' },
+        'paranoia': { icon: '🕵️', label: 'Paranoia', class: 'theme-paranoia' }
+    };
+
+    const current = configs[kat] || configs['aufgaben'];
+    spielBox.classList.add(current.class);
+    iconEl.innerText = current.icon;
+    labelEl.innerText = isGemischteRunde ? `Gemischter Mix: ${current.label}` : current.label;
 }
 
 function zufallsSpielWaehlen() {
@@ -326,6 +369,30 @@ async function karteZiehen() {
     const naechsteBtn = document.getElementById('naechsteKarteBtn');
     document.getElementById('werTrinktBereich').style.display = 'none';
 
+    // Jede neue Karte verringert die Runden der aktiven Aufgaben
+    verarbeiteRundenTick();
+
+    if (isGemischteRunde) {
+        // Master-Zufallsgenerator für die gemischte Runde
+        const rand = Math.random();
+        if (rand < 0.35) {
+            aktuelleKategorie = 'aufgaben';
+        } else if (rand < 0.65) {
+            aktuelleKategorie = 'wer_wuerde_eher';
+        } else if (rand < 0.85) {
+            aktuelleKategorie = 'ich_hab_noch_nie';
+        } else {
+            // 15% Chance auf Shot Roulette
+            if (typeof starteShotRoulette === 'function') {
+                starteShotRoulette();
+                return; // Beendet karteZiehen, da Shot Roulette eigenen Screen hat
+            }
+            aktuelleKategorie = 'aufgaben';
+        }
+    }
+
+    aktualisiereKartenOptik(aktuelleKategorie);
+
     stopBackgroundMusic(); // Musik stoppen, wenn eine neue Karte gezogen wird
     playSound('card'); // Sound beim Ziehen der Karte abspielen
 
@@ -376,8 +443,18 @@ async function karteZiehen() {
     void frageElement.offsetWidth; 
     frageElement.classList.add('karten-animation');
 
-    document.getElementById('failBtn').innerHTML = `🍻 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
-    document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
+    // Speziallogik für Runden-Aufgaben
+    const rundenMatch = fertigeFrage.match(/(\d+)\s*Runden/i);
+    if (rundenMatch) {
+        const rundenAnzahl = parseInt(rundenMatch[1]);
+        document.getElementById('failBtn').innerHTML = `✅ Herausforderung annehmen!`;
+        document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(zufallsSpieler, daten.frage, rundenAnzahl, aktuelleSchluecke);
+        document.getElementById('strafeText').innerText = `Herausforderung: ${rundenAnzahl} Runden durchhalten!`;
+    } else {
+        document.getElementById('failBtn').innerHTML = `🍻 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
+        document.getElementById('failBtn').onclick = trinkenBestätigen;
+        document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
+    }
 }
 
 /**
@@ -392,6 +469,74 @@ function trinkenBestätigen() {
     } else {
         werMussTrinkenZeigen();
     }
+}
+
+function rundenAufgabeStarten(spieler, text, runden, schluecke) {
+    playSound('win');
+    const aufgabe = {
+        id: Date.now(),
+        spielerName: spieler.name,
+        spielerEmoji: spieler.emoji,
+        text: text.replace("[SPIELER]", spieler.name),
+        restRunden: runden,
+        schluecke: schluecke
+    };
+    aktiveRundenAufgaben.push(aufgabe);
+    
+    document.getElementById('entscheidungsBereich').style.display = 'none';
+    document.getElementById('naechsteKarteBtn').style.display = 'block';
+    updateRundenAufgabenUI();
+}
+
+function verarbeiteRundenTick() {
+    aktiveRundenAufgaben.forEach(task => {
+        if (task.restRunden > 0) task.restRunden--;
+    });
+    
+    // Automatisch entfernen, wenn die Zeit um ist
+    aktiveRundenAufgaben = aktiveRundenAufgaben.filter(task => task.restRunden > 0);
+    updateRundenAufgabenUI();
+}
+
+function updateRundenAufgabenUI() {
+    const container = document.getElementById('rundenAufgabenContainer');
+    if (!container) return;
+    
+    container.innerHTML = aktiveRundenAufgaben.length > 0 ? "<h4 style='margin-bottom:10px; opacity:0.7;'>⏳ Laufende Challenges:</h4>" : "";
+    
+    aktiveRundenAufgaben.forEach((task, index) => {
+        const statusText = `${task.restRunden} ${task.restRunden === 1 ? 'Runde' : 'Runden'} übrig`;
+        
+        container.innerHTML += `
+            <div class="runden-task-card">
+                <span class="runden-badge">${statusText}</span>
+                <div style="margin-bottom: 5px;"><strong>${task.spielerEmoji} ${task.spielerName}</strong></div>
+                <div style="opacity: 0.9; line-height: 1.4;">${task.text}</div>
+                <button class="runden-fail-btn" onclick="rundenTaskFehlgeschlagen(${index})">❌ Versagt (+${task.schluecke} 🥤)</button>
+            </div>
+        `;
+    });
+}
+
+function rundenTaskFehlgeschlagen(index) {
+    const task = aktiveRundenAufgaben[index];
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    let spieler = spielerListe.find(s => s.name === task.spielerName);
+    
+    if (spieler) {
+        spieler.schluecke += task.schluecke;
+        localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+        playSound('shot');
+        listeAnzeigen();
+        
+        // Nach dem Versagen die Aufgabe direkt entfernen
+        rundenTaskEntfernen(index);
+    }
+}
+
+function rundenTaskEntfernen(index) {
+    aktiveRundenAufgaben.splice(index, 1);
+    updateRundenAufgabenUI();
 }
 
 function niemandTrinkt() {
