@@ -1,65 +1,47 @@
-// Globales Foto-Objekt initialisieren, falls noch nicht geschehen
+// Globales Foto-Objekt initialisieren
 if (!window.aktuellesFoto) window.aktuellesFoto = null;
-// Globales Stream-Objekt, um den Kamerastream zu verwalten
 if (!window.currentCameraStream) window.currentCameraStream = null;
 
 async function kameraStarten() {
     const video = document.getElementById('video');
-    const startBtn = document.getElementById('startCameraBtn');
+    const cameraPlusIcon = document.getElementById('cameraPlusIcon');
     const snapBtn = document.getElementById('snapBtn');
+    const photoPreview = document.getElementById('photoPreview');
 
-    console.log("kameraStarten() aufgerufen."); // Debug-Log
+    console.log("kameraStarten() aufgerufen.");
 
     try {
-        // Prüfen, ob wir in einem sicheren Kontext sind (HTTPS, localhost oder 127.0.0.1)
-        if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            alert("Kamera benötigt eine sichere Verbindung (HTTPS oder Localhost).");
-            return;
-        }
-
         // Aggressiver Cleanup vor dem Neustart
         if (video.srcObject) {
-            console.log("Vorhandener video.srcObject gefunden, stoppe Tracks."); // Debug-Log
             video.srcObject.getTracks().forEach(track => track.stop());
             video.srcObject = null;
         }
         window.currentCameraStream = null;
 
-        console.log("Versuche, Kamerastream anzufordern..."); // Debug-Log
         // Fragt den Nutzer nach Erlaubnis für die Kamera
         const stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { 
-                facingMode: "user",
-                width: { ideal: 400 },
-                height: { ideal: 400 }
-            }, 
+            video: { facingMode: "user", width: { ideal: 400 }, height: { ideal: 400 } }, 
             audio: false 
         });
         
-        console.log("Kamerastream erfolgreich angefordert."); // Debug-Log
-        window.currentCameraStream = stream; // Den neuen Stream global speichern
+        window.currentCameraStream = stream; 
         video.srcObject = stream;
         
-        // Erst einblenden, dann abspielen
-        video.style.display = "inline-block"; 
-        startBtn.style.display = "none"; 
-        snapBtn.style.display = "inline-block"; 
+        // --- UI UPDATE: An das neue HTML angepasst ---
+        if (photoPreview) photoPreview.style.display = "none"; // Alte Vorschau verstecken
+        if (cameraPlusIcon) cameraPlusIcon.style.display = "none"; // Das 📸 Icon verstecken
+        if (video) video.style.display = "block"; // Live-Bild zeigen
+        if (snapBtn) snapBtn.style.display = "block"; // FOTO SCHIESSEN Button zeigen
 
         video.onloadedmetadata = () => {
-            console.log("onloadedmetadata gefeuert."); // Debug-Log
             video.play().catch(e => {
-                console.warn("Autoplay blockiert oder fehlgeschlagen:", e);
+                console.warn("Autoplay blockiert:", e);
             });
         };
 
-        // Fallback, falls onloadedmetadata nicht feuert
-        if (video.readyState >= video.HAVE_METADATA) {
-            console.log("Video bereits bereit, lade manuell."); 
-            video.onloadedmetadata();
-        }
     } catch (err) {
-        console.error("Detaillierter Kamera-Fehler: ", err.name, err.message);
-        alert(`Kamera-Fehler: ${err.name === 'NotAllowedError' ? 'Zugriff verweigert. Bitte Einstellungen prüfen.' : err.message}`);
+        console.error("Detaillierter Kamera-Fehler: ", err);
+        alert(`Kamera-Fehler: Der Browser blockiert den Zugriff. Lade die Seite neu und erlaube die Kamera.`);
     }
 }
 
@@ -68,30 +50,35 @@ function fotoMachen() {
     const canvas = document.getElementById('canvas');
     const preview = document.getElementById('photoPreview');
     const snapBtn = document.getElementById('snapBtn');
-    const startBtn = document.getElementById('startCameraBtn');
+    const cameraPlusIcon = document.getElementById('cameraPlusIcon');
 
+    // Canvas genau auf ein quadratisches Format für unsere Kreise einstellen
+    canvas.width = 300;
+    canvas.height = 300;
     const context = canvas.getContext('2d');
-    // Das aktuelle Videobild auf das Canvas zeichnen
-    context.drawImage(video, 0, 0, 150, 150);
+    
+    // Das Bild zentriert und quadratisch ausschneiden
+    const minDim = Math.min(video.videoWidth, video.videoHeight);
+    const startX = (video.videoWidth - minDim) / 2;
+    const startY = (video.videoHeight - minDim) / 2;
+    context.drawImage(video, startX, startY, minDim, minDim, 0, 0, 300, 300);
 
-    // Das Bild aus dem Canvas als Text (Base64) extrahieren
+    // Das Bild aus dem Canvas als Text (Base64) speichern
     window.aktuellesFoto = canvas.toDataURL('image/png');
 
-    // Vorschau anzeigen, Video stoppen
+    // --- UI UPDATE ---
     preview.src = window.aktuellesFoto;
-    preview.style.display = "inline-block";
-    video.style.display = "none";
-    snapBtn.style.display = "none";
-    startBtn.style.display = "inline-block";
-    startBtn.innerText = "🔄 Neues Foto";
-
-    // Kamera-Stream stoppen, um Akku zu sparen
+    preview.style.display = "block"; // Zeige das fertige Foto
+    video.style.display = "none"; // Verstecke das Live-Video
+    snapBtn.style.display = "none"; // Verstecke den Auslöser-Knopf
+    
+    // Kamera-Stream beenden, um Akku zu sparen
     if (window.currentCameraStream) { 
         window.currentCameraStream.getTracks().forEach(track => track.stop());
         window.currentCameraStream = null; 
     }
     video.srcObject = null; 
-    console.log("Foto wurde generiert und global gespeichert.");
+    console.log("Foto wurde generiert.");
 }
 
 function stopCameraStream() {
@@ -108,15 +95,12 @@ function stopCameraStream() {
     }
 
     const preview = document.getElementById('photoPreview');
-    const startBtn = document.getElementById('startCameraBtn');
     const snapBtn = document.getElementById('snapBtn');
+    const cameraPlusIcon = document.getElementById('cameraPlusIcon');
 
     if (preview) preview.style.display = "none";
     if (snapBtn) snapBtn.style.display = "none";
-    if (startBtn) { 
-        startBtn.style.display = "inline-block"; 
-        startBtn.innerText = "📸 Kamera öffnen"; 
-    }
+    if (cameraPlusIcon) cameraPlusIcon.style.display = "block"; // Zeige wieder das 📸 an
+    
     window.aktuellesFoto = null; 
-    console.log("Kamerastream gestoppt und UI zurückgesetzt.");
 }

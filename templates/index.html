@@ -51,31 +51,29 @@
             <div class="neon-line"></div>
             <div class="wardrobe-subtitle">- DIE GARDEROBE</div>
             
-            <div class="creation-card">
-                <span class="creation-label">NEUEN CHARAKTER ERSTELLEN</span>
+            <div class="creation-card" style="border: 2px solid var(--neon-purple); border-radius: 15px; padding: 20px; margin-top: 20px; box-shadow: 0 0 15px var(--neon-purple); display: flex; flex-direction: column; align-items: center;">
+                <span class="creation-label" style="color: var(--neon-cyan); font-weight: bold; text-shadow: 0 0 5px var(--neon-cyan); margin-bottom: 15px;">NEUEN CHARAKTER ERSTELLEN</span>
                 
-                <div class="photo-circle-placeholder" id="wardrobeCameraTrigger" onclick="kameraStarten()">
-                    <video id="video" width="100" height="100" autoplay playsinline muted style="display: none; border-radius: 50%; object-fit: cover; position: absolute; top:0; left:0;"></video>
-                    <canvas id="canvas" width="100" height="100" style="display: none;"></canvas>
-                    <img id="photoPreview" src="" style="display: none; width: 100px; height: 100px; border-radius: 50%; object-fit: cover; position: absolute; top:0; left:0;">
-                    <span class="plus-icon" id="cameraPlusIcon">+</span>
+                <div class="photo-circle-placeholder" id="wardrobeCameraTrigger" onclick="kameraStarten()" style="width: 120px; height: 120px; background-color: #1a1a24; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); position: relative; overflow: hidden; cursor: pointer; margin-bottom: 15px;">
+                    <video id="video" autoplay playsinline muted style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0;"></video>
+                    <canvas id="canvas" style="display: none;"></canvas>
+                    <img id="photoPreview" src="" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0;">
+                    <span class="plus-icon" id="cameraPlusIcon" style="font-size: 40px; color: white;">📸</span>
                 </div>
                 
-                <input type="text" id="nameInput" class="name-input-cyber" placeholder="NAME EINGEBEN..." autocomplete="off">
-                <button id="snapBtn" onclick="fotoMachen()" style="display: none; background-color: var(--neon-cyan); color: black; margin-top: 10px; width: auto; padding: 5px 15px; font-size: 0.8rem;">FOTO SCHIESSEN</button>
-                <!-- Verstecktes Select für Kompatibilität -->
+                <button id="snapBtn" onclick="fotoMachen()" class="nav-btn btn-cyber-purple" style="display: none; width: 100%; margin-bottom: 15px;">FOTO SCHIESSEN</button>
+                
+                <input type="text" id="nameInput" class="name-input-cyber" placeholder="NAME EINGEBEN..." autocomplete="off" style="width: 100%; background: transparent; border: 2px solid var(--neon-cyan); color: white; padding: 10px; border-radius: 10px; text-align: center; margin-bottom: 10px;">
+                
                 <select id="emojiInput" style="display:none;"><option value="👤">👤</option></select>
             </div>
 
-            <div id="miniCharGrid" class="mini-char-grid">
-                <!-- Wird dynamisch von storage.js gefüllt -->
-            </div>
+            <div id="miniCharGrid" class="mini-char-grid" style="margin-top: 20px;">
+                </div>
 
-            <button id="startBtn" class="nav-btn btn-save-char" onclick="erstelleCharakter()">CHARAKTER SPEICHERN</button>
-            <button class="nav-btn btn-back-green" onclick="geheZuStartMenue()">ZURÜCK ZUM HAUPTMENÜ</button>
-            <button onclick="punkteResetten()" style="background: transparent; border: none; color: #475569; font-size: 0.7rem; margin-top: 10px;">Punkte Reset</button>
+            <button id="startBtn" class="nav-btn btn-cyber-green" onclick="erstelleCharakter()" style="margin-top: 20px;">CHARAKTER SPEICHERN</button>
+            <button class="nav-btn" onclick="geheZuStartMenue()" style="background-color: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); box-shadow: 0 0 5px var(--neon-red); margin-top: 10px;">ZURÜCK ZUM HAUPTMENÜ</button>
 
-            <div class="footer-ad-placeholder">AD BANNER SPACE (320x50)</div>
             <div style="position: fixed; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: #1e1e24; display: flex; align-items: center; justify-content: center; color: #475569; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); font-weight: bold;" onclick="zeigeRegeln()">?</div>
         </div>
 

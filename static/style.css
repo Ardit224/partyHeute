@@ -317,12 +317,60 @@ button:active {
 .camera-section {
     margin: 20px 0;
     padding: 15px;
-    background: #111827;
+    background: rgba(0, 0, 0, 0.4);
     border-radius: 20px;
     border: 1px dashed #4b5563;
 }
 
-#video, #photoPreview {
+#video {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    border: 2px solid #4b5563;
+    display: none;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+}
+
+#startCameraBtn {
+    border: 2px solid var(--neon-cyan) !important;
+    color: var(--neon-cyan) !important;
+    box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 5px var(--neon-cyan) !important;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin: 20px auto;
+    height: 70px;
+    display: flex;
+    position: relative;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 229, 255, 0.05) !important;
+}
+
+#snapBtn {
+    width: 120px !important;
+    height: 120px !important;
+    border-radius: 50% !important;
+    background: radial-gradient(circle, rgba(176, 38, 255, 0.2), transparent) !important;
+    border: 4px solid var(--neon-purple) !important;
+    color: var(--neon-purple) !important;
+    box-shadow: 0 0 25px var(--neon-purple), inset 0 0 10px var(--neon-purple) !important;
+    display: none; /* Wird via JS eingeblendet */
+    margin: 15px auto !important;
+    position: relative;
+    z-index: 11;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 900;
+    line-height: 1.2;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+#snapBtn:active { transform: scale(0.9); }
+
+#photoPreview {
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
     margin-bottom: 15px;
 }
@@ -451,12 +499,22 @@ button:active {
 
 .creation-card {
     background: rgba(0, 0, 0, 0.6);
-    border: 2px solid var(--neon-cyan);
-    box-shadow: 0 0 15px var(--neon-cyan), inset 0 0 10px var(--neon-cyan);
+    border: 2px solid var(--neon-cyan) !important;
+    box-shadow: 0 0 20px var(--neon-cyan), inset 0 0 15px var(--neon-cyan) !important;
     border-radius: 20px;
     padding: 20px;
     margin-bottom: 30px;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#photoPreview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-purple);
 }
 
 .creation-label {
