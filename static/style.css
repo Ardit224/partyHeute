@@ -9,10 +9,11 @@
     --neon-purple: #b026ff;
     --neon-cyan: #00e5ff;
     --neon-green: #39ff14;
+    --neon-red: #ff264b;
 }
 
 body {
-    background: var(--bg-dark);
+    background: #08080d;
     color: var(--text);
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
@@ -53,6 +54,126 @@ body::before {
     position: relative;
 }
 
+/* --- MASTER TEMPLATE CYBERPUNK STYLES --- */
+
+.status-bar-cyber {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 0 5px;
+}
+
+.badge-cyber {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.badge-purple {
+    color: var(--neon-purple);
+    border: 1px solid var(--neon-purple);
+    box-shadow: 0 0 8px var(--neon-purple);
+    text-shadow: 0 0 5px var(--neon-purple);
+}
+
+.badge-red {
+    color: var(--neon-red);
+    border: 1px solid var(--neon-red);
+    box-shadow: 0 0 8px var(--neon-red);
+    text-shadow: 0 0 5px var(--neon-red);
+}
+
+.badge-green {
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green);
+    text-shadow: 0 0 5px var(--neon-green);
+}
+
+.master-game-card {
+    background: #0b0b10;
+    border: 2px solid var(--neon-purple);
+    border-radius: 24px;
+    padding: 30px 20px;
+    box-shadow: 0 0 15px var(--neon-purple), inset 0 0 10px var(--neon-purple);
+    margin-bottom: 30px;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.card-title-cyan {
+    color: var(--neon-cyan);
+    font-size: 1.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.card-task-text {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    color: #ffffff;
+    margin-bottom: 30px;
+}
+
+/* Modular Slot: Avatar Row */
+.modular-slot-cyber {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 18px;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.avatar-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    background: #111118;
+}
+
+.avatar-purple { border: 2px solid var(--neon-purple); color: var(--neon-purple); }
+.avatar-green { border: 2px solid var(--neon-green); color: var(--neon-green); }
+.avatar-red { border: 2px solid var(--neon-red); color: var(--neon-red); }
+.avatar-cyan { border: 2px solid var(--neon-cyan); color: var(--neon-cyan); }
+
+.avatar-highlight {
+    border: 2px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: 0 0 12px var(--neon-cyan);
+}
+
+.label-highlight {
+    color: var(--neon-cyan);
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
 input, select, button {
     width: 100%;
     padding: 14px;
@@ -89,16 +210,17 @@ button:active {
 
 .spieler-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 15px;
     margin-top: 20px;
 }
 
 .spieler-karte {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--neon-purple);
+    box-shadow: 0 0 8px var(--neon-purple);
+    border-radius: 18px;
+    padding: 15px;
     text-align: center;
     transition: 0.3s;
     cursor: pointer;
@@ -108,19 +230,18 @@ button:active {
 
 .spieler-karte:hover {
     transform: scale(1.05);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 5px 15px rgba(244, 114, 182, 0.3);
+    box-shadow: 0 0 15px var(--neon-purple);
 }
 
 .avatar-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
+    width: 90px;
+    height: 90px;
     margin: 0 auto 8px auto;
     border-radius: 50%;
-    border: 2px solid #f472b6;
+    border: 2px solid var(--neon-purple);
     overflow: hidden;
     background-color: #374151;
 }
@@ -134,8 +255,8 @@ button:active {
 .spieler-name {
     display: block;
     font-weight: bold;
-    font-size: 14px;
-    color: white;
+    font-size: 16px;
+    color: var(--text);
     margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
@@ -433,6 +554,13 @@ button:active {
     transition: all 0.3s ease;
     margin-left: auto;
     margin-right: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 0 15px;
+    padding-bottom: 4px; /* Einheitlicher optischer Nudge nach oben für alle Cyber-Buttons */
 }
 
 .btn-save-char {
@@ -450,10 +578,7 @@ button:active {
     color: var(--neon-green);
     box-shadow: 0 0 15px var(--neon-green);
     height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 5px; /* Schiebt den Schriftzug ein Stück hoch */
+    /* Nutzt jetzt die Basis-Zentrierung von .nav-btn */
 }
 
 .footer-ad-placeholder {
@@ -478,6 +603,58 @@ button:active {
     box-shadow: 0 0 15px #10b981;
     color: #10b981;
 }
+
+.btn-cyber-red {
+    background: transparent;
+    border: 2px solid var(--neon-red);
+    box-shadow: 0 0 15px var(--neon-red);
+    color: var(--neon-red);
+    /* Extrem-Padding entfernt, nutzt Basis-Zentrierung */
+}
+
+.navigation-area-cyber {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 25px 0;
+    width: 100%;
+}
+
+.help-circle-mini {
+    width: 45px;
+    height: 45px;
+    min-width: 45px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.active-guests-section {
+    margin-top: 30px;
+    width: 100%;
+}
+
+.cyber-separator {
+    border: 0;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+    margin-bottom: 15px;
+}
+
+.horizontal-player-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding: 10px 5px;
+    scrollbar-width: none; /* Hide scrollbar for clean look */
+}
+.horizontal-player-row::-webkit-scrollbar { display: none; }
 
 .btn-cyber-blue {
     background: transparent;
@@ -644,6 +821,90 @@ button:active {
     font-size: 18px !important;
 }
 
+/* --- GAME MODE REDESIGN --- */
+
+.hero-mode-card {
+    background: linear-gradient(145deg, rgba(176, 38, 255, 0.15), rgba(0, 0, 0, 0.6));
+    border: 3px solid var(--neon-purple);
+    box-shadow: 0 0 25px var(--neon-purple), inset 0 0 15px var(--neon-purple);
+    border-radius: 28px;
+    padding: 25px;
+    margin-bottom: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.hero-mode-card:active { transform: scale(0.98); }
+
+.hero-config-unit {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 20px;
+    border: 1px solid rgba(176, 38, 255, 0.3);
+}
+
+.game-carousel {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 10px 5px 25px 5px;
+    margin-bottom: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-purple) rgba(0, 0, 0, 0.3);
+}
+
+.game-carousel::-webkit-scrollbar {
+    height: 8px;
+    display: block;
+}
+
+.game-carousel::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+}
+
+.game-carousel::-webkit-scrollbar-thumb {
+    background: var(--neon-purple);
+    border-radius: 10px;
+    box-shadow: 0 0 10px var(--neon-purple);
+}
+
+.game-mode-card {
+    flex: 0 0 140px;
+    height: 180px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    scroll-snap-align: start;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.card-purple { border-color: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); color: var(--neon-purple); }
+.card-cyan { border-color: var(--neon-cyan); box-shadow: 0 0 12px var(--neon-cyan); color: var(--neon-cyan); }
+.card-green { border-color: var(--neon-green); box-shadow: 0 0 12px var(--neon-green); color: var(--neon-green); }
+.card-red { border-color: var(--neon-red); box-shadow: 0 0 12px var(--neon-red); color: var(--neon-red); }
+
+.game-mode-card .mode-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+.game-mode-card .mode-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    padding: 0 5px;
+}
+
 .random-overlay {
     position: fixed;
     top: 0;
@@ -678,11 +939,15 @@ button:active {
 }
 
 .btn-drink-huge {
-    background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+    background: transparent !important;
+    border: 3px solid var(--neon-red) !important;
+    color: var(--neon-red) !important;
+    box-shadow: 0 0 20px var(--neon-red) !important;
     font-size: 1.6rem !important;
-    padding: 25px !important;
+    padding: 20px !important;
     height: auto !important;
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4) !important;
+    border-radius: 15px !important;
+    text-transform: uppercase;
 }
 
 .btn-skip-tiny {

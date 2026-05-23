@@ -66,10 +66,14 @@ function listeAnzeigen() {
     // Spezielles Rendering für das Garderoben-Grid
     if (istGarderobe && miniGrid) {
         miniGrid.innerHTML = "";
-        gespeicherteSpieler.slice(-3).forEach(spieler => {
+        gespeicherteSpieler.forEach((spieler, index) => {
             const content = spieler.emoji.includes('<img') ? spieler.emoji : '';
             miniGrid.innerHTML += `
-                <div class="mini-char-card">
+                <div class="mini-char-card" style="position: relative;">
+                    <div class="charakter-actions" style="opacity: 1; top: 5px; right: 5px;">
+                        <button class="action-btn edit" style="padding: 2px 5px;" onclick="event.stopPropagation(); charakterBearbeiten(${index})">✏️</button>
+                        <button class="action-btn delete" style="padding: 2px 5px;" onclick="event.stopPropagation(); charakterLoeschen(${index})">🗑️</button>
+                    </div>
                     <div class="initial-circle">${content}</div>
                     <span style="color: var(--neon-purple); font-size: 0.6rem; font-weight: bold; text-transform: uppercase;">${spieler.name}</span>
                 </div>
@@ -78,7 +82,7 @@ function listeAnzeigen() {
     }
 
     if (!listenBereich) return;
-    listenBereich.innerHTML = ""; 
+    listenBereich.innerHTML = "";
 
     gespeicherteSpieler.forEach((spieler, index) => {
         let extraKlasse = (spieler.aktiv !== false) ? "" : "spieler-inaktiv";
@@ -97,7 +101,7 @@ function listeAnzeigen() {
                 </div>
                 ${spieler.emoji.includes('<img') ? '' : `<span class="spieler-name">${spieler.name}</span>`}
                 ${isCounterEnabled ? `
-                    <div class="drink-controls">
+                    <div class="drink-controls" style="margin-bottom: 5px;">
                         <button class="drink-btn minus" onclick="event.stopPropagation(); window.getraenkAbziehen(${index})">-</button>
                         <button class="drink-btn plus" onclick="event.stopPropagation(); window.getraenkHinzufuegen(${index})">+🍹</button>
                     </div>

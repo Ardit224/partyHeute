@@ -66,16 +66,18 @@ async function paranoiaFrageLaden() {
     document.getElementById('paranoiaFrageAnsicht').style.display = "block";
 
     // Im Zen-Modus (Counter aus) den "Jemand trinkt" Button verstecken und "Weiter" anpassen
-    const drinkBtn = document.querySelector('#paranoiaFrageAnsicht button[onclick="paranoiaTrinkenAuswaehlen()"]');
-    const nextBtn = document.querySelector('#paranoiaFrageAnsicht button[onclick="naechsteParanoiaRunde()"]');
+    const drinkBtn = document.getElementById('paranoiaDrinkBtn');
+    const skipBtn = document.getElementById('paranoiaSkipBtn');
+    
     if (!isCounterEnabled) {
         if (drinkBtn) drinkBtn.style.display = 'none';
-        if (nextBtn) {
-            nextBtn.innerText = "Weiter 🃏";
-            nextBtn.onclick = isGemischteRunde ? geheZurueckZumMix : naechsteParanoiaRunde;
+        if (skipBtn) {
+            skipBtn.innerText = "Weiter";
         }
-    } else if (drinkBtn) {
+    } else {
         drinkBtn.style.display = 'inline-block';
+        skipBtn.style.display = 'inline-block';
+        skipBtn.innerText = "🙅‍♂️ Keiner muss";
     }
     
     if (typeof playSound === "function") playSound('click');
@@ -125,11 +127,19 @@ function paranoiaSchluckeVerteilen(index) {
     // Im gemischten Modus den "Nächste Frage" Knopf unterdrücken und nur "Weiter im Mix" erlauben
     if (isGemischteRunde) {
         document.getElementById('paranoiaSpielerListe').innerHTML = `
-            <div style="text-align:center; width:100%;">
-                <h3 style="color:#10b981;">Schlücke gebucht! ✅</h3>
-                <button class="nav-btn" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+            <div style="text-align:center; width:100%; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center;">
+                <h3 style="color:#10b981; margin-bottom: 20px;">Schlücke gebucht! ✅</h3>
+                <button class="nav-btn" onclick="geheZurueckZumMix()">Weiter</button>
             </div>
         `;
+    } else {
+        naechsteParanoiaRunde();
+    }
+}
+
+function paranoiaNiemandTrinkt() {
+    if (isGemischteRunde) {
+        geheZurueckZumMix();
     } else {
         naechsteParanoiaRunde();
     }

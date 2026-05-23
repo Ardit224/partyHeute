@@ -42,8 +42,8 @@ function neuerVirus(isMixed = false) {
     }
     
     const schlucke = Math.floor(Math.random() * 3) + 2;
-    // Im Mixed-Modus halten Viren 5-10 Runden, im Einzelmodus unbegrenzt (-1)
-    const runden = isMixed ? Math.floor(Math.random() * 6) + 5 : -1;
+    // Im Mixed-Modus halten Viren drastisch verkürzt nur noch 2-4 Runden
+    const runden = isMixed ? Math.floor(Math.random() * 3) + 2 : -1;
 
     const renderName = (n) => `<span style="color: #22c55e; font-weight: bold;">${n}</span>`;
     
@@ -95,7 +95,14 @@ function updateVirusUI() {
 
 function virusTick() {
     aktiveViren.forEach(v => {
-        if (v.runden > 0) v.runden--;
+        if (v.runden > 0) {
+            v.runden--;
+            if (v.runden === 0) {
+                if (typeof zeigeBefreiungsScreen === 'function') {
+                    zeigeBefreiungsScreen(v, true);
+                }
+            }
+        }
     });
     aktiveViren = aktiveViren.filter(v => v.runden !== 0);
     updateVirusStatusBar();
@@ -109,6 +116,16 @@ function updateVirusStatusBar() {
         bar.style.display = 'none';
         return;
     }
-    bar.style.display = 'block';
+    bar.style.display = 'none'; // Graue Statusleiste permanent ausblenden
     bar.innerHTML = "☣️ AKTIVE VIREN: " + mixedViren.map(v => `${v.plainText} (${v.runden}R)`).join(" | ");
+}
+
+/**
+ * Setzt alle aktiven Viren zurück.
+ */
+function resetViren() {
+    aktiveViren = [];
+    updateVirusStatusBar();
+    updateVirusUI();
+    if (typeof updateRundenAufgabenUI === 'function') updateRundenAufgabenUI();
 }

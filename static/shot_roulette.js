@@ -25,7 +25,7 @@ function starteShotRoulette() {
     if (isGemischteRunde) {
         if (nextBtn) nextBtn.style.display = 'none'; // Verstecke "Nächste Runde" im Mix
         if (exitBtn) {
-            exitBtn.innerText = "Weiter im Mix 🚀";
+            exitBtn.innerText = "Weiter";
             exitBtn.setAttribute('onclick', 'geheZurueckZumMix()');
         }
     } else {
@@ -102,7 +102,7 @@ function naechsteShotRunde() {
             if (isGemischteRunde) {
                 selectionArea.style.display = 'block';
                 document.getElementById('shotPlayerGrid').innerHTML = `
-                    <button class="nav-btn" style="grid-column: 1/-1; width: 100%; margin: 20px 0; padding: 15px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+                    <button class="nav-btn" style="grid-column: 1 / -1; margin: 20px auto; padding: 15px;" onclick="geheZurueckZumMix()">Weiter</button>
                 `;
             } else {
                 selectionArea.style.display = 'none';
@@ -110,7 +110,7 @@ function naechsteShotRunde() {
         } else if (!isCounterEnabled) {
             selectionArea.style.display = 'block';
             document.getElementById('shotPlayerGrid').innerHTML = `
-                <button class="nav-btn" style="grid-column: 1/-1; width: 100%; margin: 20px 0; padding: 15px;" onclick="${isGemischteRunde ? 'geheZurueckZumMix()' : 'naechsteShotRunde()'}">Weiter 🚀</button>
+                <button class="nav-btn" style="grid-column: 1 / -1; margin: 20px auto; padding: 15px;" onclick="${isGemischteRunde ? 'geheZurueckZumMix()' : 'naechsteShotRunde()'}">Weiter</button>
             `;
         } else {
             selectionArea.style.display = 'block';
@@ -163,7 +163,7 @@ function sr_bucheSchlückeManuell(playerName, btn) {
         // Im gemischten Modus die Auswahl durch einen "Weiter"-Button ersetzen
         if (isGemischteRunde) {
             document.getElementById('shotPlayerGrid').innerHTML = `
-                <button class="nav-btn" style="grid-column: 1/-1; width: 100%; margin: 20px 0; padding: 15px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+                <button class="nav-btn" style="grid-column: 1 / -1; margin: 20px auto; padding: 15px;" onclick="geheZurueckZumMix()">Weiter</button>
             `;
         }
     }

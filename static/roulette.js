@@ -31,7 +31,7 @@ function starteCountdownSpiel() {
     // Button Text anpassen, falls wir in der gemischten Runde sind
     const exitBtn = document.querySelector('#countdownBereich button[onclick="zurueckZumMenueAusCountdown()"]');
     if (exitBtn) {
-        exitBtn.innerText = isGemischteRunde ? "Weiter im Mix 🚀" : "Zurück zur Auswahl";
+        exitBtn.innerText = isGemischteRunde ? "Weiter" : "Zurück zur Auswahl";
     }
 }
 
@@ -144,10 +144,7 @@ function radDrehen() {
         
         aktuelleCountdownSchluecke = Math.min(countdownPot.length, 8);
 
-        if (isGemischteRunde) {
-            // Im gemischten Modus nach einem Treffer den Button ausblenden und zum Mix zurückkehren
-            document.getElementById('countdownZiehenBtn').style.display = 'none';
-        } else if (countdownPot.length === 1) {
+        if (countdownPot.length === 1) {
             let gewinner = countdownPot[0];
             document.getElementById('countdownStatus').innerText = "Spiel vorbei!";
             

@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;" onclick="customAlert('Hilfe & Regeln: ...')">?</div>
+            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;" onclick="zeigeRegeln()">?</div>
         </div>
 
         <!-- 2. GARDEROBE (Charakter-Editor) -->
@@ -76,30 +76,30 @@
             <button onclick="punkteResetten()" style="background: transparent; border: none; color: #475569; font-size: 0.7rem; margin-top: 10px;">Punkte Reset</button>
 
             <div class="footer-ad-placeholder">AD BANNER SPACE (320x50)</div>
-            <div style="position: fixed; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: #1e1e24; display: flex; align-items: center; justify-content: center; color: #475569; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); font-weight: bold;">?</div>
+            <div style="position: fixed; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: #1e1e24; display: flex; align-items: center; justify-content: center; color: #475569; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); font-weight: bold;" onclick="zeigeRegeln()">?</div>
         </div>
 
         <!-- 2.3 CHARACTER SELECTION -->
         <div id="charakterSelection" class="menu-screen" style="display: none; text-align: center; position: relative; min-height: 90vh;">
-            <h1 class="title-glow" style="margin-bottom: 0; font-size: 2.5rem;">PARTYHEUTE</h1>
-            <div style="height: 3px; width: 220px; background: linear-gradient(to right, transparent, #8b5cf6, #3b82f6, transparent); margin: 5px auto 15px auto;"></div>
-            <h3 style="color: #8b5cf6; text-shadow: 0 0 5px #8b5cf6; font-size: 1rem; margin-top: 0; font-weight: bold; letter-spacing: 2px;">- CHARAKTERAUSWAHL</h3>
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- CHARAKTERAUSWAHL</div>
             
-            <p style="margin: 25px 0 10px 0; font-size: 0.85rem; color: #cbd5e1; font-weight: bold; text-transform: uppercase;">GESPEICHERTE CHARAKTERE AUSWÄHLEN (3 - 8 Spieler)</p>
+            <p style="margin: 25px 0 10px 0; font-size: 1rem; color: #cbd5e1; font-weight: bold; text-transform: uppercase;">GESPEICHERTE CHARAKTERE AUSWÄHLEN (3 - 8 Spieler)</p>
             
             <div id="selectionGrid" class="char-selection-grid"></div>
 
-            <div style="display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 30px auto; width: 90%;">
-                <button class="nav-btn" onclick="bestaetigeCharakterAuswahl()" style="background: #8b5cf6; box-shadow: 0 0 15px #8b5cf6; border: none; padding: 18px; height: auto; border-radius: 15px; color: white;">
+            <div class="main-nav" style="width: 100%; margin-top: 30px;">
+                <button class="nav-btn btn-cyber-purple" onclick="bestaetigeCharakterAuswahl()" style="height: auto; padding: 18px;">
                     <span style="font-weight: bold; font-size: 1rem;">WEITER ZUR SPIELKONFIGURATION</span><br>
                     <small style="opacity: 0.9; font-size: 0.8rem;">(mit Counter etc.)</small>
                 </button>
-                <button class="nav-btn" onclick="geheZuStartMenue()" style="background: transparent; border: 2px solid #10b981; box-shadow: 0 0 10px #10b981; color: #10b981; padding: 15px; height: auto; border-radius: 15px; font-weight: bold;">
+                <button class="nav-btn btn-cyber-green" onclick="geheZuStartMenue()" style="height: auto; padding: 15px;">
                     ZURÜCK ZUM HAUPTMENÜ
                 </button>
             </div>
 
-            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;">?</div>
+            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;" onclick="zeigeRegeln()">?</div>
         </div>
 
         <!-- 2.5 COUNTER SELECTION -->
@@ -122,85 +122,133 @@
         </div>
 
         <!-- 3. SPIELAUSWAHL (Welches Spiel?) -->
-        <div id="hauptMenue" style="display: none;">
-            <h1 class="title-glow" style="font-size: 2rem;">Spielmodus</h1>
+        <div id="hauptMenue" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- SPIELMODUS</div>
             
-            <!-- Großer Haupt-Button für die gemischte Runde -->
-            <button class="nav-btn mixed-mode-btn" onclick="starteGemischteRunde()" style="margin-bottom: 25px; height: auto; padding: 25px; border: 2px solid #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);">
-                <span style="font-size: 1.5rem; display: block;">🚀 Gemischte Runde</span>
-                <small style="opacity: 0.8; font-size: 0.9rem;">Alles wild zusammengewürfelt</small>
-            </button>
-
-            <div style="margin-bottom: 20px;">
-                <label for="levelInput" style="display:block; margin-bottom:8px; font-size: 0.9em; opacity: 0.8;">Härtegrad wählen:</label>
-                <select id="levelInput">
-                    <option value="1">Soft (1-2 Schlücke) 🥤</option>
-                    <option value="2" selected>Normal (2-4 Schlücke)</option>
-                    <option value="3">Hardcore (3-6 Schlücke) 🔥</option>
-                </select>
+            <!-- HERO CARD: GEMISCHTE RUNDE -->
+            <div class="hero-mode-card" onclick="starteGemischteRunde()">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🚀</div>
+                <div style="font-size: 1.6rem; font-weight: 900; letter-spacing: 2px;">GEMISCHTE RUNDE</div>
+                <p style="opacity: 0.7; font-size: 0.9rem; margin-bottom: 15px;">Alles wild zusammengewürfelt</p>
+                
+                <div class="hero-config-unit" onclick="event.stopPropagation()">
+                    <label for="levelInput" style="display:block; margin-bottom:10px; font-size: 0.7rem; font-weight: bold; color: var(--neon-cyan); letter-spacing: 1px;">HÄRTEGRAD WÄHLEN:</label>
+                    <select id="levelInput" class="name-input-cyber" style="width: 100%; margin-bottom: 0;">
+                        <option value="1">Soft (1-2 Schlücke) 🥤</option>
+                        <option value="2" selected>Normal (2-4 Schlücke)</option>
+                        <option value="3">Hardcore (3-6 Schlücke) 🔥</option>
+                    </select>
+                </div>
             </div>
 
-            <h3 style="margin-top: 30px; opacity: 0.7; font-size: 1rem;">Einzelne Spiele:</h3>
-            <div class="game-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button onclick="kategorieWaehlen('wer_wuerde_eher')" style="background-color: #ec4899;">🤔 Wer würde eher...</button>
-                <button onclick="kategorieWaehlen('aufgaben')" style="background-color: #3b82f6;">🎯 Aufgaben</button>
-                <button onclick="kategorieWaehlen('ich_hab_noch_nie')" style="background-color: #f59e0b;">🤫 Ich hab noch nie...</button>
-                <button onclick="starteParanoia()" style="background-color: #10b981;">🕵️ Paranoia</button>
-                <button onclick="starteCountdownSpiel()" style="background-color: #8b5cf6;">🎡 Countdown</button>
-                <button onclick="starteShotRoulette()" style="background-color: #ef4444;">🥃 Shot Roulette</button>
-                <button onclick="starteTribunalSpiel()" style="background-color: #475569;">⚖️ Das Tribunal</button>
-                <button onclick="starteZeitbombeSpiel()" style="background-color: #f97316;">💣 Die Zeitbombe</button>
-                <button onclick="starteVirusSpiel()" style="background-color: #22c55e;">🦠 Virus-Spiel</button>
-                <button onclick="zufallsSpielWaehlen()" style="background: var(--secondary);">🎲 Zufall</button>
+            <p style="text-align: left; margin-left: 5px; font-size: 0.7rem; color: var(--neon-cyan); font-weight: bold; letter-spacing: 1px;">EINZELNE SPIELE:</p>
+            
+            <!-- HORIZONTAL SWIPE CAROUSEL -->
+            <div class="game-carousel">
+                <div class="game-mode-card card-purple" onclick="kategorieWaehlen('wer_wuerde_eher')">
+                    <span class="mode-icon">🤔</span>
+                    <span class="mode-title">WER WÜRDE EHER...</span>
+                </div>
+                <div class="game-mode-card card-cyan" onclick="kategorieWaehlen('aufgaben')">
+                    <span class="mode-icon">🎯</span>
+                    <span class="mode-title">AUFGABEN</span>
+                </div>
+                <div class="game-mode-card card-red" onclick="starteShotRoulette()">
+                    <span class="mode-icon">🥃</span>
+                    <span class="mode-title">SHOT ROULETTE</span>
+                </div>
+                <div class="game-mode-card card-green" onclick="starteParanoia()">
+                    <span class="mode-icon">🕵️</span>
+                    <span class="mode-title">PARANOIA</span>
+                </div>
+                <div class="game-mode-card card-purple" onclick="starteCountdownSpiel()">
+                    <span class="mode-icon">🎡</span>
+                    <span class="mode-title">COUNTDOWN</span>
+                </div>
+                <div class="game-mode-card card-cyan" onclick="starteTribunalSpiel()">
+                    <span class="mode-icon">⚖️</span>
+                    <span class="mode-title">TRIBUNAL</span>
+                </div>
+                <div class="game-mode-card card-green" onclick="starteVirusSpiel()">
+                    <span class="mode-icon">🦠</span>
+                    <span class="mode-title">VIRUS-SPIEL</span>
+                </div>
             </div>
-            <button id="menuEndBtn" onclick="beendeSpielUndZeigeStatistik()" style="background-color: #4b5563; margin-top: 15px;">🛑 Session beenden & Statistik</button>
+            
+            <div class="main-nav" style="width: 100%; margin-top: 30px;">
+                <button id="menuEndBtn" class="nav-btn btn-cyber-red" onclick="beendeSpielUndZeigeStatistik()" style="height: 60px;">🛑 SESSION BEENDEN & STATISTIK</button>
+            </div>
         </div>
 
         <!-- 4. SPIELBEREICH (Karten-Anzeige) -->
-        <div id="spielBereich" style="display: none;">
-            <div id="tribunalCountdownMixed" class="tribunal-countdown-box"></div>
-            <div id="gameIconHeader" style="font-size: 2.5rem; margin-bottom: 5px;"></div>
-            <p id="gameTypeLabel" style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.7rem; margin-bottom: 15px; opacity: 0.6; font-weight: bold;"></p>
-            <h2 id="frageText" style="min-height: 60px;"></h2>
-            <p id="strafeText" style="font-weight: bold; color: #f472b6;"></p>
+        <div id="spielBereich" class="menu-screen" style="display: none; text-align: center; position: relative; min-height: 90vh;">
+            <!-- Status Bar Section -->
+            <div class="status-bar-cyber">
+                <div id="badgeMixed" class="badge-cyber badge-purple" style="display: none;">🎲 Gemischte Runde</div>
+                <div id="badgeVirus" class="badge-cyber badge-red" style="display: none;">🦠 Virus Aktiv</div>
+            </div>
 
-            <div id="entscheidungsBereich" class="aktions-box-vertical">
-                <button id="failBtn" class="btn-drink-huge" onclick="trinkenBestätigen()"> Trinken!</button>
-                <button id="tribunalBtn" class="btn-drink-huge" style="display: none; background-color: #ef4444;" onclick="tribunalErgebnisEintragen('tribunalCountdownMixed', 'tribunalBtn')">⚖️ Ergebnis eintragen</button>
-                <button id="skipDrinkBtn" class="btn-skip-tiny" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
+            <!-- Main Game Card -->
+            <div class="master-game-card">
+                <div id="tribunalCountdownMixed" class="tribunal-countdown-box"></div>
+                <h1 id="gameTypeLabel" class="card-title-cyan">TITEL</h1>
+                <h2 id="frageText" class="card-task-text">AUFGABENTEXT</h2>
+                
+                <!-- Modular Feature Slot (e.g. Roulette/Avatars) -->
+                <div id="modularFeatureSlot" class="modular-slot-cyber" style="display: none;"></div>
+
+                <p id="strafeText" style="font-weight: bold; color: var(--neon-purple); margin-top: 20px;"></p>
+
+                <div id="entscheidungsBereich" class="aktions-box-vertical">
+                    <button id="failBtn" class="btn-drink-huge" style="display: none;" onclick="trinkenBestätigen()">🍹 Trinken!</button>
+                    <button id="tribunalBtn" class="btn-drink-huge" style="display: none; background-color: #ef4444;" onclick="tribunalErgebnisEintragen('tribunalCountdownMixed', 'tribunalBtn')">⚖️ Ergebnis eintragen</button>
+                    <button id="skipDrinkBtn" class="btn-skip-tiny" style="display: none;" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
+                </div>
+            </div> <!-- ENDE MASTER-GAME-CARD -->
+
+            <!-- NAVIGATION AREA (Sibling of Card) -->
+            <div class="navigation-area-cyber">
+                <button id="naechsteKarteBtn" class="nav-btn btn-weiter-cyber" onclick="karteZiehen()" style="display: none;">WEITER</button>
+                
+                <button class="nav-btn btn-cyber-green" onclick="zurueckZumHauptMenue()" style="height: 60px; margin-bottom: 10px;">ZURÜCK ZUR AUSWAHL</button>
+                
+                <div style="display: flex; align-items: center; gap: 10px; width: 100%; max-width: 350px; margin: 0 auto;">
+                    <button id="gameEndBtn" class="nav-btn btn-cyber-red" onclick="beendeSpielUndZeigeStatistik()" style="display: none; height: 60px; flex: 1; margin-bottom: 0;">🏆 SESSION BEENDEN & STATISTIK</button>
+                    <div class="help-circle-mini" onclick="zeigeRegeln()">?</div>
+                </div>
             </div>
 
             <div id="werTrinktBereich" style="display: none; margin-top: 20px;">
                 <h3>Wer muss trinken?</h3>
-                <div id="auswahlListe" class="spieler-grid">
-                    <!-- Spieler-Buttons werden hier dynamisch eingefügt -->
-                </div>
+                <div id="auswahlListe" class="spieler-grid"></div>
             </div>
-
-            <button id="naechsteKarteBtn" onclick="karteZiehen()" style="display: none; background-color: #3b82f6; margin-top: 20px;">Nächste Karte 🃏</button>
-            <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zur Spielauswahl</button>
-            <button id="gameEndBtn" onclick="beendeSpielUndZeigeStatistik()" style="display: none; background-color: #ef4444; margin-top: 10px;">🏆 Spiel beenden & Statistik</button>
         </div>
 
         <!-- Bereich für aktive Runden-Herausforderungen -->
         <div id="rundenAufgabenContainer" style="margin-top: 20px;"></div>
 
         <!-- ZEITBOMBE SPIEL BEREICH -->
-        <div id="zeitbombeBereich" style="display: none; text-align: center;">
-            <div class="shot-card theme-zeitbombe">
-                <h1 style="color: #f97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);">💣 Zeitbombe</h1>
-                
+        <div id="zeitbombeBereich" class="menu-screen" style="display: none; text-align: center; position: relative;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- ZEITBOMBE</div>
+
+            <div class="master-game-card" style="border-color: #f97316; box-shadow: 0 0 15px #f97316;">
+                <h1 class="card-title-cyan" style="color: #f97316; text-shadow: 0 0 10px #f97316;">💣 DIE BOMBE</h1>
                 <div id="bombCategoryBox" class="bomb-category-box">Bereit?</div>
-                
                 <div id="bombPlayerDisplay" style="margin: 20px 0; min-height: 150px;"></div>
-
                 <div id="bombExplosionBox" style="display: none; margin: 20px 0;"></div>
-
-                <button id="bombStartBtn" class="nav-btn" style="background-color: #f97316;" onclick="startBombLogic()">Spiel starten! 🔥</button>
-                <button id="bombPassBtn" class="nav-btn" style="background-color: #3b82f6; display: none; padding: 25px; font-size: 1.5rem;" onclick="bombeWeitergeben()">WEITERGEBEN! ➡️</button>
-                
-                <button id="bombBackBtn" class="nav-btn" style="background-color: #4b5563; margin-top: 15px;" onclick="zurueckZumHauptMenue()">Zurück zum Menü</button>
             </div>
+
+            <div class="main-nav" style="width: 100%;">
+                <button id="bombStartBtn" class="nav-btn btn-cyber-purple" onclick="startBombLogic()">SPIEL STARTEN! 🔥</button>
+                <button id="bombPassBtn" class="nav-btn btn-cyber-blue" style="display: none; height: 120px; font-size: 1.8rem;" onclick="bombeWeitergeben()">WEITERGEBEN! ➡️</button>
+                <button id="bombBackBtn" class="nav-btn btn-cyber-green" style="height: 60px;" onclick="zurueckZumHauptMenue()">ZURÜCK ZUR AUSWAHL</button>
+            </div>
+
+            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;" onclick="zeigeRegeln()">?</div>
         </div>
 
         <!-- HANDY WECHSEL BEREICH -->
@@ -212,97 +260,104 @@
         </div>
 
         <!-- TRIBUNAL SPIEL BEREICH (Einzelmodus) -->
-        <div id="tribunalBereich" style="display: none; text-align: center;">
-            <h1 style="color: #94a3b8; text-shadow: 0 0 10px rgba(148, 163, 184, 0.5);">⚖️ Das Tribunal</h1>
-            <p>Das Gericht tagt. Die Gruppe fällt das Urteil!</p>
-            
-            <div id="tribunalCard" class="shot-card theme-tribunal" style="margin: 20px auto; min-height: 200px; display: flex; align-items: center; justify-content: center; padding: 25px;">
-                <p id="tribunalTaskText" style="font-size: 1.4rem; line-height: 1.4; color: white;"></p>
-            </div>
-            
-            <div id="tribunalCountdownStandalone" class="tribunal-countdown-box"></div>
-
-            <button id="tribunalStandaloneBtn" class="nav-btn" style="background-color: #ef4444;" onclick="tribunalErgebnisEintragen('tribunalCountdownStandalone', 'tribunalStandaloneBtn')">⚖️ Ergebnis eintragen</button>
-            <button id="tribunalNextBtn" class="nav-btn" style="background-color: #3b82f6; display:none;" onclick="naechsteTribunalRunde()">Nächste Anklage ⚖️</button>
-            <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 15px;">Zurück zum Menü</button>
-        </div>
+        <!-- Dieser Bereich wurde bereits korrekt integriert, ich entferne nur das doppelte Fragment weiter oben im Code-Flow -->
 
         <!-- VIRUS SPIEL BEREICH -->
-        <div id="virusBereich" style="display: none; text-align: center;">
-            <h1 style="color: #22c55e; text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);">☣️ Virus-Labor</h1>
-            <p>Setze permanente Regeln frei. Wer sie bricht, trinkt!</p>
+        <div id="virusBereich" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- VIRUS LABOR</div>
             
-            <div id="aktiveVirenListe" style="margin: 25px 0; max-height: 300px; overflow-y: auto;"></div>
+            <div class="master-game-card" style="border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green);">
+                <h1 class="card-title-cyan" style="color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">INFEKTION</h1>
+                <div id="aktiveVirenListe" style="margin: 25px 0; max-height: 300px; overflow-y: auto;"></div>
+                <button class="nav-btn btn-cyber-green" onclick="neuerVirus(false)" style="height: auto; padding: 15px;">🦠 VIRUS FREISETZEN</button>
+            </div>
             
-            <button class="nav-btn" onclick="neuerVirus(false)" style="background-color: #22c55e; padding: 20px; font-size: 1.2rem;">🦠 Virus freisetzen</button>
-            <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 15px;">Zurück zum Menü</button>
+            <div class="main-nav" style="width: 100%;">
+                <button class="nav-btn btn-cyber-green" style="height: 60px;" onclick="zurueckZumHauptMenue()">ZURÜCK ZUR AUSWAHL</button>
+            </div>
         </div>
 
         <!-- 4b. PARANOIA BEREICH -->
-        <div id="paranoiaBereich" style="display: none;">
-            <div id="paranoiaStart">
-                <h2>🕵️ Wer ist dran?</h2>
-                <div id="paranoiaAktiverSpielerAnzeige" style="margin: 20px 0;"></div>
-                <p>Gib das Handy an diese Person weiter!</p>
-                <button onclick="paranoiaFrageLaden()" style="background-color: #10b981;">Ich habe das Handy 📱</button>
-            </div>
+        <div id="paranoiaBereich" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- PARANOIA</div>
 
-            <div id="paranoiaFrageAnsicht" style="display: none;">
-                <h3 id="paranoiaText" style="min-height: 60px; margin-bottom: 20px;"></h3>
-                <p>Beantworte die Frage, indem du auf jemanden zeigst. Wenn die Person wissen will warum, muss sie trinken!</p>
-                <div class="aktions-box">
-                    <button onclick="paranoiaTrinkenAuswaehlen()" style="background-color: #ef4444;">🍺 Jemand trinkt</button>
-                    <button onclick="naechsteParanoiaRunde()" style="background-color: #4b5563;">Nächste Runde 🃏</button>
+            <div class="master-game-card" style="border-color: var(--neon-green); box-shadow: 0 0 15px var(--neon-green);">
+                <div id="paranoiaStart">
+                    <h1 class="card-title-cyan" style="color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green);">WER IST DRAN?</h1>
+                    <div id="paranoiaAktiverSpielerAnzeige" style="margin: 20px 0;"></div>
+                    <p style="margin-bottom: 20px;">Gib das Handy an diese Person weiter!</p>
+                    <button class="nav-btn btn-cyber-green" onclick="paranoiaFrageLaden()" style="height: auto; padding: 15px;">ICH HABE DAS HANDY 📱</button>
+                </div>
+
+                <div id="paranoiaFrageAnsicht" style="display: none;">
+                    <h2 id="paranoiaText" class="card-task-text" style="min-height: 60px;"></h2>
+                    <div class="aktions-box-vertical">
+                        <button id="paranoiaDrinkBtn" class="btn-drink-huge" onclick="paranoiaTrinkenAuswaehlen()">🍹 JEMAND TRINKT</button>
+                        <button id="paranoiaSkipBtn" class="btn-skip-tiny" onclick="paranoiaNiemandTrinkt()">🙅‍♂️ Keiner muss</button>
+                    </div>
+                </div>
+
+                <div id="paranoiaTrinkAuswahl" style="display: none;">
+                    <h2 class="card-title-cyan" style="font-size: 1.2rem;">WER HAT GETRUNKEN?</h2>
+                    <div id="paranoiaSpielerListe" class="spieler-grid"></div>
                 </div>
             </div>
 
-            <div id="paranoiaTrinkAuswahl" style="display: none;">
-                <h3>Wer hat getrunken?</h3>
-                <div id="paranoiaSpielerListe" class="spieler-grid"></div>
+            <div class="main-nav" style="width: 100%;">
+                <button class="nav-btn btn-cyber-green" style="height: 60px;" onclick="zurueckZumHauptMenue()">ZURÜCK ZUR AUSWAHL</button>
             </div>
-
-            <button onclick="zurueckZumHauptMenue()" style="background-color: #374151; margin-top: 20px;">Spiel verlassen</button>
         </div>
 
         <!-- 5. COUNTDOWN BEREICH (Roulette) -->
-        <div id="countdownBereich" style="display: none;">
-            <h2>Countdown Spiel</h2>
-            <p id="countdownStatus"></p>
-            <div class="wheel-wrapper">
-                <div class="wheel-pointer"></div>
-                <canvas id="rouletteWheel" width="300" height="300"></canvas>
+        <div id="countdownBereich" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- COUNTDOWN ROULETTE</div>
+            
+            <div class="master-game-card">
+                <p id="countdownStatus" style="color: var(--neon-cyan); font-weight: bold; margin-bottom: 10px;"></p>
+                <div class="wheel-wrapper">
+                    <div class="wheel-pointer"></div>
+                    <canvas id="rouletteWheel" width="300" height="300"></canvas>
+                </div>
+                <div id="countdownErgebnis" class="card-task-text"></div>
             </div>
-            <p id="countdownErgebnis" style="font-weight: bold; font-size: 1.2em;"></p>
-            <button id="countdownZiehenBtn" onclick="radDrehen()" style="background-color: #ef4444;">Ziehen!</button>
-            <button onclick="zurueckZumMenueAusCountdown()" style="background-color: #4b5563;">Zurück zur Spielauswahl</button>
+
+            <div class="main-nav" style="width: 100%;">
+                <button id="countdownZiehenBtn" class="nav-btn btn-cyber-red" onclick="radDrehen()" style="height: 60px;">RAD DREHEN! 🎡</button>
+                <button class="nav-btn btn-cyber-green" style="height: 60px;" onclick="zurueckZumMenueAusCountdown()">ZURÜCK ZUR AUSWAHL</button>
+            </div>
         </div>
 
         <!-- SHOT ROULETTE BEREICH -->
-        <div id="shotRouletteBereich" style="display: none;">
-            <div class="shot-card">
-                <h1 style="margin-bottom: 20px;">🎰 Shot-Roulette 🎰</h1>
-                
-                <div id="shotTaskContainer" class="shot-task-box">
-                    <p id="shotTaskText">Lade Schicksal...</p>
-                </div>
+        <div id="shotRouletteBereich" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- SHOT ROULETTE</div>
 
-                <!-- Bereich für die manuelle Auswahl der Trinker -->
-                <div id="shotSelectionArea" style="display: none; margin-top: 15px;">
-                    <p style="font-size: 0.8rem; margin-bottom: 8px; opacity: 0.8;">Wer hat getrunken? (Anklicken zum Buchen)</p>
-                    <div id="shotPlayerGrid" class="spieler-grid" style="max-height: 250px; overflow-y: auto; padding: 5px;"></div>
-                </div>
+            <div class="master-game-card" style="border-color: var(--neon-red); box-shadow: 0 0 15px var(--neon-red);">
+                <h1 class="card-title-cyan" style="color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red);">🎰 SCHICKSAL 🎰</h1>
+                <h2 id="shotTaskText" class="card-task-text">LADE SCHICKSAL...</h2>
 
-                <div style="margin-top: 30px; display: flex; flex-direction: column; gap: 10px;">
-                    <button id="shotNextBtn" class="nav-btn" style="background-color: #ef4444; font-size: 1.2rem; padding: 15px;" onclick="naechsteShotRunde()">Nächste Runde 🃏</button>
-                    <button class="nav-btn" style="background-color: #4b5563;" onclick="zurueckZumHauptMenue()">Spiel beenden</button>
+                <div id="shotSelectionArea" style="display: none;">
+                    <div id="shotPlayerGrid" class="spieler-grid"></div>
                 </div>
+            </div>
+
+            <div class="main-nav" style="width: 100%;">
+                <button id="shotNextBtn" class="nav-btn btn-cyber-red" onclick="naechsteShotRunde()" style="height: 60px;">NÄCHSTE RUNDE 🃏</button>
+                <button class="nav-btn btn-cyber-green" style="height: 60px;" onclick="zurueckZumHauptMenue()">ZURÜCK ZUR AUSWAHL</button>
             </div>
         </div>
 
         <!-- GLOBALE SPIELERLISTE (Wird außer im Hauptmenü immer unten drunter angezeigt) -->
         <div id="footerPlayerList">
             <hr style="margin-top: 30px; border: 0; border-top: 1px solid var(--border);">
-            <h3>Aktive Party-Gäste:</h3>
+            <div class="wardrobe-subtitle" style="margin-top: 10px;">- AKTIVE GÄSTE</div>
             <div class="spieler-grid" id="spielerListe">
                 <!-- Spieler-Karten werden hier von storage.js eingefügt -->
             </div>

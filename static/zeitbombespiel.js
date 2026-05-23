@@ -130,7 +130,7 @@ function zeigeBombErgebnis(opfer) {
 
     const backBtn = document.getElementById('bombBackBtn');
     if (isGemischteRunde) {
-        backBtn.innerText = "Weiter im Mix 🚀";
+        backBtn.innerText = "Weiter";
         backBtn.onclick = () => geheZurueckZumMix();
     } else {
         backBtn.innerText = "Nächste Runde";

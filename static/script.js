@@ -46,9 +46,9 @@ function zeigeBereich(bereichId) {
         }
     });
     
-    // Spielerliste im Hauptmenü und Garderobe ausblenden
+    // Spielerliste im Hauptmenü, in der Garderobe und in der Charakterauswahl ausblenden
     const footerList = document.getElementById('footerPlayerList');
-    if (footerList) footerList.style.display = (bereichId === 'startMenue' || bereichId === 'editor-box') ? 'none' : 'block';
+    if (footerList) footerList.style.display = (bereichId === 'startMenue' || bereichId === 'charakterSelection' || bereichId === 'editor-box') ? 'none' : 'block';
 
     // Aktualisiere die Spielerliste bei jedem Bereichswechsel
     if (typeof window.listeAnzeigen === "function") {
@@ -117,6 +117,79 @@ function toggleMute() {
     
     if (isMuted) stopBackgroundMusic();
     playSound('click');
+}
+
+/**
+ * Zeigt die Regeln basierend auf dem aktuellen Spielmodus oder Menü an.
+ */
+function zeigeRegeln() {
+    const regeln = {
+        'aufgaben': "Erfülle die Aufgabe auf der Karte. Wenn du scheiterst, musst du trinken! ✅🍹",
+        'wer_wuerde_eher': "Die Gruppe zählt auf 3 und zeigt auf die Person, auf die die Aussage am ehesten zutrifft. Die Person mit den meisten Stimmen trinkt! 👆🍹",
+        'ich_hab_noch_nie': "Alle, auf die die Aussage zutrifft (die es schon mal getan haben), müssen trinken! 🤫🍹",
+        'paranoia': "Stell eine Frage leise an die Person auf dem Display. Diese zeigt auf jemanden. Wenn die Person wissen will warum, muss sie trinken! 🕵️🍹",
+        'virus': "Viren sind dauerhafte Regeln. Wer gegen sie verstößt, muss trinken! Sie verschwinden nach ein paar Runden. 🦠🍹",
+        'tribunal': "Die Gruppe stimmt über zwei Optionen ab (👍 oder 👎). Die Minderheit (die weniger Stimmen hat) muss trinken! ⚖️🍹",
+        'zeitbombe': "Nenne einen Begriff zur Kategorie und gib das Handy schnell weiter. Bei wem die Bombe explodiert, der trinkt! 💣🍹",
+        'countdown': "Dreh das Rad! Wer ausgewählt wird, trinkt und ist für den Rest der Runde raus. Der letzte Überlebende gewinnt! 🎡🍹",
+        'shot_roulette': "Folge den Anweisungen des Schicksals. Wer Pech hat, muss trinken! 🥃🍹",
+        'sudden_event': "Ein Extrem-Event! Alle müssen sofort die Anweisung befolgen. Keine Ausreden! 🚨🍹"
+    };
+
+    // Prüfe welcher Bereich gerade sichtbar ist (für Menü-Hilfe)
+    if (document.getElementById('startMenue').style.display === 'block') {
+        customAlert("Willkommen bei PARTYHEUTE! 🍹 Wähle einen Spielmodus, erstelle Charaktere und genieße den Abend. Alles ist auf Spaß ausgelegt!");
+        return;
+    }
+    if (document.getElementById('editor-box').style.display === 'block') {
+        customAlert("In der Garderobe kannst du neue Charaktere erstellen. Gib einen Namen ein und mach optional ein Foto! 👗");
+        return;
+    }
+    if (document.getElementById('charakterSelection').style.display === 'block') {
+        customAlert("Wähle hier die Spieler aus, die heute Abend mitspielen sollen (3 - 8 Personen). ✅");
+        return;
+    }
+
+    let text = regeln[aktuelleKategorie] || "Befolgt einfach die Anweisungen auf dem Bildschirm und habt Spaß! 🍹";
+    customAlert(text);
+}
+
+/**
+ * Zeigt einen speziellen Screen an, wenn eine Aufgabe oder ein Virus beendet ist.
+ */
+function zeigeBefreiungsScreen(item, isVirus = false) {
+    const overlay = document.createElement('div');
+    overlay.className = 'custom-modal-overlay freedom-overlay';
+    
+    let title, subtitle, color, btnClass, text;
+    
+    if (isVirus) {
+        title = "VIRUS GEHEILT! 💉";
+        subtitle = "Die Infektion ist vorbei:";
+        color = "var(--neon-green)";
+        btnClass = "btn-cyber-green";
+        text = item.text; 
+    } else {
+        title = item.isGlobal ? "REGEL BEENDET! ⚖️" : "AUFGABE GESCHAFFT! ✅";
+        subtitle = item.isGlobal ? "Die Zeit ist um:" : `${item.spielerEmoji} ${item.spielerName} ist befreit:`;
+        color = item.isGlobal ? "var(--neon-red)" : "var(--neon-cyan)";
+        btnClass = item.isGlobal ? "btn-cyber-red" : "btn-cyber-purple";
+        text = item.text;
+    }
+
+    overlay.innerHTML = `
+        <div class="custom-modal" style="border: 2px solid ${color}; box-shadow: 0 0 20px ${color}; min-width: 310px;">
+            <h1 style="color: ${color}; text-shadow: 0 0 10px ${color}; margin-bottom: 10px; font-size: 1.8rem;">${title}</h1>
+            <p style="font-size: 1.1rem; margin-bottom: 20px; color: #fff;">${subtitle}</p>
+            <div style="background: rgba(0,0,0,0.6); padding: 20px; border-radius: 15px; margin-bottom: 25px; font-style: italic; border: 1px solid rgba(255,255,255,0.1); line-height: 1.4;">
+                ${text}
+            </div>
+            <button class="nav-btn ${btnClass}" style="height: 60px; font-size: 1.2rem; width: 100%; margin: 0;" onclick="this.parentElement.parentElement.remove()">WEITER 🍹</button>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    playSound('win');
 }
 
 /**
@@ -248,6 +321,8 @@ style.innerHTML = `
     .runden-task-card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 0.95rem; backdrop-filter: blur(10px); animation: fadeInTask 0.3s ease-out; }
     @keyframes fadeInTask { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     .runden-badge { background: #f59e0b; color: #1e293b; padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; display: inline-block; margin-bottom: 8px; }
+    .runden-task-card.compact { padding: 10px; font-size: 0.85rem; margin-bottom: 10px; }
+    .runden-task-card.compact .runden-badge { font-size: 0.65rem; padding: 2px 6px; }
     .runden-fail-btn { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; padding: 8px; cursor: pointer; font-size: 0.85rem; margin-top: 10px; width: 100%; transition: all 0.2s; }
     .runden-fail-btn:hover { background: rgba(239, 68, 68, 0.4); color: white; }
 
@@ -279,15 +354,15 @@ style.innerHTML = `
     .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: 20px; padding: 40px; text-align: center; }
 
     /* Charakter Selection Mockup Style */
-    .char-selection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
-    .char-card { background: rgba(0,0,0,0.4); border: 2px solid #8b5cf6; box-shadow: 0 0 8px #8b5cf6; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
-    .char-card.selected { background: rgba(139, 92, 246, 0.15); box-shadow: 0 0 20px #8b5cf6; transform: translateY(-3px); }
-    .char-portrait { width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 8px; background: rgba(255,255,255,0.08); font-size: 2rem; border: 1px solid rgba(255,255,255,0.1); }
+    .char-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
+    .char-card { background: rgba(0,0,0,0.6); border: 2px solid var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .char-card.selected { background: rgba(176, 38, 255, 0.15); box-shadow: 0 0 20px var(--neon-purple); transform: translateY(-3px); }
+    .char-portrait { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 12px; background: rgba(255,255,255,0.08); font-size: 3.5rem; border: 2px solid rgba(255,255,255,0.1); }
     .char-portrait img { width: 100%; height: 100%; object-fit: cover; }
-    .char-name { font-size: 0.8rem; color: #fff; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .neon-checkbox { width: 20px; height: 20px; border: 2px solid #8b5cf6; border-radius: 6px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
-    .neon-checkbox.checked { background: #8b5cf6; box-shadow: 0 0 12px #8b5cf6; }
-    .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -3px; left: 2px; font-size: 15px; color: white; font-weight: bold; }
+    .char-name { font-size: 1.1rem; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .neon-checkbox { width: 30px; height: 30px; border: 2px solid var(--neon-purple); border-radius: 8px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
+    .neon-checkbox.checked { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); }
+    .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -4px; left: 5px; font-size: 22px; color: white; font-weight: bold; }
 `;
 document.head.appendChild(style);
 
@@ -398,6 +473,14 @@ function beendeSpielUndZeigeStatistik() {
         s.getraenkeCount = 0;
     });
     localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+
+    // NEU: Aktive Aufgaben und Viren zurücksetzen
+    aktiveRundenAufgaben = [];
+    updateRundenAufgabenUI();
+    
+    if (typeof resetViren === "function") {
+        resetViren();
+    }
     
     if (typeof listeAnzeigen === "function") listeAnzeigen();
 }
@@ -440,8 +523,12 @@ function refillMixedModePool() {
     // Damit sinkt die Chance auf ca. 2.2% (im Schnitt alle 46 Karten), was sie deutlich seltener macht.
     fullPool.push('sudden_event');
     
-    // Fisher-Yates Shuffle für echten Zufall ohne Wiederholungs-Pech
-    mixedModePool = fullPool.sort(() => Math.random() - 0.5);
+    // Echter Fisher-Yates Shuffle für gleichmäßige Verteilung
+    for (let i = fullPool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [fullPool[i], fullPool[j]] = [fullPool[j], fullPool[i]];
+    }
+    mixedModePool = fullPool;
 }
 
 function starteGemischteRunde() {
@@ -478,25 +565,32 @@ function aktualisiereKartenOptik(kat) {
     const spielBox = document.getElementById('spielBereich');
     const iconEl = document.getElementById('gameIconHeader');
     const labelEl = document.getElementById('gameTypeLabel');
+    const badgeMixed = document.getElementById('badgeMixed');
+    const badgeVirus = document.getElementById('badgeVirus');
+    const modularSlot = document.getElementById('modularFeatureSlot');
 
-    // Alle Themes entfernen
+    // Reset UI
     spielBox.classList.remove('theme-wer_wuerde_eher', 'theme-aufgaben', 'theme-ich_hab_noch_nie', 'theme-paranoia', 'theme-sudden-event', 'theme-virus', 'theme-tribunal', 'theme-zeitbombe');
+    badgeMixed.style.display = isGemischteRunde ? 'block' : 'none';
+    badgeVirus.style.display = 'none'; // Hier könnte das Backend steuern
+    modularSlot.style.display = 'none';
 
     const configs = {
-        'wer_wuerde_eher': { icon: '🤔', label: 'Wer würde eher...', class: 'theme-wer_wuerde_eher' },
-        'aufgaben': { icon: '🎯', label: 'Aufgabe', class: 'theme-aufgaben' },
-        'ich_hab_noch_nie': { icon: '🤫', label: 'Ich hab noch nie...', class: 'theme-ich_hab_noch_nie' },
-        'paranoia': { icon: '🕵️', label: 'Paranoia', class: 'theme-paranoia' },
-        'virus': { icon: '☣️', label: 'INFEKTION!', class: 'theme-virus' },
-        'tribunal': { icon: '⚖️', label: 'DAS TRIBUNAL', class: 'theme-tribunal' },
-        'zeitbombe': { icon: '💣', label: 'ZEITBOMBE', class: 'theme-zeitbombe' },
-        'sudden_event': { icon: '🚨', label: '⚠️ EXTREM-EVENT!', class: 'theme-sudden-event' }
+        'wer_wuerde_eher': { label: 'WER WÜRDE EHER...', class: 'theme-wer_wuerde_eher', color: 'var(--neon-purple)' },
+        'aufgaben': { label: 'AUFGABE', class: 'theme-aufgaben', color: 'var(--neon-cyan)' },
+        'ich_hab_noch_nie': { label: 'ICH HAB NOCH NIE...', class: 'theme-ich_hab_noch_nie', color: '#ec4899' },
+        'paranoia': { label: 'PARANOIA', class: 'theme-paranoia', color: 'var(--neon-green)' },
+        'virus': { label: 'INFEKTION!', class: 'theme-virus', color: 'var(--neon-red)' },
+        'tribunal': { label: 'DAS TRIBUNAL', class: 'theme-tribunal', color: 'var(--neon-cyan)' },
+        'zeitbombe': { label: 'ZEITBOMBE', class: 'theme-zeitbombe', color: '#f97316' },
+        'sudden_event': { label: 'EXTREM-EVENT!', class: 'theme-sudden-event', color: 'var(--neon-red)' }
     };
 
     const current = configs[kat] || configs['aufgaben'];
     spielBox.classList.add(current.class);
-    iconEl.innerText = current.icon;
-    labelEl.innerText = isGemischteRunde ? `Gemischter Mix: ${current.label}` : current.label;
+    labelEl.innerText = current.label;
+    labelEl.style.color = current.color;
+    labelEl.style.textShadow = `0 0 10px ${current.color}`;
 }
 
 function zufallsSpielWaehlen() {
@@ -584,12 +678,26 @@ async function karteZiehen() {
             refillMixedModePool();
         }
 
+        // Sicherstellen, dass nicht das gleiche Spiel 2x hintereinander kommt
+        let lastIndex = mixedModePool.length - 1;
+        if (mixedModePool[lastIndex] === aktuelleKategorie && mixedModePool.length > 1) {
+            // Suche im Stapel nach einem anderen Spiel zum Tauschen
+            for (let i = 0; i < lastIndex; i++) {
+                if (mixedModePool[i] !== aktuelleKategorie) {
+                    // Tausche das Spiel am Ende mit einem anderen Platz im Stapel
+                    [mixedModePool[i], mixedModePool[lastIndex]] = [mixedModePool[lastIndex], mixedModePool[i]];
+                    break;
+                }
+            }
+        }
+
         // Karte vom Stapel ziehen
         aktuelleKategorie = mixedModePool.pop();
 
         // Spezial-Logik für Spiele mit eigenem UI oder speziellen Start-Funktionen
+        const totalActive = aktiveRundenAufgaben.length + (typeof aktiveViren !== 'undefined' ? aktiveViren.length : 0);
         if (aktuelleKategorie === 'virus') {
-            if (typeof zeigeVirusEventAufKarte === 'function') {
+            if (typeof zeigeVirusEventAufKarte === 'function' && totalActive < 2) {
                 const virus = neuerVirus(true);
                 if (virus) {
                     zeigeVirusEventAufKarte(virus);
@@ -637,7 +745,7 @@ async function karteZiehen() {
         if (entscheidung) entscheidung.style.display = 'none';
         if (naechsteBtn) {
             naechsteBtn.style.display = 'block';
-            naechsteBtn.innerText = "Weiter 🃏";
+            naechsteBtn.innerText = "Weiter";
         }
     } else {
         if (entscheidung) entscheidung.style.display = 'flex';
@@ -689,18 +797,36 @@ async function karteZiehen() {
 
     // Speziallogik für Runden-Aufgaben
     const rundenMatch = fertigeFrage.match(/(\d+)\s*Runden/i);
+    const totalActive = aktiveRundenAufgaben.length + (typeof aktiveViren !== 'undefined' ? aktiveViren.length : 0);
+
     if (rundenMatch) {
+        if (totalActive >= 2) {
+            // Limit erreicht: Ziehe eine neue Karte, die keine Dauer-Aufgabe ist
+            return karteZiehen();
+        }
         const rundenAnzahl = parseInt(rundenMatch[1]);
         document.getElementById('failBtn').innerHTML = `✅ Herausforderung annehmen!`;
+        document.getElementById('failBtn').style.display = 'block';
         document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(zufallsSpieler, daten.frage, rundenAnzahl, aktuelleSchluecke);
         document.getElementById('strafeText').innerText = `Herausforderung: ${rundenAnzahl} Runden durchhalten!`;
         if (isCounterEnabled) document.getElementById('entscheidungsBereich').style.display = 'flex';
-        if (isCounterEnabled) document.getElementById('naechsteKarteBtn').style.display = 'none';
+        if (isCounterEnabled) document.getElementById('naechsteKarteBtn').style.display = 'block';
     } else {
         if (isCounterEnabled) {
-            document.getElementById('failBtn').innerHTML = `🍹 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
+            let failText = `🍹 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
+            let skipText = "🙅‍♂️ Keiner muss";
+
+            if (aktuelleKategorie === 'aufgaben') {
+                failText = `🍹 Nicht geschafft! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
+                skipText = "✅ Aufgabe geschafft";
+            }
+
+            document.getElementById('failBtn').innerHTML = failText;
+            document.getElementById('skipDrinkBtn').innerText = skipText;
+            document.getElementById('failBtn').style.display = 'block';
             document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
             document.getElementById('failBtn').onclick = trinkenBestätigen;
+            document.getElementById('skipDrinkBtn').style.display = 'block';
         }
     }
 }
@@ -719,8 +845,16 @@ function starteZeitbombeMixed() {
 function zeigeSuddenEvent() {
     const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
     const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
+    const totalActive = aktiveRundenAufgaben.length + (typeof aktiveViren !== 'undefined' ? aktiveViren.length : 0);
     
-    const eventTemplate = suddenEvents[Math.floor(Math.random() * suddenEvents.length)];
+    // Wähle ein Event aus, aber verhindere Runden-Events, wenn das Limit erreicht ist
+    let eventTemplate;
+    let attempts = 0;
+    do {
+        eventTemplate = suddenEvents[Math.floor(Math.random() * suddenEvents.length)];
+        attempts++;
+    } while (eventTemplate.match(/(\d+)\s*Runden/i) && totalActive >= 2 && attempts < suddenEvents.length);
+
     const p1 = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
     
     const renderName = (s) => `<span style="color: #ef4444; font-weight: bold;">${s.name}</span>`;
@@ -746,21 +880,21 @@ function zeigeSuddenEvent() {
         const rundenAnzahl = parseInt(rundenMatch[1]);
         if (isCounterEnabled) {
             document.getElementById('entscheidungsBereich').style.display = 'flex';
-            document.getElementById('naechsteKarteBtn').style.display = 'none';
             const skipBtn = document.getElementById('skipDrinkBtn');
             if (skipBtn) skipBtn.style.display = 'none'; // Keine Ausrede bei Sudden Events
         } else {
             document.getElementById('entscheidungsBereich').style.display = 'none';
             document.getElementById('naechsteKarteBtn').style.display = 'block';
-            document.getElementById('naechsteKarteBtn').innerText = "Weiter 🃏";
+            document.getElementById('naechsteKarteBtn').innerText = "Weiter";
         }
         document.getElementById('failBtn').innerHTML = `🔥 Regel aktivieren!`;
         document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(p1, fertigesEvent, rundenAnzahl, gefundeneSchluecke, true);
         document.getElementById('strafeText').innerText = `⚠️ Regel aktiv für ${rundenAnzahl} Runden!`;
+        document.getElementById('naechsteKarteBtn').style.display = 'block';
     } else {
         document.getElementById('entscheidungsBereich').style.display = 'none';
         document.getElementById('naechsteKarteBtn').style.display = 'block';
-        document.getElementById('naechsteKarteBtn').innerText = "Weiter 🃏";
+        document.getElementById('naechsteKarteBtn').innerText = "Weiter";
         document.getElementById('strafeText').innerText = "🚨 ALARM! KEINE AUSREDEN!";
     }
     
@@ -785,9 +919,13 @@ function trinkenBestätigen() {
         return;
     }
 
-    // Öffnet jetzt für alle Kategorien (inkl. Aufgaben) die Spielerauswahl,
-    // um die Schlücke manuell eintragen zu können.
-    werMussTrinkenZeigen();
+    // Bei Aufgaben direkt dem aktuellen Spieler buchen, bei anderen Kategorien Auswahl zeigen
+    if (aktuelleKategorie === 'aufgaben') {
+        document.getElementById('entscheidungsBereich').style.display = 'none';
+        strafSchluckeVerteilen(aktuellerSpielerIndex);
+    } else {
+        werMussTrinkenZeigen();
+    }
 }
 
 function rundenAufgabeStarten(spieler, text, runden, schluecke, isGlobal = false) {
@@ -810,7 +948,12 @@ function rundenAufgabeStarten(spieler, text, runden, schluecke, isGlobal = false
 
 function verarbeiteRundenTick() {
     aktiveRundenAufgaben.forEach(task => {
-        if (task.restRunden > 0) task.restRunden--;
+        if (task.restRunden > 0) {
+            task.restRunden--;
+            if (task.restRunden === 0) {
+                zeigeBefreiungsScreen(task);
+            }
+        }
     });
     
     // Automatisch entfernen, wenn die Zeit um ist
@@ -825,14 +968,22 @@ function updateRundenAufgabenUI() {
     const container = document.getElementById('rundenAufgabenContainer');
     if (!container) return;
     
-    container.innerHTML = aktiveRundenAufgaben.length > 0 ? "<h4 style='margin-bottom:10px; opacity:0.7;'>⏳ Laufende Challenges:</h4>" : "";
-    
+    let html = "";
+    const hatAufgaben = aktiveRundenAufgaben.length > 0;
+    const hatViren = typeof aktiveViren !== 'undefined' && aktiveViren.length > 0;
+    const totalCount = aktiveRundenAufgaben.length + (hatViren ? aktiveViren.length : 0);
+
+    if (hatAufgaben || hatViren) {
+        html = "<h4 style='margin-bottom:15px; opacity:0.8; color: var(--neon-cyan); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;'>⏳ Aktive Regeln & Challenges:</h4>";
+    }
+
+    // 1. Challenges / Runden-Aufgaben rendern
     aktiveRundenAufgaben.forEach((task, index) => {
         const statusText = `${task.restRunden} ${task.restRunden === 1 ? 'Runde' : 'Runden'} übrig`;
         const isGlobal = task.isGlobal === true;
 
-        container.innerHTML += `
-            <div class="runden-task-card" style="${isGlobal ? 'border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1);' : ''}">
+        html += `
+            <div class="runden-task-card ${totalCount > 1 ? 'compact' : ''}" style="${isGlobal ? 'border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1);' : ''}">
                 <span class="runden-badge" style="${isGlobal ? 'background: #ef4444; color: white;' : ''}">${statusText}</span>
                 <div style="margin-bottom: 5px;">
                     <strong>${isGlobal ? '🚨 GLOBALE REGEL' : `${task.spielerEmoji} ${task.spielerName}`}</strong>
@@ -844,8 +995,42 @@ function updateRundenAufgabenUI() {
             </div>
         `;
     });
+
+    // 2. Viren rendern (Nachträgliches Trinken ermöglichen)
+    if (hatViren) {
+        aktiveViren.forEach(v => {
+            const statusText = v.runden === -1 ? "Permanent" : `${v.runden} Runden`;
+            html += `
+                <div class="runden-task-card ${totalCount > 1 ? 'compact' : ''}" style="border-left-color: var(--neon-green); background: rgba(57, 255, 20, 0.05);">
+                    <span class="runden-badge" style="background: var(--neon-green); color: black;">${statusText}</span>
+                    <div style="margin-bottom: 5px; color: var(--neon-green); font-weight: bold;">🦠 VIRUS-EFFEKT</div>
+                    <div style="opacity: 0.9; line-height: 1.4;">${v.text}</div>
+                    <button class="runden-fail-btn" style="border-color: var(--neon-red); color: var(--neon-red);" onclick="triggerVirusPenalty('${v.id}')">
+                        ❌ Regel gebrochen
+                    </button>
+                </div>
+            `;
+        });
+    }
+
+    container.innerHTML = html;
 }
 
+/**
+ * Ermöglicht das nachträgliche Buchen von Viren-Strafen
+ */
+function triggerVirusPenalty(virusId) {
+    const virus = aktiveViren.find(v => v.id == virusId);
+    if (!virus) return;
+
+    // Wir nutzen das existierende System für globale Strafen
+    const schluckeMatch = virus.plainText.match(/(\d+)\s*Schlücke/i);
+    aktuelleSchluecke = schluckeMatch ? parseInt(schluckeMatch[1]) : 2;
+    
+    // Mocking einer "Globalen Aufgabe" für das Trink-Raster
+    taskIndexForDrinkSelection = 999; // Dummy ID
+    werMussTrinkenZeigen();
+}
 /**
  * Zeigt einen Virus speziell auf der Hauptkarte an (Mixed Mode)
  */
