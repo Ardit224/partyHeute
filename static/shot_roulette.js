@@ -31,7 +31,7 @@ function starteShotRoulette() {
     } else {
         if (nextBtn) nextBtn.style.display = 'block';
         if (exitBtn) {
-            exitBtn.innerText = "Spiel beenden";
+            exitBtn.innerText = "Zurück zur Auswahl";
             exitBtn.onclick = () => zurueckZumHauptMenue();
         }
     }
@@ -102,11 +102,16 @@ function naechsteShotRunde() {
             if (isGemischteRunde) {
                 selectionArea.style.display = 'block';
                 document.getElementById('shotPlayerGrid').innerHTML = `
-                    <button class="nav-btn" style="grid-column: 1/-1; margin-top: 20px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+                    <button class="nav-btn" style="grid-column: 1/-1; width: 100%; margin: 20px 0; padding: 15px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
                 `;
             } else {
                 selectionArea.style.display = 'none';
             }
+        } else if (!isCounterEnabled) {
+            selectionArea.style.display = 'block';
+            document.getElementById('shotPlayerGrid').innerHTML = `
+                <button class="nav-btn" style="grid-column: 1/-1; width: 100%; margin: 20px 0; padding: 15px;" onclick="${isGemischteRunde ? 'geheZurueckZumMix()' : 'naechsteShotRunde()'}">Weiter 🚀</button>
+            `;
         } else {
             selectionArea.style.display = 'block';
             sr_zeichneTrinkerAuswahl(pool);
@@ -158,7 +163,7 @@ function sr_bucheSchlückeManuell(playerName, btn) {
         // Im gemischten Modus die Auswahl durch einen "Weiter"-Button ersetzen
         if (isGemischteRunde) {
             document.getElementById('shotPlayerGrid').innerHTML = `
-                <button class="nav-btn" style="grid-column: 1/-1; margin-top: 20px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+                <button class="nav-btn" style="grid-column: 1/-1; width: 100%; margin: 20px 0; padding: 15px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
             `;
         }
     }

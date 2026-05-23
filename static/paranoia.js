@@ -8,15 +8,7 @@ function starteParanoia() {
 
     // UI Button für das Verlassen anpassen
     const exitBtn = document.querySelector('#paranoiaBereich button[onclick="zurueckZumHauptMenue()"]');
-    if (exitBtn) {
-        if (isGemischteRunde) {
-            exitBtn.innerText = "Weiter im Mix 🚀";
-            exitBtn.setAttribute('onclick', 'geheZurueckZumMix()');
-        } else {
-            exitBtn.innerText = "Spiel verlassen";
-            exitBtn.setAttribute('onclick', 'zurueckZumHauptMenue()');
-        }
-    }
+    if (exitBtn) exitBtn.innerText = "Zurück zur Auswahl";
 }
 
 function naechsteParanoiaRunde() {
@@ -72,6 +64,19 @@ async function paranoiaFrageLaden() {
     // Wechsel zur Frage-Ansicht
     document.getElementById('paranoiaStart').style.display = "none";
     document.getElementById('paranoiaFrageAnsicht').style.display = "block";
+
+    // Im Zen-Modus (Counter aus) den "Jemand trinkt" Button verstecken und "Weiter" anpassen
+    const drinkBtn = document.querySelector('#paranoiaFrageAnsicht button[onclick="paranoiaTrinkenAuswaehlen()"]');
+    const nextBtn = document.querySelector('#paranoiaFrageAnsicht button[onclick="naechsteParanoiaRunde()"]');
+    if (!isCounterEnabled) {
+        if (drinkBtn) drinkBtn.style.display = 'none';
+        if (nextBtn) {
+            nextBtn.innerText = "Weiter 🃏";
+            nextBtn.onclick = isGemischteRunde ? geheZurueckZumMix : naechsteParanoiaRunde;
+        }
+    } else if (drinkBtn) {
+        drinkBtn.style.display = 'inline-block';
+    }
     
     if (typeof playSound === "function") playSound('click');
 }

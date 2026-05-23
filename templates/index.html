@@ -68,6 +68,25 @@
             <button onclick="geheZuStartMenue()" style="background-color: #374151;">Zurück zum Menü</button>
         </div>
 
+        <!-- 2.5 COUNTER SELECTION -->
+        <div id="counterSelection" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">Getränke-Tracking</h1>
+            <p style="margin-bottom: 30px;">Möchtet ihr die Schlücke und Getränke in der App mitzählen?</p>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 0 auto;">
+                <button class="nav-btn" onclick="setCounterPreference(true)" style="background-color: #10b981; padding: 20px;">
+                    <span style="font-size: 1.2rem;">✅ Ja, bitte!</span><br>
+                    <small>Inkl. Rangliste & Statistik</small>
+                </button>
+                <button class="nav-btn" onclick="setCounterPreference(false)" style="background-color: #ef4444; padding: 20px;">
+                    <span style="font-size: 1.2rem;">❌ Nein danke</span><br>
+                    <small>Einfach nur die Spiele spielen</small>
+                </button>
+            </div>
+            
+            <button onclick="geheZuStartMenue()" style="background-color: #4b5563; margin-top: 30px;">Abbrechen</button>
+        </div>
+
         <!-- 3. SPIELAUSWAHL (Welches Spiel?) -->
         <div id="hauptMenue" style="display: none;">
             <h1 class="title-glow" style="font-size: 2rem;">Spielmodus</h1>
@@ -100,7 +119,7 @@
                 <button onclick="starteVirusSpiel()" style="background-color: #22c55e;">🦠 Virus-Spiel</button>
                 <button onclick="zufallsSpielWaehlen()" style="background: var(--secondary);">🎲 Zufall</button>
             </div>
-            <button onclick="geheZuStartMenue()" style="background-color: #4b5563;">Zurück zum Menü</button>
+            <button id="menuEndBtn" onclick="beendeSpielUndZeigeStatistik()" style="background-color: #4b5563; margin-top: 15px;">🛑 Session beenden & Statistik</button>
         </div>
 
         <!-- 4. SPIELBEREICH (Karten-Anzeige) -->
@@ -114,7 +133,7 @@
             <div id="entscheidungsBereich" class="aktions-box-vertical">
                 <button id="failBtn" class="btn-drink-huge" onclick="trinkenBestätigen()"> Trinken!</button>
                 <button id="tribunalBtn" class="btn-drink-huge" style="display: none; background-color: #ef4444;" onclick="tribunalErgebnisEintragen('tribunalCountdownMixed', 'tribunalBtn')">⚖️ Ergebnis eintragen</button>
-                <button class="btn-skip-tiny" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
+                <button id="skipDrinkBtn" class="btn-skip-tiny" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
             </div>
 
             <div id="werTrinktBereich" style="display: none; margin-top: 20px;">
@@ -126,6 +145,7 @@
 
             <button id="naechsteKarteBtn" onclick="karteZiehen()" style="display: none; background-color: #3b82f6; margin-top: 20px;">Nächste Karte 🃏</button>
             <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 10px;">Zurück zur Spielauswahl</button>
+            <button id="gameEndBtn" onclick="beendeSpielUndZeigeStatistik()" style="display: none; background-color: #ef4444; margin-top: 10px;">🏆 Spiel beenden & Statistik</button>
         </div>
 
         <!-- Bereich für aktive Runden-Herausforderungen -->

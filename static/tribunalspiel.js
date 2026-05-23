@@ -77,7 +77,7 @@ function naechsteTribunalRunde() {
     // UI zurücksetzen
     document.getElementById('tribunalCountdownStandalone').innerHTML = "";
     document.getElementById('tribunalStandaloneBtn').style.display = "inline-block";
-    document.getElementById('tribunalStandaloneBtn').innerText = "⚖️ Ergebnis eintragen";
+    document.getElementById('tribunalStandaloneBtn').innerText = isCounterEnabled ? "⚖️ Ergebnis eintragen" : "Weiter 🚀";
     document.getElementById('tribunalNextBtn').style.display = "none";
 
     const questionTemplate = tribunalQuestions[Math.floor(Math.random() * tribunalQuestions.length)];
@@ -113,11 +113,17 @@ function starteTribunalMixed() {
     document.getElementById('strafeText').innerText = "Die Minderheit muss trinken!";
     
     // UI im spielBereich anpassen
-    document.getElementById('entscheidungsBereich').style.display = 'flex';
-    document.getElementById('failBtn').style.display = 'none';
-    document.getElementById('tribunalBtn').style.display = 'block';
-    document.getElementById('tribunalBtn').innerText = "⚖️ Ergebnis eintragen";
-    document.getElementById('naechsteKarteBtn').style.display = 'none';
+    if (isCounterEnabled) {
+        document.getElementById('entscheidungsBereich').style.display = 'flex';
+        document.getElementById('failBtn').style.display = 'none';
+        document.getElementById('tribunalBtn').style.display = 'block';
+        document.getElementById('tribunalBtn').innerText = "⚖️ Ergebnis eintragen";
+        document.getElementById('naechsteKarteBtn').style.display = 'none';
+    } else {
+        document.getElementById('entscheidungsBereich').style.display = 'none';
+        document.getElementById('naechsteKarteBtn').style.display = 'block';
+        document.getElementById('naechsteKarteBtn').innerText = "Weiter 🃏";
+    }
 }
 
 /**
@@ -135,11 +141,14 @@ function generiereTribunalHTML(template, schlucke, spielerName) {
     const optionA = match[1];
     const optionB = match[2];
 
+    const einsatzHtml = isCounterEnabled ? `
+        <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.3rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+            ⚖️ Einsatz: ${schlucke} Schlücke
+        </div>` : '';
+
     return `
         <div style="width: 100%; text-align: center;">
-            <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.3rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
-                ⚖️ Einsatz: ${schlucke} Schlücke
-            </div>
+            ${einsatzHtml}
             <div style="display: flex; gap: 15px; justify-content: center; align-items: stretch;">
                 <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <span style="font-size: 3rem; margin-bottom: 10px;">👍</span>
@@ -165,6 +174,12 @@ function tribunalErgebnisEintragen(displayId, btnId) {
     const btn = document.getElementById(btnId);
     
     btn.style.display = "none";
+
+    if (!isCounterEnabled) {
+        if (isGemischteRunde) geheZurueckZumMix();
+        else naechsteTribunalRunde();
+        return;
+    }
 
     if (isGemischteRunde) {
         display.innerHTML = ""; 
@@ -220,5 +235,5 @@ function bucheTribunalSchlueckeManuell(opfer, anzahl) {
 
 function tribunalAuswahlBeenden() {
     document.getElementById('tribunalCountdownStandalone').innerHTML = "";
-    document.getElementById('tribunalNextBtn').style.display = "inline-block";
+    naechsteTribunalRunde();
 }

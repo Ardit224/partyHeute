@@ -7,6 +7,7 @@ let isGemischteRunde = false;
 let aktiveRundenAufgaben = [];
 let taskIndexForDrinkSelection = -1; // Trackt, für welche laufende Regel gerade Schlücke verteilt werden
 let mixedModePool = []; // Der Stapel für die gemischte Runde
+let isCounterEnabled = true; 
 
 const suddenEvents = [
     "🚨 EX UND HOPP! Alle Spieler leeren sofort ihr aktuelles Getränk ohne Ausnahme!",
@@ -26,7 +27,7 @@ const suddenEvents = [
 ];
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich', 'counterSelection'];
     
     // Musik stoppen, sobald der Bereich gewechselt wird (Knopf gedrückt)
     stopBackgroundMusic();
@@ -306,7 +307,43 @@ function geheZuSpiele() {
         customAlert("Halt! 🛑 Es müssen mindestens 2 Spieler aktiv sein!");
         return;
     }
+    zeigeBereich('counterSelection');
+}
+
+function setCounterPreference(enabled) {
+    isCounterEnabled = enabled;
     zeigeBereich('hauptMenue');
+    
+    // Buttons im Hauptmenü und Spielbereich aktualisieren
+    const menuEndBtn = document.getElementById('menuEndBtn');
+    if (menuEndBtn) {
+        menuEndBtn.innerText = isCounterEnabled ? "🛑 Session beenden & Statistik" : "🛑 Session beenden";
+    }
+
+    // Spielerliste aktualisieren, um Counter zu verstecken/zeigen
+    if (typeof listeAnzeigen === 'function') listeAnzeigen();
+}
+
+/**
+ * Beendet die aktuelle Spiel-Session, zeigt ggf. Statistiken und resettet die Counter.
+ */
+function beendeSpielUndZeigeStatistik() {
+    if (isCounterEnabled) {
+        zeigeStatistiken();
+    } else {
+        geheZuStartMenue();
+    }
+    
+    // WICHTIG: Counter sofort nach dem Anzeigen der Ergebnisse im Hintergrund resetten
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    spielerListe.forEach(s => {
+        s.schluecke = 0;
+        s.ausgewaehltCount = 0;
+        s.getraenkeCount = 0;
+    });
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+    
+    if (typeof listeAnzeigen === "function") listeAnzeigen();
 }
 
 // Alias für den Aufruf aus HTML
@@ -316,6 +353,7 @@ function kategorieWaehlen(kategorie) {
     aktuelleKategorie = kategorie; 
     isGemischteRunde = false;
     zeigeBereich('spielBereich');
+    updateGameEndBtnVisibility();
     karteZiehen();
 }
 
@@ -353,7 +391,23 @@ function refillMixedModePool() {
 function starteGemischteRunde() {
     isGemischteRunde = true;
     zeigeBereich('spielBereich');
+    updateGameEndBtnVisibility();
     karteZiehen();
+}
+
+/**
+ * Hilfsfunktion um den Beenden-Button im Spielbereich anzuzeigen
+ */
+function updateGameEndBtnVisibility() {
+    const btn = document.getElementById('gameEndBtn');
+    if (!btn) return;
+    
+    if (isCounterEnabled) {
+        btn.innerText = "🏆 Spiel beenden & Statistik";
+    } else {
+        btn.innerText = "🛑 Spiel beenden";
+    }
+    btn.style.display = 'block';
 }
 
 /**
@@ -523,8 +577,16 @@ async function karteZiehen() {
     aktuelleSchluecke = daten.schluecke;
     
     // Sichtbarkeit anpassen
-    if (entscheidung) entscheidung.style.display = 'flex';
-    if (naechsteBtn) naechsteBtn.style.display = 'none';
+    if (!isCounterEnabled) {
+        if (entscheidung) entscheidung.style.display = 'none';
+        if (naechsteBtn) {
+            naechsteBtn.style.display = 'block';
+            naechsteBtn.innerText = "Weiter 🃏";
+        }
+    } else {
+        if (entscheidung) entscheidung.style.display = 'flex';
+        if (naechsteBtn) naechsteBtn.style.display = 'none';
+    }
 
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
     
@@ -576,10 +638,14 @@ async function karteZiehen() {
         document.getElementById('failBtn').innerHTML = `✅ Herausforderung annehmen!`;
         document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(zufallsSpieler, daten.frage, rundenAnzahl, aktuelleSchluecke);
         document.getElementById('strafeText').innerText = `Herausforderung: ${rundenAnzahl} Runden durchhalten!`;
+        if (isCounterEnabled) document.getElementById('entscheidungsBereich').style.display = 'flex';
+        if (isCounterEnabled) document.getElementById('naechsteKarteBtn').style.display = 'none';
     } else {
-        document.getElementById('failBtn').innerHTML = `🍹 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
-        document.getElementById('failBtn').onclick = trinkenBestätigen;
-        document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
+        if (isCounterEnabled) {
+            document.getElementById('failBtn').innerHTML = `🍹 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
+            document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
+            document.getElementById('failBtn').onclick = trinkenBestätigen;
+        }
     }
 }
 
@@ -622,14 +688,23 @@ function zeigeSuddenEvent() {
 
     if (rundenMatch) {
         const rundenAnzahl = parseInt(rundenMatch[1]);
-        document.getElementById('entscheidungsBereich').style.display = 'flex';
+        if (isCounterEnabled) {
+            document.getElementById('entscheidungsBereich').style.display = 'flex';
+            document.getElementById('naechsteKarteBtn').style.display = 'none';
+            const skipBtn = document.getElementById('skipDrinkBtn');
+            if (skipBtn) skipBtn.style.display = 'none'; // Keine Ausrede bei Sudden Events
+        } else {
+            document.getElementById('entscheidungsBereich').style.display = 'none';
+            document.getElementById('naechsteKarteBtn').style.display = 'block';
+            document.getElementById('naechsteKarteBtn').innerText = "Weiter 🃏";
+        }
         document.getElementById('failBtn').innerHTML = `🔥 Regel aktivieren!`;
         document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(p1, fertigesEvent, rundenAnzahl, gefundeneSchluecke, true);
-        document.getElementById('naechsteKarteBtn').style.display = 'none';
         document.getElementById('strafeText').innerText = `⚠️ Regel aktiv für ${rundenAnzahl} Runden!`;
     } else {
         document.getElementById('entscheidungsBereich').style.display = 'none';
         document.getElementById('naechsteKarteBtn').style.display = 'block';
+        document.getElementById('naechsteKarteBtn').innerText = "Weiter 🃏";
         document.getElementById('strafeText').innerText = "🚨 ALARM! KEINE AUSREDEN!";
     }
     
@@ -647,13 +722,16 @@ function zeigeSuddenEvent() {
  */
 function trinkenBestätigen() {
     playSound('click');
-    // Bei Aufgaben direkt buchen, bei "Ich hab noch nie" die Mehrfachauswahl zeigen
-    if (aktuelleKategorie === 'aufgaben') {
+
+    if (!isCounterEnabled) {
         document.getElementById('entscheidungsBereich').style.display = 'none';
-        strafSchluckeVerteilen(aktuellerSpielerIndex);
-    } else {
-        werMussTrinkenZeigen();
+        document.getElementById('naechsteKarteBtn').style.display = 'block';
+        return;
     }
+
+    // Öffnet jetzt für alle Kategorien (inkl. Aufgaben) die Spielerauswahl,
+    // um die Schlücke manuell eintragen zu können.
+    werMussTrinkenZeigen();
 }
 
 function rundenAufgabeStarten(spieler, text, runden, schluecke, isGlobal = false) {

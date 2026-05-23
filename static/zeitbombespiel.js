@@ -78,6 +78,15 @@ function explodeBomb() {
     const explosionBox = document.getElementById('bombExplosionBox');
     explosionBox.style.display = "block";
     
+    if (!isCounterEnabled) {
+        explosionBox.innerHTML = `
+            <h1 style="font-size: 3rem; color: #ef4444;">💥 BOOM!</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 20px;">Die Bombe ist hochgegangen! Trinkt 3 Schlücke! 🍹</p>
+            <button class="nav-btn" style="margin-top: 20px;" onclick="${isGemischteRunde ? 'geheZurueckZumMix()' : 'resetBombUI()'}">Weiter 🚀</button>
+        `;
+        return;
+    }
+
     // Zeige Auswahl-Grid für das Opfer
     explosionBox.innerHTML = `
         <h1 style="font-size: 3rem; color: #ef4444;">💥 BOOM!</h1>
@@ -115,7 +124,7 @@ function zeigeBombErgebnis(opfer) {
     explosionBox.innerHTML = `
         <h1 style="font-size: 3rem; color: #ef4444;">💥 BOOM!</h1>
         <p>Die Bombe ist bei <strong>${opfer.name}</strong> explodiert!</p>
-        <p style="font-size: 1.5rem; margin-top: 10px;">TRINK 3 SCHLÜCKE! 🍹</p>
+        <p style="font-size: 1.5rem; margin-top: 10px;">TRINK! 🍹 ${isCounterEnabled ? '(3 Schlücke)' : ''}</p>
         <button id="bombBackBtn" class="nav-btn" style="margin-top: 25px;"></button>
     `;
 

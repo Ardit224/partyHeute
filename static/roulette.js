@@ -31,12 +31,16 @@ function starteCountdownSpiel() {
     // Button Text anpassen, falls wir in der gemischten Runde sind
     const exitBtn = document.querySelector('#countdownBereich button[onclick="zurueckZumMenueAusCountdown()"]');
     if (exitBtn) {
-        exitBtn.innerText = isGemischteRunde ? "Weiter im Mix 🚀" : "Zurück zur Spielauswahl";
+        exitBtn.innerText = isGemischteRunde ? "Weiter im Mix 🚀" : "Zurück zur Auswahl";
     }
 }
 
 function statusUpdaten() {
-    document.getElementById('countdownStatus').innerText = `Noch ${countdownPot.length} Spieler im Pot. Das Opfer trinkt ${aktuelleCountdownSchluecke} 🍹!`;
+    if (isCounterEnabled) {
+        document.getElementById('countdownStatus').innerText = `Noch ${countdownPot.length} Spieler im Pot. Das Opfer trinkt ${aktuelleCountdownSchluecke} 🍹!`;
+    } else {
+        document.getElementById('countdownStatus').innerText = `Noch ${countdownPot.length} Spieler im Pot. Wer wird das nächste Opfer?`;
+    }
 }
 
 function zeichneRad() {
