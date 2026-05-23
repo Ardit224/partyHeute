@@ -57,14 +57,28 @@ function erstelleCharakter() {
 }
 
 function listeAnzeigen() {
+    const miniGrid = document.getElementById('miniCharGrid');
     const listenBereich = document.getElementById('spielerListe');
+    
+    let gespeicherteSpieler = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    const istGarderobe = document.getElementById('editor-box') && document.getElementById('editor-box').style.display !== 'none';
+
+    // Spezielles Rendering für das Garderoben-Grid
+    if (istGarderobe && miniGrid) {
+        miniGrid.innerHTML = "";
+        gespeicherteSpieler.slice(-3).forEach(spieler => {
+            const content = spieler.emoji.includes('<img') ? spieler.emoji : '';
+            miniGrid.innerHTML += `
+                <div class="mini-char-card">
+                    <div class="initial-circle">${content}</div>
+                    <span style="color: var(--neon-purple); font-size: 0.6rem; font-weight: bold; text-transform: uppercase;">${spieler.name}</span>
+                </div>
+            `;
+        });
+    }
+
     if (!listenBereich) return;
     listenBereich.innerHTML = ""; 
-
-    let gespeicherteSpieler = JSON.parse(localStorage.getItem('partySpieler')) || [];
-    
-    // Prüfen, ob wir uns in der Garderobe befinden
-    const istGarderobe = document.getElementById('editor-box') && document.getElementById('editor-box').style.display !== 'none';
 
     gespeicherteSpieler.forEach((spieler, index) => {
         let extraKlasse = (spieler.aktiv !== false) ? "" : "spieler-inaktiv";

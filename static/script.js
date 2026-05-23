@@ -27,7 +27,7 @@ const suddenEvents = [
 ];
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich', 'counterSelection'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich', 'counterSelection', 'charakterSelection'];
     
     // Musik stoppen, sobald der Bereich gewechselt wird (Knopf gedrückt)
     stopBackgroundMusic();
@@ -46,6 +46,10 @@ function zeigeBereich(bereichId) {
         }
     });
     
+    // Spielerliste im Hauptmenü und Garderobe ausblenden
+    const footerList = document.getElementById('footerPlayerList');
+    if (footerList) footerList.style.display = (bereichId === 'startMenue' || bereichId === 'editor-box') ? 'none' : 'block';
+
     // Aktualisiere die Spielerliste bei jedem Bereichswechsel
     if (typeof window.listeAnzeigen === "function") {
         listeAnzeigen();
@@ -273,6 +277,17 @@ style.innerHTML = `
 
     /* Handy Wechsel */
     .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: 20px; padding: 40px; text-align: center; }
+
+    /* Charakter Selection Mockup Style */
+    .char-selection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
+    .char-card { background: rgba(0,0,0,0.4); border: 2px solid #8b5cf6; box-shadow: 0 0 8px #8b5cf6; border-radius: 18px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .char-card.selected { background: rgba(139, 92, 246, 0.15); box-shadow: 0 0 20px #8b5cf6; transform: translateY(-3px); }
+    .char-portrait { width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 8px; background: rgba(255,255,255,0.08); font-size: 2rem; border: 1px solid rgba(255,255,255,0.1); }
+    .char-portrait img { width: 100%; height: 100%; object-fit: cover; }
+    .char-name { font-size: 0.8rem; color: #fff; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .neon-checkbox { width: 20px; height: 20px; border: 2px solid #8b5cf6; border-radius: 6px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
+    .neon-checkbox.checked { background: #8b5cf6; box-shadow: 0 0 12px #8b5cf6; }
+    .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -3px; left: 2px; font-size: 15px; color: white; font-weight: bold; }
 `;
 document.head.appendChild(style);
 
@@ -301,10 +316,51 @@ function geheZuGarderobe() {
 function geheZuSpiele() { 
     const spielerRaw = localStorage.getItem('partySpieler');
     let spieler = spielerRaw ? JSON.parse(spielerRaw) : [];
-    let aktiveSpieler = spieler.filter(s => s.aktiv !== false);
     
-    if (aktiveSpieler.length < 2) {
-        customAlert("Halt! 🛑 Es müssen mindestens 2 Spieler aktiv sein!");
+    if (spieler.length === 0) {
+        customAlert("Keine Charaktere gespeichert! 👗 Geh zuerst in die Garderobe.");
+        return;
+    }
+    
+    renderCharakterSelectionGrid();
+    zeigeBereich('charakterSelection');
+}
+
+function renderCharakterSelectionGrid() {
+    const grid = document.getElementById('selectionGrid');
+    if (!grid) return;
+    grid.innerHTML = "";
+    
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    
+    spielerListe.forEach((spieler, index) => {
+        const card = document.createElement('div');
+        const isSelected = spieler.aktiv !== false;
+        card.className = `char-card ${isSelected ? 'selected' : ''}`;
+        card.onclick = () => toggleCharakterSelect(index);
+        
+        card.innerHTML = `
+            <div class="char-portrait">${spieler.emoji}</div>
+            <div class="char-name">${spieler.name}</div>
+            <div class="neon-checkbox ${isSelected ? 'checked' : ''}"></div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function toggleCharakterSelect(index) {
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    spielerListe[index].aktiv = !spielerListe[index].aktiv;
+    localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+    renderCharakterSelectionGrid();
+}
+
+function bestaetigeCharakterAuswahl() {
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    let aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
+    
+    if (aktiveSpieler.length < 3 || aktiveSpieler.length > 8) {
+        customAlert("Halt! 🛑 Bitte wählt zwischen 3 und 8 Spielern aus.");
         return;
     }
     zeigeBereich('counterSelection');

@@ -24,48 +24,82 @@
         <button id="muteBtn" onclick="toggleMute()" class="mute-toggle" title="Sound an/aus">🔊</button>
         
         <!-- 1. HAUPTMENÜ (Landing Page / Startbildschirm) -->
-        <div id="startMenue" class="menu-screen">
-            <h1 class="title-glow">🍹 Party App</h1>
-            <p>Bereit für die Eskalation?</p>
-            <div class="main-nav">
-                <button class="nav-btn" onclick="geheZuGarderobe()">👗 Garderobe <br><small>Spieler verwalten</small></button>
-                <button class="nav-btn" onclick="geheZuSpiele()">🎮 Spiele starten <br><small>Viel Spaß!</small></button>
+        <div id="startMenue" class="menu-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            
+            <div class="main-nav" style="width: 100%;">
+                <button class="nav-btn btn-cyber-purple" onclick="geheZuSpiele()">SPIEL STARTEN</button>
+                <button class="nav-btn btn-cyber-green" onclick="geheZuGarderobe()">ZUR GARDEROBE</button>
+                <button class="nav-btn btn-cyber-blue" onclick="customAlert('Raum-System folgt in Kürze! 🌐')">
+                    RAUM BEITRETEN <span style="font-size: 1.4rem;">🔳</span>
+                </button>
             </div>
-            
-        </div>
 
-        <!-- 2. GARDEROBE (Charakter-Editor) -->
-        <div id="editor-box" style="display: none;">
-            <h2>Charakter erstellen / bearbeiten</h2>
-            <input type="text" id="nameInput" placeholder="Name des Spielers" autocomplete="off">
-            
-            <label for="emojiInput" style="display:block; margin: 10px 0 5px 0; text-align: left; font-size: 0.9em;">Wähle ein Emoji:</label>
-            <select id="emojiInput">
-                <option value="😎">😎 Cool</option>
-                <option value="👽">👽 Alien</option>
-                <option value="👻">👻 Geist</option>
-                <option value="🦊">🦊 Fuchs</option>
-                <option value="🤖">🤖 Roboter</option>
-                <option value="🦖">🦖 Dino</option>
-                <option value="🐙">🐙 Oktopus</option>
-                <option value="🤠">🤠 Cowboy</option>
-            </select>
-            
-            <p style="font-size: 0.9em; color: #94a3b8; margin-top: 15px;">Oder mach ein Foto:</p>
-            <div class="camera-section">
-                <video id="video" width="150" height="150" autoplay playsinline muted style="display: none; border-radius: 50%; object-fit: cover; margin: 0 auto;"></video>
-                <canvas id="canvas" width="150" height="150" style="display: none;"></canvas>
-                <img id="photoPreview" src="" alt="Foto Vorschau" style="display: none; width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto;">
-                
-                <div style="margin-top: 10px;">
-                    <button id="startCameraBtn" onclick="kameraStarten()" style="background-color: #6366f1; width: auto; padding: 8px 15px;">📸 Kamera öffnen</button>
-                    <button id="snapBtn" onclick="fotoMachen()" style="display: none; background-color: #ef4444; width: auto; padding: 8px 15px;">📸 Foto machen</button>
+            <div style="margin-top: 60px; width: 100%;">
+                <div style="width: 320px; height: 50px; background: rgba(0,0,0,0.6); border: 1px solid #1e293b; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.7rem; letter-spacing: 1px; font-family: 'Inter', sans-serif;">
+                    AD BANNER SPACE (320x50)
                 </div>
             </div>
 
-            <button id="startBtn" onclick="erstelleCharakter()" style="background-color: #10b981;">Charakter speichern</button>
-            <button onclick="punkteResetten()" style="background-color: #4b5563;">Alle Schlücke auf 0 setzen</button>
-            <button onclick="geheZuStartMenue()" style="background-color: #374151;">Zurück zum Menü</button>
+            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;" onclick="customAlert('Hilfe & Regeln: ...')">?</div>
+        </div>
+
+        <!-- 2. GARDEROBE (Charakter-Editor) -->
+        <div id="editor-box" class="menu-screen" style="display: none; text-align: center;">
+            <h1 class="title-glow">PARTYHEUTE</h1>
+            <div class="neon-line"></div>
+            <div class="wardrobe-subtitle">- DIE GARDEROBE</div>
+            
+            <div class="creation-card">
+                <span class="creation-label">NEUEN CHARAKTER ERSTELLEN</span>
+                
+                <div class="photo-circle-placeholder" id="wardrobeCameraTrigger" onclick="kameraStarten()">
+                    <video id="video" width="100" height="100" autoplay playsinline muted style="display: none; border-radius: 50%; object-fit: cover; position: absolute; top:0; left:0;"></video>
+                    <canvas id="canvas" width="100" height="100" style="display: none;"></canvas>
+                    <img id="photoPreview" src="" style="display: none; width: 100px; height: 100px; border-radius: 50%; object-fit: cover; position: absolute; top:0; left:0;">
+                    <span class="plus-icon" id="cameraPlusIcon">+</span>
+                </div>
+                
+                <input type="text" id="nameInput" class="name-input-cyber" placeholder="NAME EINGEBEN..." autocomplete="off">
+                <button id="snapBtn" onclick="fotoMachen()" style="display: none; background-color: var(--neon-cyan); color: black; margin-top: 10px; width: auto; padding: 5px 15px; font-size: 0.8rem;">FOTO SCHIESSEN</button>
+                <!-- Verstecktes Select für Kompatibilität -->
+                <select id="emojiInput" style="display:none;"><option value="👤">👤</option></select>
+            </div>
+
+            <div id="miniCharGrid" class="mini-char-grid">
+                <!-- Wird dynamisch von storage.js gefüllt -->
+            </div>
+
+            <button id="startBtn" class="nav-btn btn-save-char" onclick="erstelleCharakter()">CHARAKTER SPEICHERN</button>
+            <button class="nav-btn btn-back-green" onclick="geheZuStartMenue()">ZURÜCK ZUM HAUPTMENÜ</button>
+            <button onclick="punkteResetten()" style="background: transparent; border: none; color: #475569; font-size: 0.7rem; margin-top: 10px;">Punkte Reset</button>
+
+            <div class="footer-ad-placeholder">AD BANNER SPACE (320x50)</div>
+            <div style="position: fixed; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: #1e1e24; display: flex; align-items: center; justify-content: center; color: #475569; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); font-weight: bold;">?</div>
+        </div>
+
+        <!-- 2.3 CHARACTER SELECTION -->
+        <div id="charakterSelection" class="menu-screen" style="display: none; text-align: center; position: relative; min-height: 90vh;">
+            <h1 class="title-glow" style="margin-bottom: 0; font-size: 2.5rem;">PARTYHEUTE</h1>
+            <div style="height: 3px; width: 220px; background: linear-gradient(to right, transparent, #8b5cf6, #3b82f6, transparent); margin: 5px auto 15px auto;"></div>
+            <h3 style="color: #8b5cf6; text-shadow: 0 0 5px #8b5cf6; font-size: 1rem; margin-top: 0; font-weight: bold; letter-spacing: 2px;">- CHARAKTERAUSWAHL</h3>
+            
+            <p style="margin: 25px 0 10px 0; font-size: 0.85rem; color: #cbd5e1; font-weight: bold; text-transform: uppercase;">GESPEICHERTE CHARAKTERE AUSWÄHLEN (3 - 8 Spieler)</p>
+            
+            <div id="selectionGrid" class="char-selection-grid"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 30px auto; width: 90%;">
+                <button class="nav-btn" onclick="bestaetigeCharakterAuswahl()" style="background: #8b5cf6; box-shadow: 0 0 15px #8b5cf6; border: none; padding: 18px; height: auto; border-radius: 15px; color: white;">
+                    <span style="font-weight: bold; font-size: 1rem;">WEITER ZUR SPIELKONFIGURATION</span><br>
+                    <small style="opacity: 0.9; font-size: 0.8rem;">(mit Counter etc.)</small>
+                </button>
+                <button class="nav-btn" onclick="geheZuStartMenue()" style="background: transparent; border: 2px solid #10b981; box-shadow: 0 0 10px #10b981; color: #10b981; padding: 15px; height: auto; border-radius: 15px; font-weight: bold;">
+                    ZURÜCK ZUM HAUPTMENÜ
+                </button>
+            </div>
+
+            <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;">?</div>
         </div>
 
         <!-- 2.5 COUNTER SELECTION -->
@@ -265,12 +299,13 @@
             </div>
         </div>
 
-        <hr style="margin-top: 30px; border: 0; border-top: 1px solid var(--border);">
-
-        <!-- GLOBALE SPIELERLISTE (Wird immer unten drunter angezeigt) -->
-        <h3>Aktive Party-Gäste:</h3>
-        <div class="spieler-grid" id="spielerListe">
-            <!-- Spieler-Karten werden hier von storage.js eingefügt -->
+        <!-- GLOBALE SPIELERLISTE (Wird außer im Hauptmenü immer unten drunter angezeigt) -->
+        <div id="footerPlayerList">
+            <hr style="margin-top: 30px; border: 0; border-top: 1px solid var(--border);">
+            <h3>Aktive Party-Gäste:</h3>
+            <div class="spieler-grid" id="spielerListe">
+                <!-- Spieler-Karten werden hier von storage.js eingefügt -->
+            </div>
         </div>
     </div>
 
