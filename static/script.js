@@ -7,7 +7,6 @@ let isGemischteRunde = false;
 let aktiveRundenAufgaben = [];
 let taskIndexForDrinkSelection = -1; // Trackt, für welche laufende Regel gerade Schlücke verteilt werden
 let mixedModePool = []; // Der Stapel für die gemischte Runde
-let handyWechselCounter = 0;
 
 const suddenEvents = [
     "🚨 EX UND HOPP! Alle Spieler leeren sofort ihr aktuelles Getränk ohne Ausnahme!",
@@ -325,7 +324,6 @@ function kategorieWaehlen(kategorie) {
  * um eine gleichmäßige Verteilung der Spiele zu garantieren.
  */
 function refillMixedModePool() {
-    // Alle Spiele werden mit absolut gleicher Häufigkeit in den Pool gelegt
     const categories = [
         'aufgaben', 
         'wer_wuerde_eher', 
@@ -334,15 +332,19 @@ function refillMixedModePool() {
         'countdown',
         'shot_roulette',
         'virus',
-        'sudden_event',
-        'tribunal'
+        'tribunal',
+        'zeitbombe'
     ];
     
-    // Wir erstellen einen größeren Pool (z.B. 24 Karten), damit die Mischung besser ist
     let fullPool = [];
-    for(let i = 0; i < 3; i++) {
+    // Standard-Kategorien werden öfter (5 Mal) in den Pool gelegt (45 Karten)
+    for(let i = 0; i < 5; i++) {
         fullPool = fullPool.concat(categories);
     }
+
+    // Extrem-Events (sudden_event) werden nur noch 1 Mal hinzugefügt.
+    // Damit sinkt die Chance auf ca. 2.2% (im Schnitt alle 46 Karten), was sie deutlich seltener macht.
+    fullPool.push('sudden_event');
     
     // Fisher-Yates Shuffle für echten Zufall ohne Wiederholungs-Pech
     mixedModePool = fullPool.sort(() => Math.random() - 0.5);
@@ -466,24 +468,6 @@ async function karteZiehen() {
     // Jede neue Karte verringert die Runden der aktiven Aufgaben
     verarbeiteRundenTick();
 
-    // Sudden Explosion Chance (ca. 4% - passiert unvorhersehbar)
-    if (isGemischteRunde && Math.random() < 0.04) {
-        if (typeof triggerSuddenExplosion === 'function') {
-            triggerSuddenExplosion();
-            return;
-        }
-    }
-
-    // Handy-Wechsel alle 8 Karten
-    handyWechselCounter++;
-    if (isGemischteRunde && handyWechselCounter >= 8) {
-        handyWechselCounter = 0;
-        if (typeof zeigeHandyWechsel === 'function') {
-            zeigeHandyWechsel();
-            return;
-        }
-    }
-
     if (isGemischteRunde) {
         // Prüfen ob der Stapel leer ist
         if (mixedModePool.length === 0) {
@@ -520,6 +504,9 @@ async function karteZiehen() {
             aktuelleKategorie = 'wer_wuerde_eher';
         } else if (aktuelleKategorie === 'countdown') {
             starteCountdownSpiel();
+            return;
+        } else if (aktuelleKategorie === 'zeitbombe') {
+            starteZeitbombeMixed();
             return;
         }
     }
@@ -590,33 +577,12 @@ async function karteZiehen() {
         document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(zufallsSpieler, daten.frage, rundenAnzahl, aktuelleSchluecke);
         document.getElementById('strafeText').innerText = `Herausforderung: ${rundenAnzahl} Runden durchhalten!`;
     } else {
-        document.getElementById('failBtn').innerHTML = `🍻 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
+        document.getElementById('failBtn').innerHTML = `🍹 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
         document.getElementById('failBtn').onclick = trinkenBestätigen;
         document.getElementById('strafeText').innerText = `Einsatz: ${aktuelleSchluecke} Schlücke!`;
     }
 }
 
-/**
- * Zeigt den Screen zum Handy-Weitergeben
- */
-function zeigeHandyWechsel() {
-    const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
-    const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
-    const zielSpieler = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
-    
-    zeigeBereich('handyWechselBereich');
-    playSound('card');
-
-    const display = document.getElementById('handyWechselDisplay');
-    const avatar = zielSpieler.emoji.includes('<img') ? zielSpieler.emoji : `<span style="font-size: 5rem;">${zielSpieler.emoji}</span>`;
-    
-    display.innerHTML = `
-        <div class="avatar-wrapper" style="width: 150px; height: 150px; margin-bottom: 20px;">${avatar}</div>
-        <h1 style="font-size: 2.5rem;">ÜBERGABE!</h1>
-        <p style="font-size: 1.5rem;">Reich das Handy weiter an:</p>
-        <h2 style="color: #6366f1; font-size: 3rem;">${zielSpieler.name}</h2>
-    `;
-}
 
 function starteZeitbombeMixed() {
     isGemischteRunde = true;

@@ -84,11 +84,11 @@ function listeAnzeigen() {
                 ${spieler.emoji.includes('<img') ? '' : `<span class="spieler-name">${spieler.name}</span>`}
                 <div class="drink-controls">
                     <button class="drink-btn minus" onclick="event.stopPropagation(); window.getraenkAbziehen(${index})">-</button>
-                    <button class="drink-btn plus" onclick="event.stopPropagation(); window.getraenkHinzufuegen(${index})">+🍺</button>
+                    <button class="drink-btn plus" onclick="event.stopPropagation(); window.getraenkHinzufuegen(${index})">+🍹</button>
                 </div>
                 <div style="display: flex; justify-content: center; gap: 4px; margin-top: 5px;">
                     <span class="schluck-anzahl" title="Schlücke">${spieler.schluecke || 0} 🥤</span>
-                    <span class="getraenke-anzahl" title="Getränke">${spieler.getraenkeCount || 0} 🍺</span>
+                    <span class="getraenke-anzahl" title="Getränke">${spieler.getraenkeCount || 0} 🍹</span>
                 </div>
             </div>
         `;
@@ -131,7 +131,7 @@ function charakterBearbeiten(index) {
 }
 
 function punkteResetten() {
-    customConfirm("Alle Schlücke auf 0 setzen? Seid ihr wieder nüchtern? 🍺", () => {
+    customConfirm("Alle Schlücke auf 0 setzen? Seid ihr wieder nüchtern? 🍹", () => {
         let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
         spielerListe.forEach(s => {
             s.schluecke = 0;

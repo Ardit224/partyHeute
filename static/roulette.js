@@ -36,7 +36,7 @@ function starteCountdownSpiel() {
 }
 
 function statusUpdaten() {
-    document.getElementById('countdownStatus').innerText = `Noch ${countdownPot.length} Spieler im Pot. Das Opfer trinkt ${aktuelleCountdownSchluecke} 🍺!`;
+    document.getElementById('countdownStatus').innerText = `Noch ${countdownPot.length} Spieler im Pot. Das Opfer trinkt ${aktuelleCountdownSchluecke} 🍹!`;
 }
 
 function zeichneRad() {
@@ -140,7 +140,10 @@ function radDrehen() {
         
         aktuelleCountdownSchluecke = Math.min(countdownPot.length, 8);
 
-        if (countdownPot.length === 1) {
+        if (isGemischteRunde) {
+            // Im gemischten Modus nach einem Treffer den Button ausblenden und zum Mix zurückkehren
+            document.getElementById('countdownZiehenBtn').style.display = 'none';
+        } else if (countdownPot.length === 1) {
             let gewinner = countdownPot[0];
             document.getElementById('countdownStatus').innerText = "Spiel vorbei!";
             

@@ -4,7 +4,6 @@
  */
 
 let bombTimer = null;
-let bombCurrentPlayerIndex = 0;
 let bombPool = [];
 let bombIsActive = false;
 
@@ -29,30 +28,6 @@ function starteZeitbombeSpiel() {
     resetBombUI();
 }
 
-/**
- * Triggert eine sofortige, unvorhersehbare Explosion in der gemischten Runde.
- */
-function triggerSuddenExplosion() {
-    const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
-    const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
-    if (aktiveSpieler.length === 0) return;
-
-    // Der "Besitzer" des Handys wird zufällig bestimmt
-    const opfer = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
-    
-    isGemischteRunde = true;
-    zeigeBereich('zeitbombeBereich');
-    
-    // UI für den Schock-Moment vorbereiten
-    document.getElementById('bombCategoryBox').innerHTML = "🚨 SCHARFE BOMBE! 🚨";
-    document.getElementById('bombStartBtn').style.display = "none";
-    document.getElementById('bombPassBtn').style.display = "none";
-    
-    bombPool = aktiveSpieler;
-    bombCurrentPlayerIndex = aktiveSpieler.findIndex(s => s.name === opfer.name);
-    
-    explodeBomb();
-}
 
 function resetBombUI() {
     document.getElementById('bombCategoryBox').innerHTML = "Bereit?";
@@ -73,40 +48,26 @@ function startBombLogic() {
     }
 
     bombIsActive = true;
-    bombCurrentPlayerIndex = Math.floor(Math.random() * bombPool.length);
     
     const randomTime = Math.floor(Math.random() * (40000 - 15000 + 1)) + 15000; // 15s bis 40s
     
     document.getElementById('bombStartBtn').style.display = "none";
-    document.getElementById('bombPassBtn').style.display = "block";
+    document.getElementById('bombPassBtn').style.display = "none";
     document.getElementById('bombCategoryBox').innerHTML = `Kategorie: <br><strong>${bombCategories[Math.floor(Math.random() * bombCategories.length)]}</strong>`;
     
-    updateBombPlayer();
+    document.getElementById('bombPlayerDisplay').innerHTML = `
+        <div style="font-size: 1.5rem; margin-top: 20px; color: #f97316; font-weight: bold; animation: pulse 1.5s infinite;">
+            ⏱️ DIE BOMBE TICKT... <br> Reicht das Handy schnell weiter!
+        </div>
+    `;
+
     playSound('click');
 
     bombTimer = setTimeout(explodeBomb, randomTime);
 }
 
-function updateBombPlayer() {
-    const p = bombPool[bombCurrentPlayerIndex];
-    const avatar = p.emoji.includes('<img') ? p.emoji : `<span style="font-size: 3rem;">${p.emoji}</span>`;
-    document.getElementById('bombPlayerDisplay').innerHTML = `
-        <div class="avatar-wrapper" style="width: 100px; height: 100px;">${avatar}</div>
-        <h2 style="margin-top: 10px;">💣 BOMBE BEI: ${p.name}</h2>
-    `;
-}
-
-function bombeWeitergeben() {
-    if (!bombIsActive) return;
-    bombCurrentPlayerIndex = (bombCurrentPlayerIndex + 1) % bombPool.length;
-    updateBombPlayer();
-    playSound('click');
-    if ("vibrate" in navigator) navigator.vibrate(30);
-}
-
 function explodeBomb() {
     bombIsActive = false;
-    const opfer = bombPool[bombCurrentPlayerIndex];
     
     // UI Explosion
     playSound('shot');
@@ -116,28 +77,55 @@ function explodeBomb() {
     
     const explosionBox = document.getElementById('bombExplosionBox');
     explosionBox.style.display = "block";
+    
+    // Zeige Auswahl-Grid für das Opfer
     explosionBox.innerHTML = `
         <h1 style="font-size: 3rem; color: #ef4444;">💥 BOOM!</h1>
-        <p>Die Bombe ist bei <strong>${opfer.name}</strong> explodiert!</p>
-        <p style="font-size: 1.5rem; margin-top: 10px;">TRINK 3 SCHLÜCKE! 🍺</p>
+        <p style="font-size: 1.2rem; margin-bottom: 20px;">Bei wem ist die Bombe explodiert?</p>
+        <div id="bombVictimGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;"></div>
     `;
 
-    // Robustes Tracking
-    bucheBombSchluecke(opfer, 3);
+    const grid = document.getElementById('bombVictimGrid');
+    bombPool.forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = "strafe-btn";
+        btn.style.padding = "10px";
+        btn.innerHTML = `
+            <div class="avatar-wrapper" style="width: 60px; height: 60px;">${p.emoji}</div>
+            <small style="font-size: 0.7rem; display: block; margin-top: 5px;">${p.name}</small>
+        `;
+        btn.onclick = () => {
+            bucheBombSchluecke(p, 3);
+            zeigeBombErgebnis(p);
+        };
+        grid.appendChild(btn);
+    });
 
     setTimeout(() => {
         document.body.classList.remove('explosion-flash');
         document.getElementById('zeitbombeBereich').classList.remove('shake-anim');
     }, 1000);
+}
 
-    // Back Button Handling
+/**
+ * Zeigt das finale Ergebnis nach Auswahl des Opfers an
+ */
+function zeigeBombErgebnis(opfer) {
+    const explosionBox = document.getElementById('bombExplosionBox');
+    explosionBox.innerHTML = `
+        <h1 style="font-size: 3rem; color: #ef4444;">💥 BOOM!</h1>
+        <p>Die Bombe ist bei <strong>${opfer.name}</strong> explodiert!</p>
+        <p style="font-size: 1.5rem; margin-top: 10px;">TRINK 3 SCHLÜCKE! 🍹</p>
+        <button id="bombBackBtn" class="nav-btn" style="margin-top: 25px;"></button>
+    `;
+
     const backBtn = document.getElementById('bombBackBtn');
     if (isGemischteRunde) {
         backBtn.innerText = "Weiter im Mix 🚀";
-        backBtn.setAttribute('onclick', 'geheZurueckZumMix()');
+        backBtn.onclick = () => geheZurueckZumMix();
     } else {
         backBtn.innerText = "Nächste Runde";
-        backBtn.setAttribute('onclick', 'resetBombUI()');
+        backBtn.onclick = () => resetBombUI();
     }
 }
 

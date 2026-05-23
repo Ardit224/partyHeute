@@ -117,6 +117,15 @@ function paranoiaSchluckeVerteilen(index) {
     // UI aktualisieren (Globale Liste unten)
     if (typeof listeAnzeigen === "function") listeAnzeigen();
 
-    // Nächste Runde starten
-    naechsteParanoiaRunde();
+    // Im gemischten Modus den "Nächste Frage" Knopf unterdrücken und nur "Weiter im Mix" erlauben
+    if (isGemischteRunde) {
+        document.getElementById('paranoiaSpielerListe').innerHTML = `
+            <div style="text-align:center; width:100%;">
+                <h3 style="color:#10b981;">Schlücke gebucht! ✅</h3>
+                <button class="nav-btn" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+            </div>
+        `;
+    } else {
+        naechsteParanoiaRunde();
+    }
 }

@@ -77,19 +77,14 @@ function naechsteTribunalRunde() {
     // UI zurücksetzen
     document.getElementById('tribunalCountdownStandalone').innerHTML = "";
     document.getElementById('tribunalStandaloneBtn').style.display = "inline-block";
+    document.getElementById('tribunalStandaloneBtn').innerText = "⚖️ Ergebnis eintragen";
     document.getElementById('tribunalNextBtn').style.display = "none";
 
     const questionTemplate = tribunalQuestions[Math.floor(Math.random() * tribunalQuestions.length)];
     const p1 = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
     tribunalSchluecke = Math.floor(Math.random() * 4) + 2; // 2-5 Schlücke
 
-    const renderName = (n) => `<span style="color: #ef4444; font-weight: bold;">${n}</span>`;
-    
-    let fertigeFrage = questionTemplate
-        .replace(/{p1}/g, renderName(p1.name))
-        .replace(/{schlucke}/g, `<strong>${tribunalSchluecke}</strong>`);
-
-    document.getElementById('tribunalTaskText').innerHTML = fertigeFrage;
+    document.getElementById('tribunalTaskText').innerHTML = generiereTribunalHTML(questionTemplate, tribunalSchluecke, p1.name);
     if (typeof playSound === 'function') playSound('card');
 }
 
@@ -114,49 +109,116 @@ function starteTribunalMixed() {
     const p1 = aktiveSpieler[Math.floor(Math.random() * aktiveSpieler.length)];
     tribunalSchluecke = Math.floor(Math.random() * 3) + 2; 
 
-    const renderName = (n) => `<span style="color: #ef4444; font-weight: bold;">${n}</span>`;
-    let fertigeFrage = questionTemplate
-        .replace(/{p1}/g, renderName(p1.name))
-        .replace(/{schlucke}/g, `<strong>${tribunalSchluecke}</strong>`);
-
-    document.getElementById('frageText').innerHTML = fertigeFrage;
-    document.getElementById('strafeText').innerText = "Bereitet euch auf die Abstimmung vor!";
+    document.getElementById('frageText').innerHTML = generiereTribunalHTML(questionTemplate, tribunalSchluecke, p1.name);
+    document.getElementById('strafeText').innerText = "Die Minderheit muss trinken!";
     
     // UI im spielBereich anpassen
     document.getElementById('entscheidungsBereich').style.display = 'flex';
     document.getElementById('failBtn').style.display = 'none';
     document.getElementById('tribunalBtn').style.display = 'block';
+    document.getElementById('tribunalBtn').innerText = "⚖️ Ergebnis eintragen";
     document.getElementById('naechsteKarteBtn').style.display = 'none';
 }
 
 /**
- * Startet den visuellen Countdown
+ * Hilfsfunktion zum Erstellen des Zwei-Spalten-Layouts für das Tribunal
+ */
+function generiereTribunalHTML(template, schlucke, spielerName) {
+    // Ersetzt den Namen im Template
+    let text = template.replace(/{p1}/g, `<span style="color: #ef4444; font-weight: bold;">${spielerName}</span>`);
+    
+    // Extrahiert die beiden Optionen (alles zwischen 'eher' und 'ODER' sowie zwischen 'ODER' und '?')
+    const match = text.match(/Würdet ihr eher (.*?) ODER (.*?)\?/i);
+    
+    if (!match) return text.replace(/{schlucke}/g, schlucke);
+
+    const optionA = match[1];
+    const optionB = match[2];
+
+    return `
+        <div style="width: 100%; text-align: center;">
+            <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.3rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+                ⚖️ Einsatz: ${schlucke} Schlücke
+            </div>
+            <div style="display: flex; gap: 15px; justify-content: center; align-items: stretch;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="font-size: 3rem; margin-bottom: 10px;">👍</span>
+                    <p style="font-size: 1.1rem; margin: 0; line-height: 1.3;">${optionA}</p>
+                </div>
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="font-size: 3rem; margin-bottom: 10px;">👎</span>
+                    <p style="font-size: 1.1rem; margin: 0; line-height: 1.3;">${optionB}</p>
+                </div>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.6; font-style: italic;">Stimmt jetzt ab! 👍 vs 👎</p>
+        </div>
+    `;
+}
+
+/**
+ * Zeigt direkt die Auswahl der Trinker an (Countdown erfolgt real durch die Spieler)
  * @param {string} displayId - ID des Containers für die Zahlen
  * @param {string} btnId - ID des Buttons, der versteckt werden soll
  */
-function starteTribunalCountdown(displayId, btnId) {
+function tribunalErgebnisEintragen(displayId, btnId) {
     const display = document.getElementById(displayId);
     const btn = document.getElementById(btnId);
     
     btn.style.display = "none";
-    const steps = ["3", "2", "1", "⚖️ ZEIGT AUF SIE!"];
-    let current = 0;
 
-    const interval = setInterval(() => {
-        if (current < steps.length) {
-            display.innerHTML = `<span class="countdown-number">${steps[current]}</span>`;
-            if (typeof playSound === 'function') playSound('click');
-            current++;
-        } else {
-            clearInterval(interval);
-            setTimeout(() => {
-                display.innerHTML = ""; // Countdown leeren
-                window.aktuelleSchluecke = tribunalSchluecke; // Schluckanzahl global setzen
-                
-                if (typeof werMussTrinkenZeigen === 'function') {
-                    werMussTrinkenZeigen();
-                }
-            }, 1500);
-        }
-    }, 1000);
+    if (isGemischteRunde) {
+        display.innerHTML = ""; 
+        window.aktuelleSchluecke = tribunalSchluecke; 
+        if (typeof werMussTrinkenZeigen === 'function') werMussTrinkenZeigen();
+    } else {
+        // Im Einzelspiel: Auswahl direkt im Tribunal-Bereich anzeigen
+        zeigeTribunalAuswahlStandalone(display);
+    }
+}
+
+/**
+ * Zeigt das Auswahl-Raster für Verlierer im Standalone-Modus
+ */
+function zeigeTribunalAuswahlStandalone(display) {
+    display.innerHTML = `
+        <h3 style="margin-bottom:15px; color:#ef4444;">Wer hat verloren? ⚖️</h3>
+        <div id="tribunalVictimGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;"></div>
+        <button class="nav-btn" style="margin-top:20px; width:100%;" onclick="tribunalAuswahlBeenden()">✅ Auswahl beenden</button>
+    `;
+    
+    const grid = document.getElementById('tribunalVictimGrid');
+    const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    
+    spielerListe.filter(s => s.aktiv !== false).forEach(p => {
+        const btn = document.createElement('button');
+        btn.className = "strafe-btn";
+        btn.style.padding = "10px";
+        btn.innerHTML = `<div class="avatar-wrapper" style="width: 55px; height: 55px;">${p.emoji}</div>`;
+        btn.onclick = function() {
+            if (this.classList.contains('selected-for-drink')) return;
+
+            bucheTribunalSchlueckeManuell(p, tribunalSchluecke);
+            this.classList.add('selected-for-drink');
+            this.style.border = "2px solid #10b981";
+            this.style.opacity = "0.6";
+            this.style.pointerEvents = "none";
+        };
+        grid.appendChild(btn);
+    });
+}
+
+function bucheTribunalSchlueckeManuell(opfer, anzahl) {
+    let alle = JSON.parse(localStorage.getItem('partySpieler'));
+    let s = alle.find(x => x.name === opfer.name && x.emoji === opfer.emoji);
+    if(s) {
+        s.schluecke += anzahl;
+        s.ausgewaehltCount = (s.ausgewaehltCount || 0) + 1;
+        localStorage.setItem('partySpieler', JSON.stringify(alle));
+        if (typeof listeAnzeigen === "function") listeAnzeigen();
+    }
+}
+
+function tribunalAuswahlBeenden() {
+    document.getElementById('tribunalCountdownStandalone').innerHTML = "";
+    document.getElementById('tribunalNextBtn').style.display = "inline-block";
 }

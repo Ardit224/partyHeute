@@ -16,14 +16,24 @@ function starteShotRoulette() {
 
     zeigeBereich('shotRouletteBereich');
     
-    const exitBtn = document.querySelector('#shotRouletteBereich .nav-btn[onclick="zurueckZumHauptMenue()"]');
+    // Selector robuster machen, da sich das onclick Attribut im Mix ändern kann
+    let exitBtn = document.querySelector('#shotRouletteBereich .nav-btn[onclick*="zurueckZumHauptMenue"]');
+    if (!exitBtn) exitBtn = document.querySelector('#shotRouletteBereich .nav-btn[onclick*="geheZurueckZumMix"]');
+    
+    const nextBtn = document.getElementById('shotNextBtn');
     
     if (isGemischteRunde) {
-        exitBtn.innerText = "Weiter im Mix 🚀";
-        exitBtn.setAttribute('onclick', 'geheZurueckZumMix()');
+        if (nextBtn) nextBtn.style.display = 'none'; // Verstecke "Nächste Runde" im Mix
+        if (exitBtn) {
+            exitBtn.innerText = "Weiter im Mix 🚀";
+            exitBtn.setAttribute('onclick', 'geheZurueckZumMix()');
+        }
     } else {
-        exitBtn.innerText = "Spiel beenden";
-        exitBtn.onclick = () => zurueckZumHauptMenue();
+        if (nextBtn) nextBtn.style.display = 'block';
+        if (exitBtn) {
+            exitBtn.innerText = "Spiel beenden";
+            exitBtn.onclick = () => zurueckZumHauptMenue();
+        }
     }
 
     // UI Reset
@@ -89,7 +99,14 @@ function naechsteShotRunde() {
         
         // Zeige Auswahl-Grid nur, wenn getrunken werden muss
         if (istNiemandRunde) {
-            selectionArea.style.display = 'none';
+            if (isGemischteRunde) {
+                selectionArea.style.display = 'block';
+                document.getElementById('shotPlayerGrid').innerHTML = `
+                    <button class="nav-btn" style="grid-column: 1/-1; margin-top: 20px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+                `;
+            } else {
+                selectionArea.style.display = 'none';
+            }
         } else {
             selectionArea.style.display = 'block';
             sr_zeichneTrinkerAuswahl(pool);
@@ -137,6 +154,13 @@ function sr_bucheSchlückeManuell(playerName, btn) {
         setTimeout(() => btn.style.background = "", 500);
         
         if (typeof listeAnzeigen === 'function') listeAnzeigen();
+
+        // Im gemischten Modus die Auswahl durch einen "Weiter"-Button ersetzen
+        if (isGemischteRunde) {
+            document.getElementById('shotPlayerGrid').innerHTML = `
+                <button class="nav-btn" style="grid-column: 1/-1; margin-top: 20px;" onclick="geheZurueckZumMix()">Weiter im Mix 🚀</button>
+            `;
+        }
     }
 }
 

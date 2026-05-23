@@ -112,8 +112,8 @@
             <p id="strafeText" style="font-weight: bold; color: #f472b6;"></p>
 
             <div id="entscheidungsBereich" class="aktions-box-vertical">
-                <button id="failBtn" class="btn-drink-huge" onclick="trinkenBestätigen()">🍻 Trinken!</button>
-                <button id="tribunalBtn" class="btn-drink-huge" style="display: none; background-color: #ef4444;" onclick="starteTribunalCountdown('tribunalCountdownMixed', 'tribunalBtn')">⚖️ Countdown starten!</button>
+                <button id="failBtn" class="btn-drink-huge" onclick="trinkenBestätigen()"> Trinken!</button>
+                <button id="tribunalBtn" class="btn-drink-huge" style="display: none; background-color: #ef4444;" onclick="tribunalErgebnisEintragen('tribunalCountdownMixed', 'tribunalBtn')">⚖️ Ergebnis eintragen</button>
                 <button class="btn-skip-tiny" onclick="niemandTrinkt()">🙅‍♂️ Keiner muss</button>
             </div>
 
@@ -168,7 +168,7 @@
             
             <div id="tribunalCountdownStandalone" class="tribunal-countdown-box"></div>
 
-            <button id="tribunalStandaloneBtn" class="nav-btn" style="background-color: #ef4444;" onclick="starteTribunalCountdown('tribunalCountdownStandalone', 'tribunalStandaloneBtn')">⚖️ Countdown starten!</button>
+            <button id="tribunalStandaloneBtn" class="nav-btn" style="background-color: #ef4444;" onclick="tribunalErgebnisEintragen('tribunalCountdownStandalone', 'tribunalStandaloneBtn')">⚖️ Ergebnis eintragen</button>
             <button id="tribunalNextBtn" class="nav-btn" style="background-color: #3b82f6; display:none;" onclick="naechsteTribunalRunde()">Nächste Anklage ⚖️</button>
             <button onclick="zurueckZumHauptMenue()" style="background-color: #4b5563; margin-top: 15px;">Zurück zum Menü</button>
         </div>
