@@ -59,6 +59,15 @@ async function paranoiaFrageLaden() {
     let avatar = zielSpieler.emoji.includes('<img') ? zielSpieler.emoji : `<span class="emoji-display">${zielSpieler.emoji}</span>`;
     let fertigeFrage = daten.frage.replace("[SPIELER]", `<span class="spieler-anzeige">${avatar} <span class="spieler-name-display">${zielSpieler.name}</span></span>`);
 
+    // Spezielle Anzeige für Paranoia-Einsatz (Preis für die Antwort)
+    if (isCounterEnabled) {
+        fertigeFrage = `
+            <div style="background: rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.2rem; color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
+                🕵️ Preis für die Antwort: ${paranoiaSchluecke} Schlücke
+            </div>
+            ${fertigeFrage}`;
+    }
+
     document.getElementById('paranoiaText').innerHTML = fertigeFrage;
     
     // Wechsel zur Frage-Ansicht
@@ -76,8 +85,9 @@ async function paranoiaFrageLaden() {
         }
     } else {
         drinkBtn.style.display = 'inline-block';
+        drinkBtn.innerHTML = `🔍 Frage verraten <br><small>+${paranoiaSchluecke} Schlücke</small>`;
         skipBtn.style.display = 'inline-block';
-        skipBtn.innerText = "🙅‍♂️ Keiner muss";
+        skipBtn.innerText = "🤫 Geheimnis behalten";
     }
     
     if (typeof playSound === "function") playSound('click');
