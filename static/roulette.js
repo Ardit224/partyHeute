@@ -21,6 +21,14 @@ function starteCountdownSpiel() {
         zeigeBereich('countdownBereich');
     }
     
+    // Rad visuell zurücksetzen für einen sauberen Start
+    aktuellerWinkel = 0;
+    const canvas = document.getElementById('rouletteWheel');
+    if (canvas) {
+        canvas.style.transition = "none";
+        canvas.style.transform = "rotate(0deg)";
+    }
+
     document.getElementById('countdownErgebnis').innerText = "";
     document.getElementById('countdownZiehenBtn').style.display = 'inline-block';
     document.getElementById('countdownZiehenBtn').innerText = "Rad drehen! 🎡";
@@ -115,15 +123,24 @@ function radDrehen() {
 
     let opferIndex = Math.floor(Math.random() * countdownPot.length);
     let opfer = countdownPot[opferIndex];
-
     const canvas = document.getElementById('rouletteWheel');
     const winkelProSegment = 360 / countdownPot.length;
     
-    // Wir berechnen den Winkel so, dass der Pfeil (oben, also 270 Grad) auf das Segment zeigt
-    const extraDrehungen = 5 + Math.random() * 5; 
-    const zielWinkel = (extraDrehungen * 360) + (270 - (opferIndex * winkelProSegment) - (winkelProSegment / 2));
+    // Der Pfeil (Pointer) ist oben bei 270 Grad.
+    // Wir berechnen die Mitte des gewählten Sektors.
+    const sektorMitte = (opferIndex * winkelProSegment) + (winkelProSegment / 2);
     
-    aktuellerWinkel = zielWinkel;
+    // Der benötigte Stopp-Winkel, um sektorMitte auf 270 Grad zu bringen.
+    const stoppWinkel = (270 - sektorMitte + 360) % 360;
+    
+    // Wir berechnen die Differenz zum aktuellen Winkel, damit das Rad immer vorwärts dreht.
+    const extraDrehungen = 5 + Math.floor(Math.random() * 5);
+    const aktuellerMod = aktuellerWinkel % 360;
+    let differenz = stoppWinkel - aktuellerMod;
+    if (differenz <= 0) differenz += 360; 
+
+    aktuellerWinkel += (extraDrehungen * 360) + differenz;
+    
     canvas.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.15, 1)";
     canvas.style.transform = `rotate(${aktuellerWinkel}deg)`;
 
