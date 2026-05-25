@@ -27,7 +27,16 @@ const suddenEvents = [
 ];
 
 function zeigeBereich(bereichId) {
-    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich', 'counterSelection', 'charakterSelection'];
+    const bereiche = ['startMenue', 'editor-box', 'hauptMenue', 'spielBereich', 'countdownBereich', 'statistikBereich', 'paranoiaBereich', 'shotRouletteBereich', 'virusBereich', 'tribunalBereich', 'zeitbombeBereich', 'handyWechselBereich', 'counterSelection', 'charakterSelection', 'gaesteUebersicht'];
+
+    // Vorherigen Bereich merken für die Rückkehr aus der Übersicht
+    const aktuellSichtbar = bereiche.find(id => {
+        const el = document.getElementById(id);
+        return el && el.style.display === 'block';
+    });
+    if (aktuellSichtbar && aktuellSichtbar !== 'gaesteUebersicht') {
+        window.lastBereich = aktuellSichtbar;
+    }
     
     // Musik stoppen, sobald der Bereich gewechselt wird (Knopf gedrückt)
     stopBackgroundMusic();
@@ -46,9 +55,12 @@ function zeigeBereich(bereichId) {
         }
     });
     
-    // Spielerliste im Hauptmenü, in der Garderobe und in der Charakterauswahl ausblenden
-    const footerList = document.getElementById('footerPlayerList');
-    if (footerList) footerList.style.display = (bereichId === 'startMenue' || bereichId === 'charakterSelection' || bereichId === 'editor-box') ? 'none' : 'block';
+    // Floating Button Sichtbarkeit steuern
+    const floatBtn = document.getElementById('floatingGaesteBtn');
+    if (floatBtn) {
+        const versteckt = ['startMenue', 'editor-box', 'charakterSelection', 'counterSelection', 'gaesteUebersicht', 'statistikBereich'];
+        floatBtn.style.display = versteckt.includes(bereichId) ? 'none' : 'flex';
+    }
 
     // Aktualisiere die Spielerliste bei jedem Bereichswechsel
     if (typeof window.listeAnzeigen === "function") {
@@ -397,11 +409,106 @@ style.innerHTML = `
     .neon-checkbox { width: 30px; height: 30px; border: 2px solid var(--neon-purple); border-radius: 8px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
     .neon-checkbox.checked { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); }
     .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -4px; left: 5px; font-size: 22px; color: white; font-weight: bold; }
+
+    /* Floating Player Button */
+    .floating-gaeste-btn {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(176, 38, 255, 0.2);
+        border: 2px solid var(--neon-purple);
+        box-shadow: 0 0 15px var(--neon-purple);
+        color: white;
+        font-size: 1.5rem;
+        z-index: 1001;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+        transition: transform 0.2s;
+    }
+    .floating-gaeste-btn:active { transform: scale(0.9); }
+    #footerPlayerList { display: none !important; }
+
+    /* Optimierte Gäste Übersicht (Cyberpunk Style) */
+    #gaesteUebersicht { 
+        padding: 20px; 
+        background: #050505; 
+        min-height: 100vh;
+        color: white;
+        text-transform: uppercase;
+    }
+    .gaeste-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+        gap: 15px; 
+        margin-top: 25px; 
+    }
+    .gaeste-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(188, 19, 254, 0.3);
+        box-shadow: 0 0 15px rgba(188, 19, 254, 0.1);
+        border-radius: 16px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(10px);
+    }
+    .gaeste-card .val-display { 
+        font-weight: 900; 
+        color: var(--neon-cyan); 
+        font-size: 1.1rem; 
+        text-shadow: 0 0 8px var(--neon-cyan);
+        min-width: 40px;
+        text-align: center;
+    }
+    .control-row { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px; margin: 8px 0; }
+    .cyber-mini-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--neon-purple);
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .cyber-mini-btn:active { background: var(--neon-purple); transform: scale(0.9); }
+    .cyber-mini-btn.plus { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 `;
 document.head.appendChild(style);
 
 function initialisiereApp() {
     console.log("App wird initialisiert...");
+    
+    // Floating Button & Container erstellen falls nicht vorhanden
+    if (!document.getElementById('floatingGaesteBtn')) {
+        const btn = document.createElement('button');
+        btn.id = 'floatingGaesteBtn';
+        btn.className = 'floating-gaeste-btn';
+        btn.innerHTML = '👥';
+        btn.onclick = () => zeigeBereich('gaesteUebersicht');
+        document.body.appendChild(btn);
+    }
+
+    if (!document.getElementById('gaesteUebersicht')) {
+        const div = document.createElement('div');
+        div.id = 'gaesteUebersicht';
+        div.className = 'bereich'; 
+        div.style.display = 'none';
+        document.querySelector('.container').appendChild(div);
+        if (typeof initialisiereGaesteUebersicht === 'function') initialisiereGaesteUebersicht();
+    }
+
     // Stelle sicher, dass beim Start alle Spiel-UI-Elemente versteckt sind
     if (document.getElementById('naechsteKarteBtn')) {
         document.getElementById('naechsteKarteBtn').style.display = 'none';
