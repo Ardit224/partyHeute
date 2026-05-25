@@ -243,13 +243,47 @@ style.innerHTML = `
     .btn-cancel { background: #6b7280 !important; }
     .custom-modal button:hover { opacity: 0.8; }
 
-    /* Podium / Siegertreppchen */
-    .podium-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 10px; margin: 40px 0; height: 200px; }
-    .podium-place { display: flex; flex-direction: column; align-items: center; width: 80px; transition: height 1s ease-out; }
-    .podium-bar { width: 100%; border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; }
-    .place-1 { height: 120px; background: linear-gradient(to top, #f59e0b, #fbbf24); order: 2; }
-    .place-2 { height: 90px; background: linear-gradient(to top, #94a3b8, #cbd5e1); order: 1; }
-    .place-3 { height: 60px; background: linear-gradient(to top, #92400e, #b45309); order: 3; }
+    /* Cyberpunk Statistik Styles */
+    .stats-container { padding: 20px; color: white; text-transform: uppercase; background: #050505; min-height: 100vh; }
+    .cyber-title { font-family: 'Inter', sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+    .glow-cyan { text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan); color: #fff; }
+    .glow-purple { text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple); color: #fff; }
+    .glow-red { text-shadow: 0 0 10px var(--neon-red), 0 0 20px var(--neon-red); color: #fff; }
+
+    .podium-wrapper { display: flex; align-items: flex-end; justify-content: center; gap: 15px; margin: 40px 0; height: 220px; }
+    .podium-place { display: flex; flex-direction: column; align-items: center; width: 100px; position: relative; }
+    .podium-bar { width: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid; border-bottom: none; }
+    .place-1 { height: 130px; background: rgba(0, 243, 255, 0.2); border-color: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); order: 2; }
+    .place-2 { height: 100px; background: rgba(255, 255, 255, 0.1); border-color: #fff; box-shadow: 0 0 10px #fff; order: 1; }
+    .place-3 { height: 70px; background: rgba(188, 19, 254, 0.2); border-color: var(--neon-purple); box-shadow: 0 0 15px var(--neon-purple); order: 3; }
+    
+    .initial-placeholder { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; border: 3px solid #fff; background: #000; }
+
+    /* Tabelle */
+    .cyber-table { width: 100%; border-collapse: collapse; border: 2px solid var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); margin: 20px 0; background: rgba(0,0,0,0.5); font-size: 0.85rem; }
+    .cyber-table th { background: rgba(0, 243, 255, 0.2); color: var(--neon-cyan); padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--neon-cyan); }
+    .cyber-table td { padding: 12px 8px; border-bottom: 1px solid rgba(0, 243, 255, 0.1); }
+    .highlight-val { color: var(--neon-purple); font-weight: bold; text-shadow: 0 0 5px var(--neon-purple); }
+
+    /* Achievement Grid */
+    .achievement-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
+    .achievement-card { 
+        background: rgba(239, 68, 68, 0.05); 
+        border: 2px solid var(--neon-red); 
+        box-shadow: 0 0 15px var(--neon-red); 
+        padding: 15px; 
+        border-radius: 12px; 
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .ach-icon { font-size: 2rem; margin-bottom: 8px; }
+    .ach-title { font-size: 0.75rem; font-weight: 900; color: var(--neon-red); margin-bottom: 5px; }
+    .ach-desc { font-size: 0.65rem; opacity: 0.8; line-height: 1.2; }
+    .ach-winner { margin-top: 8px; color: #fff; font-weight: bold; display: flex; align-items: center; gap: 5px; font-size: 0.75rem; }
+
+    /* Restliche Bestands-Statistiken entfernen/ausblenden */
     .podium-avatar { width: 50px; height: 50px; border-radius: 50%; border: 3px solid white; margin-bottom: 5px; background: #1e293b; overflow: hidden; }
     .podium-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -1190,97 +1224,122 @@ function feierKonfetti() {
 function zeigeStatistiken() {
     const spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
     const aktiveSpieler = spielerListe.filter(s => s.aktiv !== false);
-
     if (aktiveSpieler.length === 0) {
         customAlert("Keine aktiven Spieler für Statistiken gefunden!");
         return;
     }
 
-    // Sound und Konfetti!
     playSound('win');
     feierKonfetti();
 
-    // Berechnungen für Awards
-    const meisteSchluecke = [...aktiveSpieler].sort((a, b) => (b.schluecke || 0) - (a.schluecke || 0))[0];
-    const amHaeufigstenGezogen = [...aktiveSpieler].sort((a, b) => (b.ausgewaehltCount || 0) - (a.ausgewaehltCount || 0))[0];
-    const gesamtSchluecke = aktiveSpieler.reduce((sum, s) => sum + (s.schluecke || 0), 0);
-
-    // Effizienz berechnen (Schlücke pro Getränk) - Weniger ist besser
     const effizienzListe = aktiveSpieler
-        .filter(s => s.getraenkeCount > 0)
         .map(s => ({
             ...s,
-            schnitt: (s.schluecke / s.getraenkeCount).toFixed(1)
+            schnitt: s.getraenkeCount > 0 ? (s.schluecke / s.getraenkeCount).toFixed(1) : (s.schluecke > 0 ? s.schluecke : 0)
         }))
-        .sort((a, b) => a.schnitt - b.schnitt); // Aufsteigend sortieren
+        .sort((a, b) => a.schnitt - b.schnitt);
 
-    let podiumHtml = "";
-    if (effizienzListe.length > 0) {
-        podiumHtml = `
-            <h3>🏆 Effizienz-Ranking</h3>
-            <p style="font-size: 0.8rem; opacity: 0.7;">(Schlücke pro Getränk - Weniger ist besser!)</p>
-            <div class="podium-wrapper">
-                ${effizienzListe.slice(0, 3).map((s, i) => `
-                    <div class="podium-place">
-                        <div class="podium-avatar">
-                            ${s.emoji.includes('<img') ? s.emoji : `<span style="font-size: 30px;">${s.emoji}</span>`}
-                        </div>
-                        <div class="podium-bar place-${i+1}">
-                            ${i+1}.
-                        </div>
-                        <div style="font-size: 0.7rem; margin-top: 5px;">${s.name}</div>
-                        <div style="font-size: 0.8rem; font-weight: bold;">${s.schnitt}</div>
-                    </div>
-                `).join('')}
+    const meisteSchluecke = [...aktiveSpieler].sort((a, b) => b.schluecke - a.schluecke)[0];
+    const meisteGetraenke = [...aktiveSpieler].sort((a, b) => b.getraenkeCount - a.getraenkeCount)[0];
+    const amHaeufigstenGezogen = [...aktiveSpieler].sort((a, b) => b.ausgewaehltCount - a.ausgewaehltCount)[0];
+    const wenigsteSchluecke = [...aktiveSpieler].sort((a, b) => a.schluecke - b.schluecke)[0];
+
+    // Podium Plätze extrahieren
+    const p1 = effizienzListe[0];
+    const p2 = effizienzListe[1] || { name: "-", schnitt: "0", emoji: "👤" };
+    const p3 = effizienzListe[2] || { name: "-", schnitt: "0", emoji: "👤" };
+
+    const renderPodium = (s, rank, cls) => `
+        <div class="podium-place">
+            <div class="initial-placeholder" style="border-color: ${rank === 1 ? 'var(--neon-cyan)' : (rank === 2 ? '#fff' : 'var(--neon-purple)')};">
+                ${s.name !== "-" ? s.name.charAt(0) : "?"}${rank}
             </div>
-        `;
-    }
+            <div class="podium-bar ${cls}">${rank}.</div>
+            <div style="font-size: 0.65rem; margin-top: 8px; font-weight: bold;">${s.name}</div>
+            <div style="font-size: 0.6rem; opacity: 0.8;">${s.schnitt} SCHLÜCKE / DRINK</div>
+        </div>
+    `;
 
     const statsHtml = `
         <div class="stats-container">
-            <h2 class="stats-title">🏆 Abend-Resümee</h2>
+            <!-- SEKTION 1 -->
+            <header style="text-align: center; margin-bottom: 40px;">
+                <h1 class="cyber-title glow-cyan" style="font-size: 2.2rem; margin-bottom: 5px;">SESSION-ABSCHLUSS</h1>
+                <p style="font-size: 0.9rem; letter-spacing: 3px; opacity: 0.7;">DIE RANGSCHLÜCKE & ERFOLGE</p>
+                <button class="nav-btn btn-cyber-green" style="margin-top: 25px; box-shadow: 0 0 15px var(--neon-green);" onclick="geheZuStartMenue()">ZURÜCK ZUM HAUPTMENÜ</button>
+            </header>
+
+            <div style="text-align: center;">
+                <h2 class="cyber-title" style="color: var(--neon-cyan); font-size: 1.1rem; margin-bottom: 10px;">EFFIZIENTESTE TRINKER</h2>
+                <div class="podium-wrapper">
+                    ${renderPodium(p2, 2, 'place-2')}
+                    ${renderPodium(p1, 1, 'place-1')}
+                    ${renderPodium(p3, 3, 'place-3')}
+                </div>
+            </div>
+
+            <!-- SEKTION 2 -->
+            <div style="margin: 60px 0;">
+                <h2 class="cyber-title glow-purple" style="font-size: 1.1rem; text-align: center; margin-bottom: 20px;">ALLE EINZELSTATISTIKEN</h2>
+                <table class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>SPIELER</th>
+                            <th>GESAMT SCHLÜCKE</th>
+                            <th>GETRÄNKE</th>
+                            <th>DURCHSCHNITT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${aktiveSpieler.map(s => `
+                            <tr>
+                                <td style="font-weight: bold;">${s.name}</td>
+                                <td class="highlight-val">${s.schluecke}</td>
+                                <td class="highlight-val">${s.getraenkeCount}</td>
+                                <td class="highlight-val">${s.getraenkeCount > 0 ? (s.schluecke / s.getraenkeCount).toFixed(1) : s.schluecke}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- SEKTION 3 -->
+            <div style="margin-bottom: 40px;">
+                <h2 class="cyber-title glow-red" style="font-size: 1.1rem; text-align: center; margin-bottom: 20px;">ABSCHLUSS-ACHIEVEMENTS</h2>
+                <div class="achievement-grid">
+                    <div class="achievement-card">
+                        <div class="ach-icon">🍻</div>
+                        <div class="ach-title">PROMILLE-KÖNIG</div>
+                        <div class="ach-desc">DIE MEISTEN SCHLÜCKE VERINNERLICHT</div>
+                        <div class="ach-winner">➜ ${meisteSchluecke.name}</div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="ach-icon">🎯</div>
+                        <div class="ach-title">HAUPTZIEL</div>
+                        <div class="ach-desc">AM HÄUFIGSTEN VOM SCHICKSAL GEWÄHLT</div>
+                        <div class="ach-winner">➜ ${amHaeufigstenGezogen.name}</div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="ach-icon">🐯</div>
+                        <div class="ach-title">PARTY-TIGER</div>
+                        <div class="ach-desc">DIE MEISTEN VOLLEN GETRÄNKE GELEERT</div>
+                        <div class="ach-winner">➜ ${meisteGetraenke.name}</div>
+                    </div>
+                    <div class="achievement-card">
+                        <div class="ach-icon">🌵</div>
+                        <div class="ach-title">TROCKENER HALS</div>
+                        <div class="ach-desc">HAT SICH ERFOLGREICH VORM TRINKEN GEDRÜCKT</div>
+                        <div class="ach-winner">➜ ${wenigsteSchluecke.name}</div>
+                    </div>
+                </div>
+            </div>
             
-            ${podiumHtml}
-
-            <div class="stat-card reveal-1">
-                <div class="stat-icon">🍻</div>
-                <div class="stat-info">
-                    <span class="stat-label">Promille-König</span>
-                    <span class="stat-value" style="display: flex; align-items: center; gap: 10px;">
-                        <div class="avatar-wrapper" style="width: 60px; height: 60px; margin: 0; font-size: 2rem;">
-                            ${meisteSchluecke.emoji}
-                        </div>
-                        ${meisteSchluecke.name}
-                    </span>
-                    <span class="stat-sub">${meisteSchluecke.schluecke || 0} Schlücke</span>
-                </div>
-            </div>
-
-            <div class="stat-card reveal-2">
-                <div class="stat-icon">🎯</div>
-                <div class="stat-info">
-                    <span class="stat-label">Hauptziel</span>
-                    <span class="stat-value" style="display: flex; align-items: center; gap: 10px;">
-                        <div class="avatar-wrapper" style="width: 60px; height: 60px; margin: 0; font-size: 2rem;">
-                            ${amHaeufigstenGezogen.emoji}
-                        </div>
-                        ${amHaeufigstenGezogen.name}
-                    </span>
-                    <span class="stat-sub">${amHaeufigstenGezogen.ausgewaehltCount || 0} Mal dran gewesen</span>
-                </div>
-            </div>
-
-            <div class="stat-card reveal-3">
-                <div class="stat-icon">🔥</div>
-                <div class="stat-info">
-                    <span class="stat-label">Gruppenleistung</span>
-                    <span class="stat-value">Eskalation pur</span>
-                    <span class="stat-sub">Insgesamt ${gesamtSchluecke} Schlücke vernichtet</span>
-                </div>
-            </div>
-            <button class="nav-btn" style="margin-top:20px;" onclick="geheZuStartMenue()">Neue Runde</button>
+            <footer style="text-align: center; padding: 20px; opacity: 0.5; font-size: 0.7rem;">
+                CYBER-STATS v2.0 // SYSTEM: ONLINE
+            </footer>
         </div>
     `;
+
     document.getElementById('statistikBereich').innerHTML = statsHtml;
     zeigeBereich('statistikBereich');
 }
