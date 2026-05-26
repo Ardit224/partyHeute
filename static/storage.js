@@ -91,7 +91,7 @@ function listeAnzeigen() {
             uebersichtGrid.innerHTML += `
                 <div class="gaeste-card">
                     <div class="avatar-wrapper" style="width: 60px; height: 60px;">${spieler.emoji}</div>
-                    <div style="font-size: 0.8rem; font-weight: 900; margin-top: 8px; letter-spacing: 1px;">${spieler.name}</div>
+                    <div style="font-size: 0.7rem; font-weight: 900; margin-top: 8px; letter-spacing: 1px;">${spieler.name}</div>
                     
                     <div style="width: 100%; margin-top: 15px;">
                         <div class="control-row">

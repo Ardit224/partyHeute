@@ -336,11 +336,15 @@ style.innerHTML = `
         align-items: center; 
         position: relative; 
         margin: 30px auto; 
-        width: 300px; 
-        height: 300px; 
+        width: 100%;
+        max-width: 320px;
+        aspect-ratio: 1 / 1;
+        height: auto;
         background: transparent;
     }
     #rouletteWheel { 
+        width: 100%;
+        height: 100%;
         border-radius: 50%; 
         background: transparent; 
         box-shadow: 0 0 20px rgba(0,0,0,0.5); 
@@ -405,7 +409,7 @@ style.innerHTML = `
     .char-card.selected { background: rgba(176, 38, 255, 0.15); box-shadow: 0 0 20px var(--neon-purple); transform: translateY(-3px); }
     .char-portrait { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 12px; background: rgba(255,255,255,0.08); font-size: 3.5rem; border: 2px solid rgba(255,255,255,0.1); }
     .char-portrait img { width: 100%; height: 100%; object-fit: cover; }
-    .char-name { font-size: 1.1rem; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .char-name { font-size: 0.9rem; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .neon-checkbox { width: 30px; height: 30px; border: 2px solid var(--neon-purple); border-radius: 8px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
     .neon-checkbox.checked { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); }
     .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -4px; left: 5px; font-size: 22px; color: white; font-weight: bold; }
