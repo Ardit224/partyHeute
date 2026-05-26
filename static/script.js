@@ -150,7 +150,7 @@ function zeigeRegeln() {
 
     // Prüfe welcher Bereich gerade sichtbar ist (für Menü-Hilfe)
     if (document.getElementById('startMenue').style.display === 'block') {
-        customAlert("Willkommen bei PARTYHEUTE! 🍹 Wähle einen Spielmodus, erstelle Charaktere und genieße den Abend. Alles ist auf Spaß ausgelegt!");
+        customAlert("Willkommen bei NEOSIP! 🍹 Wähle einen Spielmodus, erstelle Charaktere und genieße den Abend. Alles ist auf Spaß ausgelegt!");
         return;
     }
     if (document.getElementById('editor-box').style.display === 'block') {
