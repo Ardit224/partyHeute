@@ -13,7 +13,7 @@
 }
 
 body {
-    background: #08080d;
+    background: #0a0a0f;
     color: var(--text);
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
@@ -475,13 +475,196 @@ button:active {
 }
 
 .title-glow {
-    font-size: 3.2rem;
-    font-weight: 800;
-    margin-bottom: 0;
-    color: #fff;
+    /* Existing title-glow for other screens, not the main menu logo */
+    font-size: 2.5rem; /* Keep existing size for other screens */
+    font-weight: 900; /* Keep existing weight for other screens */
+    text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan); /* Keep existing glow for other screens */
+    color: #fff; /* Keep existing color for other screens */
+}
+
+/* Logo (Top) */
+.logo {
+    font-size: 5rem; /* Very large */
+    font-weight: 900; /* Very bold */
+    text-transform: lowercase; /* "neosip" in lowercase */
+    margin-bottom: 10px;
+    line-height: 1; /* Adjust line height to prevent extra space */
+}
+
+.logo-neo {
+    color: #8a2be2; /* Neon Purple */
+    text-shadow: 0 0 15px #8a2be2, 0 0 30px #8a2be2, 0 0 45px #8a2be2; /* Intense glow */
+}
+
+.logo-sip {
+    color: #00ffff; /* Neon Cyan */
+    text-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff, 0 0 45px #00ffff; /* Intense glow */
+}
+
+.logo-line {
+    width: 50%; /* 50% of logo width */
+    max-width: 200px; /* Cap max width for responsiveness */
+    height: 3px;
+    background: linear-gradient(to right, #8a2be2, #00ffff); /* Purple to Cyan gradient */
+    box-shadow: 0 0 8px #8a2be2, 0 0 15px #00ffff; /* Glow effect */
+    margin-bottom: 120px; /* Deutlich mehr Platz, um die Knöpfe nach unten zu schieben */
+}
+
+/* Main Button ("SPIEL STARTEN") */
+.btn-main-start {
+    width: 580px; /* Massiv vergrößert */
+    padding: 45px 55px; /* Deutlich mehr Padding */
+    border-radius: 50px; /* Strongly rounded corners */
+    background-color: #8a2be2; /* Saturated Purple/Violet */
+    color: white;
+    font-weight: 900; /* Extra Fett */
     text-transform: uppercase;
-    letter-spacing: 4px;
-    text-shadow: 0 0 10px #8b5cf6, 0 0 20px #8b5cf6, 0 0 40px #8b5cf6;
+    font-size: 3rem; /* Massive Schriftgröße */
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(138, 43, 226, 0.8); /* Verstärkter Glow */
+    transition: all 0.3s ease;
+    margin-bottom: 90px; /* Mehr Abstand zur Aktionsleiste */
+}
+
+.btn-main-start:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(138, 43, 226, 1);
+}
+
+/* Action Bar (Sub-Buttons) */
+.action-bar {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    justify-content: center;
+    gap: 30px; /* Abstand zwischen den Sub-Buttons beibehalten */
+    margin-bottom: 140px; /* Noch mehr Platz nach unten */
+}
+
+.action-bar .nav-btn {
+    width: 140px; /* Deutlich vergrößert */
+    height: 140px; /* Quadratisch */
+    border-radius: 20px; /* Strongly rounded corners */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem; /* Bessere Lesbarkeit */
+    font-weight: 800;
+    text-transform: uppercase;
+    background: rgba(0, 0, 0, 0.3); /* Very dark/transparent background */
+    border: 2px solid; /* Border will be colored per button */
+    color: white; /* Default text color, overridden by specific classes */
+    transition: all 0.3s ease;
+    padding: 0; /* Remove default padding from nav-btn */
+}
+
+.action-bar .nav-btn:hover {
+    transform: translateY(-3px);
+}
+
+.btn-action-green {
+    border-color: #22c55e; /* Dark green border */
+    color: #39ff14; /* Neon green text */
+    box-shadow: 0 0 15px rgba(57, 255, 20, 0.5); /* Neon green glow */
+}
+.btn-action-green:hover {
+    box-shadow: 0 0 25px rgba(57, 255, 20, 0.8);
+}
+
+.btn-action-cyan {
+    border-color: #008080; /* Dark blue/cyan border */
+    color: #00ffff; /* Cyan text */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); /* Cyan glow */
+}
+.btn-action-cyan:hover {
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+}
+
+.btn-action-red {
+    border-color: #8b0000; /* Dark red border */
+    color: #ff073a; /* Neon red text */
+    box-shadow: 0 0 15px rgba(255, 7, 58, 0.5); /* Neon red glow */
+}
+.btn-action-red:hover {
+    box-shadow: 0 0 25px rgba(255, 7, 58, 0.8);
+}
+
+.action-icon {
+    width: 50px; /* Größeres Icon */
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+/* Ad Banner (Bottom) */
+.ad-banner-placeholder {
+    position: absolute; /* Position at the bottom of the startMenue */
+    bottom: 50px; /* Ein Stück höher gesetzt */
+    width: 320px; /* Fixed width as per prompt */
+    height: 50px; /* Fixed height as per prompt */
+    background: rgba(0,0,0,0.6); /* Very dark filling */
+    border: 1px dashed #333; /* Dashed dark gray border */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569; /* Dimmed gray text */
+    font-size: 0.7rem; /* Small font size */
+    letter-spacing: 1px;
+    font-family: 'Inter', sans-serif;
+    left: 50%; /* Center horizontally with absolute positioning */
+    transform: translateX(-50%); /* Adjust for centering */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+    .menu-screen {
+        justify-content: flex-start; /* Verhindert das Abschneiden von Inhalten bei vertikalem Überlauf */
+        padding-top: 40px;
+        padding-bottom: 60px;
+        min-height: 100vh;
+        height: auto;
+    }
+
+    .logo {
+        font-size: 3.5rem; /* Smaller on small screens */
+    }
+    .logo-line {
+        max-width: 150px; /* Adjust line width */
+        margin-bottom: 30px;
+    }
+    .btn-main-start {
+        width: 95%;
+        font-size: 2.2rem; /* Auch auf Mobilgeräten deutlich größer */
+        padding: 30px 25px; 
+    }
+    .action-bar {
+        gap: 20px; /* Abstand beibehalten */
+        margin-bottom: 100px; /* Mehr Platz auf Mobile */
+    }
+    .action-bar .nav-btn {
+        width: 100px;
+        height: 100px;
+        font-size: 0.8rem;
+    }
+    .ad-banner-placeholder {
+        width: 90%; /* Make it responsive */
+        max-width: 320px; /* Keep max width */
+        bottom: 35px; /* Auch auf Mobile ein Stück höher gesetzt */
+    }
+
+    /* Navigation Buttons für Mobile untereinander stapeln */
+    .main-nav {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .main-nav .nav-btn {
+        height: auto;
+        min-height: 60px;
+        padding: 15px;
+        font-size: 1rem;
+    }
 }
 
 .neon-line {

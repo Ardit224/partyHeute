@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Party App</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1942840638191847"
+     crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Google Fonts für das schicke Design -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
@@ -24,21 +26,29 @@
         <button id="muteBtn" onclick="toggleMute()" class="mute-toggle" title="Sound an/aus">🔊</button>
         
         <!-- 1. HAUPTMENÜ (Landing Page / Startbildschirm) -->
-        <div id="startMenue" class="menu-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
-            <h1 class="title-glow">NEOSIP</h1>
-            <div class="neon-line"></div>
+        <div id="startMenue" class="menu-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh;">
+            <h1 class="logo">
+                <span class="logo-neo">neo</span><span class="logo-sip">sip</span>
+            </h1>
+            <div class="logo-line"></div>
             
-            <div class="main-nav">
-                <button class="nav-btn btn-cyber-purple" onclick="geheZuSpiele()">SPIEL STARTEN</button>
-                <button class="nav-btn btn-cyber-green" onclick="geheZuGarderobe()">ZUR GARDEROBE</button>
-                <button class="nav-btn btn-cyber-blue" onclick="customAlert('Raum-System folgt in Kürze! 🌐')">RAUM BEITRETEN</button>
-                <button class="nav-btn btn-cyber-red" onclick="customAlert('Shop folgt in Kürze! 🛒')">SHOP 🛒</button>
+            <div class="start-menu-main-button-container">
+                <button class="nav-btn btn-main-start" onclick="geheZuSpiele()">SPIEL STARTEN</button>
             </div>
 
-            <div style="margin-top: 60px; width: 100%;">
-                <div style="width: 320px; height: 50px; background: rgba(0,0,0,0.6); border: 1px solid #1e293b; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.7rem; letter-spacing: 1px; font-family: 'Inter', sans-serif;">
-                    AD BANNER SPACE (320x50)
-                </div>
+            <div class="action-bar">
+                <button class="nav-btn btn-action-green" onclick="geheZuGarderobe()">GARDEROBE</button>
+                <button class="nav-btn btn-action-cyan" onclick="customAlert('Raum-System folgt in Kürze! 🌐')">RAUM</button>
+                <button class="nav-btn btn-action-cyan" onclick="customAlert('QR-Code Scanner folgt in Kürze! 🌐')">
+                    <svg class="action-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 3h8V5H5v6H3V3zm0 10h2v8h6v2H3v-8zm10-10h8v8h-2V5h-6V3zm8 10h-2v6h-6v2h8v-8zM9 9h6v6H9V9z"/>
+                    </svg>
+                </button>
+                <button class="nav-btn btn-action-red" onclick="customAlert('Shop folgt in Kürze! 🛒')">SHOP</button>
+            </div>
+
+            <div class="ad-banner-placeholder">
+                AD BANNER SPACE (320x50)
             </div>
 
             <div style="position: absolute; bottom: 20px; right: 20px; width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); font-weight: bold; font-size: 1.2rem;" onclick="zeigeRegeln()">?</div>
@@ -77,7 +87,7 @@
         </div>
 
         <!-- 2.3 CHARACTER SELECTION -->
-        <div id="charakterSelection" class="menu-screen" style="display: none; text-align: center; position: relative; min-height: 90vh;">
+        <div id="charakterSelection" class="menu-screen" style="display: none; text-align: center; position: relative;">
             <h1 class="title-glow">NEOSIP</h1>
             <div class="neon-line"></div>
             <div class="wardrobe-subtitle">- CHARAKTERAUSWAHL</div>
@@ -86,7 +96,7 @@
             
             <div id="selectionGrid" class="char-selection-grid"></div>
 
-            <div class="main-nav" style="width: 100%; margin-top: 30px;">
+            <div class="main-nav" style="width: 100%;">
                 <button class="nav-btn btn-cyber-purple" onclick="bestaetigeCharakterAuswahl()" style="height: auto; padding: 18px;">
                     <span style="font-weight: bold; font-size: 1rem;">WEITER ZUR SPIELKONFIGURATION</span><br>
                     <small style="opacity: 0.9; font-size: 0.8rem;">(mit Counter etc.)</small>
