@@ -1093,16 +1093,16 @@ function rundenAufgabeStarten(spieler, text, runden, schluecke, isGlobal = false
 
 function verarbeiteRundenTick() {
     aktiveRundenAufgaben.forEach(task => {
-        if (task.restRunden > 0) {
+        if (task.restRunden === 0) {
+            zeigeBefreiungsScreen(task);
+            task.restRunden = -1; // Markierung zum Löschen
+        } else if (task.restRunden > 0) {
             task.restRunden--;
-            if (task.restRunden === 0) {
-                zeigeBefreiungsScreen(task);
-            }
         }
     });
     
     // Automatisch entfernen, wenn die Zeit um ist
-    aktiveRundenAufgaben = aktiveRundenAufgaben.filter(task => task.restRunden > 0);
+    aktiveRundenAufgaben = aktiveRundenAufgaben.filter(task => task.restRunden >= 0);
     updateRundenAufgabenUI();
     
     // Viren ticken lassen

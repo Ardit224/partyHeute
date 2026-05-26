@@ -95,23 +95,23 @@ function updateVirusUI() {
 
 function virusTick() {
     aktiveViren.forEach(v => {
-        if (v.runden > 0) {
-            v.runden--;
-            if (v.runden === 0) {
-                if (typeof zeigeBefreiungsScreen === 'function') {
-                    zeigeBefreiungsScreen(v, true);
-                }
+        if (v.runden === 0) {
+            if (typeof zeigeBefreiungsScreen === 'function') {
+                zeigeBefreiungsScreen(v, true);
             }
+            v.runden = -2; // Markiert zum Löschen (-1 ist permanent)
+        } else if (v.runden > 0) {
+            v.runden--;
         }
     });
-    aktiveViren = aktiveViren.filter(v => v.runden !== 0);
+    aktiveViren = aktiveViren.filter(v => v.runden !== -2);
     updateVirusStatusBar();
 }
 
 function updateVirusStatusBar() {
     const bar = document.getElementById('activeVirusBar');
     if(!bar) return;
-    const mixedViren = aktiveViren.filter(v => v.runden > 0);
+    const mixedViren = aktiveViren.filter(v => v.runden >= 0);
     if (mixedViren.length === 0) {
         bar.style.display = 'none';
         return;
