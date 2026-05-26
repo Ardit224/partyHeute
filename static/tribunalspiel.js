@@ -142,15 +142,15 @@ function generiereTribunalHTML(template, schlucke, spielerName) {
     const optionB = match[2];
 
     const einsatzHtml = isCounterEnabled ? `
-        <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 8px; margin-bottom: 12px; font-weight: bold; font-size: 1.1rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+        <div style="background: rgba(239, 68, 68, 0.15); border-radius: var(--border-radius); padding: calc(var(--padding-standard) / 2); margin-bottom: 12px; font-weight: bold; font-size: 1.1rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
             ⚖️ Einsatz: ${schlucke} Schlücke
         </div>` : '';
 
     return `
         <div style="width: 100%; text-align: center;">
             ${einsatzHtml}
-            <div style="display: flex; gap: 10px; justify-content: center; align-items: stretch;">
-                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="display: flex; gap: calc(var(--padding-standard) / 2); justify-content: center; align-items: stretch;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: calc(var(--padding-standard) / 2); border-radius: var(--border-radius); border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
                     <span style="font-size: 2.2rem; margin-bottom: 5px;">👍</span>
                     <p style="font-size: 0.95rem; margin: 0; line-height: 1.3;">${optionA}</p>
                 </div>

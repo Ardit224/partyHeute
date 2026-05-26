@@ -276,7 +276,7 @@ style.innerHTML = `
     .cyber-table th { background: rgba(0, 243, 255, 0.2); color: var(--neon-cyan); padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--neon-cyan); }
     .cyber-table td { padding: 12px 8px; border-bottom: 1px solid rgba(0, 243, 255, 0.1); }
     .highlight-val { color: var(--neon-purple); font-weight: bold; text-shadow: 0 0 5px var(--neon-purple); }
-
+    
     /* Achievement Grid */
     .achievement-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
     .achievement-card { 
@@ -285,7 +285,7 @@ style.innerHTML = `
         box-shadow: 0 0 15px var(--neon-red); 
         padding: 15px; 
         border-radius: 12px; 
-        text-align: center;
+        border-radius: var(--border-radius);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -306,7 +306,7 @@ style.innerHTML = `
         background: rgba(255,255,255,0.1); 
         margin-bottom: 15px; 
         padding: 15px; 
-        border-radius: 15px; 
+        border-radius: var(--border-radius);
         display: flex; 
         align-items: center; 
         gap: 20px;
@@ -326,7 +326,7 @@ style.innerHTML = `
     @keyframes slideIn { to { transform: translateY(0); opacity: 1; } }
 
     /* Shot Roulette Card Design */
-    .shot-card { background: rgba(255, 255, 255, 0.1); border: 2px solid #ef4444; border-radius: 20px; padding: 30px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2); max-width: 400px; margin: 0 auto; }
+    .shot-card { background: rgba(255, 255, 255, 0.1); border: 2px solid #ef4444; border-radius: var(--border-radius); padding: var(--padding-standard); text-align: center; backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2); max-width: 400px; margin: 0 auto; }
     .shot-task-box { min-height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; line-height: 1.4; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); border-top: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
 
     /* Rad-Zentrierung & Fix für den schwarzen Kreis */
@@ -357,7 +357,7 @@ style.innerHTML = `
     .drink-btn.minus { background-color: #ef4444; }
     .drink-btn:active { transform: scale(0.9); }
 
-    /* Globale Avatar-Anpassung für die Auswahlmenüs */
+    /* Globale Avatar-Anpassung für die Auswahlmenüs */ /* Behält bestehende Styles */
     .avatar-wrapper { display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin: 0 auto; }
     .avatar-wrapper img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -368,10 +368,10 @@ style.innerHTML = `
     .theme-paranoia { border: 2px solid #10b981 !important; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3) !important; }
 
     /* Verbessertes Runden Aufgaben UI */
-    .runden-task-card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 12px; margin-bottom: 15px; font-size: 0.95rem; backdrop-filter: blur(10px); animation: fadeInTask 0.3s ease-out; }
+    .runden-task-card { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1); border-left: 4px solid #f59e0b; padding: 15px; border-radius: var(--border-radius); margin-bottom: 15px; font-size: 0.95rem; backdrop-filter: blur(10px); animation: fadeInTask 0.3s ease-out; }
     @keyframes fadeInTask { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
     .runden-badge { background: #f59e0b; color: #1e293b; padding: 3px 8px; border-radius: 6px; font-weight: bold; font-size: 0.75rem; display: inline-block; margin-bottom: 8px; }
-    .runden-task-card.compact { padding: 10px; font-size: 0.85rem; margin-bottom: 10px; }
+    .runden-task-card.compact { padding: calc(var(--padding-standard) / 2); font-size: 0.85rem; margin-bottom: 10px; }
     .runden-task-card.compact .runden-badge { font-size: 0.65rem; padding: 2px 6px; }
     .runden-fail-btn { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; border-radius: 8px; padding: 8px; cursor: pointer; font-size: 0.85rem; margin-top: 10px; width: 100%; transition: all 0.2s; }
     .runden-fail-btn:hover { background: rgba(239, 68, 68, 0.4); color: white; }
@@ -394,17 +394,17 @@ style.innerHTML = `
     }
 
     /* Zeitbombe & Explosion */
-    .theme-zeitbombe { background: radial-gradient(circle, #450a0a, #000) !important; border: 2px solid #f97316 !important; }
+    .theme-zeitbombe { background: radial-gradient(circle, #450a0a, #000) !important; border: 2px solid #f97316 !important; } /* Behält bestehende Styles */
     .explosion-flash { animation: flashScreen 0.2s 5; }
     @keyframes flashScreen { 0%, 100% { background: transparent; } 50% { background: #ef4444; } }
     
-    .bomb-category-box { background: rgba(249, 115, 22, 0.1); border: 2px dashed #f97316; border-radius: 15px; padding: 12px; margin: 10px 0; font-size: 1.1rem; }
+    .bomb-category-box { background: rgba(249, 115, 22, 0.1); border: 2px dashed #f97316; border-radius: var(--border-radius); padding: calc(var(--padding-standard) * 0.6); margin: 10px 0; font-size: 1.1rem; }
     
     /* Entfernt Namen in der Explosions-Auswahl */
     #bombExplosionBox .spieler-name, #bombExplosionBox small { display: none !important; }
 
     /* Handy Wechsel */
-    .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: 20px; padding: 40px; text-align: center; }
+    .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: var(--border-radius); padding: calc(var(--padding-standard) * 2); text-align: center; }
 
     /* Charakter Selection Mockup Style */
     .char-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
@@ -412,7 +412,7 @@ style.innerHTML = `
     .char-card.selected { background: rgba(176, 38, 255, 0.15); box-shadow: 0 0 20px var(--neon-purple); transform: translateY(-3px); }
     .char-portrait { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 8px; background: rgba(255,255,255,0.08); font-size: 2.5rem; border: 2px solid rgba(255,255,255,0.1); }
     .char-portrait img { width: 100%; height: 100%; object-fit: cover; }
-    .char-name { font-size: 0.85rem; color: #fff; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .char-name { font-size: 0.85rem; color: var(--text); font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
     .neon-checkbox { width: 24px; height: 24px; border: 2px solid var(--neon-purple); border-radius: 6px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
     .neon-checkbox.checked { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); }
     .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -7px; left: 4px; font-size: 18px; color: white; font-weight: bold; }
@@ -459,7 +459,7 @@ style.innerHTML = `
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(188, 19, 254, 0.3);
         box-shadow: 0 0 15px rgba(188, 19, 254, 0.1);
-        border-radius: 16px;
+        border-radius: var(--border-radius);
         padding: 15px;
         display: flex;
         flex-direction: column;
@@ -480,7 +480,7 @@ style.innerHTML = `
         border: 1px solid var(--neon-purple);
         color: white;
         width: 35px;
-        height: 35px;
+        height: 35px; /* Behält bestehende Größe */
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -492,7 +492,7 @@ style.innerHTML = `
     .cyber-mini-btn:active { background: var(--neon-purple); transform: scale(0.9); }
     .cyber-mini-btn.plus { border-color: var(--neon-cyan); color: var(--neon-cyan); }
 `;
-document.head.appendChild(style);
+document.head.appendChild(style); /* Behält bestehendes Skript */
 
 function initialisiereApp() {
     console.log("App wird initialisiert...");

@@ -63,7 +63,7 @@ async function paranoiaFrageLaden() {
     if (isCounterEnabled) {
         fertigeFrage = `
             <div style="background: rgba(16, 185, 129, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.2rem; color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);">
-                🕵️ Preis für die Antwort: ${paranoiaSchluecke} Schlücke
+                🕵️ Preis für die Antwort: ${paranoiaSchluecke} Schlücke /* Behält bestehenden Text */
             </div>
             ${fertigeFrage}`;
     }

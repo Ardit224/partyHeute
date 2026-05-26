@@ -91,7 +91,7 @@ function explodeBomb() {
     explosionBox.innerHTML = `
         <h1 style="font-size: 3rem; color: #ef4444;">💥 BOOM!</h1>
         <p style="font-size: 1.2rem; margin-bottom: 20px;">Bei wem ist die Bombe explodiert?</p>
-        <div id="bombVictimGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px;"></div>
+        <div id="bombVictimGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(var(--padding-standard) / 2); margin-top: var(--padding-standard);"></div>
     `;
 
     const grid = document.getElementById('bombVictimGrid');
