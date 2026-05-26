@@ -495,6 +495,37 @@ style.innerHTML = `
 document.head.appendChild(style); /* Behält bestehendes Skript */
 
 function initialisiereApp() {
+    // Altersprüfung vor dem Start der App
+    if (localStorage.getItem('ageVerified') !== 'true') {
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-modal-overlay';
+        overlay.id = 'ageVerificationOverlay';
+        overlay.innerHTML = `
+            <div class="custom-modal" style="border: 2px solid var(--neon-red); box-shadow: 0 0 20px var(--neon-red); min-width: 300px;">
+                <h1 style="color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); margin-bottom: 15px; font-size: 2rem;">FSK 18 🔞</h1>
+                <p style="font-size: 1rem; line-height: 1.4; margin-bottom: 25px;">
+                    Dieses System enthält Inhalte über Alkoholkonsum.<br>
+                    <strong>Bist du bereits 18 Jahre alt?</strong>
+                </p>
+                <div class="modal-buttons" style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="nav-btn btn-cyber-green" id="ageYes" style="width: 120px; height: 60px; margin: 0;">JA</button>
+                    <button class="nav-btn btn-cyber-red" id="ageNo" style="width: 120px; height: 60px; margin: 0;">NEIN</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        document.getElementById('ageYes').onclick = () => {
+            localStorage.setItem('ageVerified', 'true');
+            overlay.remove();
+            initialisiereApp(); // Initialisierung fortsetzen
+        };
+        document.getElementById('ageNo').onclick = () => {
+            window.location.href = "https://www.google.com";
+        };
+        return; // Verhindert die weitere Ausführung bis zur Bestätigung
+    }
+
     console.log("App wird initialisiert...");
     
     // Floating Button & Container erstellen falls nicht vorhanden
@@ -1467,6 +1498,6 @@ function zeigeStatistiken() {
 
     document.getElementById('statistikBereich').innerHTML = statsHtml;
     zeigeBereich('statistikBereich');
-}
+a}
 
 window.onload = initialisiereApp;
