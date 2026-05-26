@@ -507,7 +507,7 @@ button:active {
     height: 3px;
     background: linear-gradient(to right, #8a2be2, #00ffff); /* Purple to Cyan gradient */
     box-shadow: 0 0 8px #8a2be2, 0 0 15px #00ffff; /* Glow effect */
-    margin-bottom: 120px; /* Deutlich mehr Platz, um die Knöpfe nach unten zu schieben */
+    margin-bottom: 40px; /* Komprimiert */
 }
 
 /* Main Button ("SPIEL STARTEN") */
@@ -524,7 +524,7 @@ button:active {
     cursor: pointer;
     box-shadow: 0 0 40px rgba(138, 43, 226, 0.8); /* Verstärkter Glow */
     transition: all 0.3s ease;
-    margin-bottom: 90px; /* Mehr Abstand zur Aktionsleiste */
+    margin-bottom: 40px; /* Komprimiert */
 }
 
 .btn-main-start:hover {
@@ -538,7 +538,7 @@ button:active {
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     justify-content: center;
     gap: 30px; /* Abstand zwischen den Sub-Buttons beibehalten */
-    margin-bottom: 140px; /* Noch mehr Platz nach unten */
+    margin-bottom: 70px; /* Um 10px reduziert, um den Banner nach oben zu schieben */
 }
 
 .action-bar .nav-btn {
@@ -598,8 +598,8 @@ button:active {
 
 /* Ad Banner (Bottom) */
 .ad-banner-placeholder {
-    position: absolute; /* Position at the bottom of the startMenue */
-    bottom: 50px; /* Ein Stück höher gesetzt */
+    position: relative; 
+    margin: 0 auto;
     width: 320px; /* Fixed width as per prompt */
     height: 50px; /* Fixed height as per prompt */
     background: rgba(0,0,0,0.6); /* Very dark filling */
@@ -611,8 +611,6 @@ button:active {
     font-size: 0.7rem; /* Small font size */
     letter-spacing: 1px;
     font-family: 'Inter', sans-serif;
-    left: 50%; /* Center horizontally with absolute positioning */
-    transform: translateX(-50%); /* Adjust for centering */
 }
 
 /* Responsive Adjustments */
@@ -639,7 +637,7 @@ button:active {
     }
     .action-bar {
         gap: 20px; /* Abstand beibehalten */
-        margin-bottom: 100px; /* Mehr Platz auf Mobile */
+        margin-bottom: 15px; /* Platz auf Mobile minimiert */
     }
     .action-bar .nav-btn {
         width: 100px;
@@ -649,7 +647,6 @@ button:active {
     .ad-banner-placeholder {
         width: 90%; /* Make it responsive */
         max-width: 320px; /* Keep max width */
-        bottom: 35px; /* Auch auf Mobile ein Stück höher gesetzt */
     }
 
     /* Navigation Buttons für Mobile untereinander stapeln */
@@ -902,6 +899,13 @@ button:active {
     color: #475569;
     cursor: pointer;
     font-weight: bold;
+}
+
+/* Hilfe-Button speziell im Hauptmenü auf Banner-Höhe ausrichten */
+#startMenue .help-circle-mini {
+    position: absolute;
+    right: 20px;
+    bottom: 60px; /* Ebenfalls 10px nach oben gerückt, um bündig mit dem Banner zu bleiben */
 }
 
 .active-guests-section {
