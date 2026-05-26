@@ -1,5 +1,6 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_from_directory
 import random
+import os
 
 app = Flask(__name__)
 
@@ -224,6 +225,11 @@ for kat in fragen_pools:
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/ads.txt')
+def ads_txt():
+    # Dieser Befehl sendet die ads.txt direkt aus deinem Hauptordner
+    return send_from_directory(app.root_path, 'ads.txt')
 
 @app.route('/neue_karte')
 def neue_karte():
