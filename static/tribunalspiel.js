@@ -142,24 +142,24 @@ function generiereTribunalHTML(template, schlucke, spielerName) {
     const optionB = match[2];
 
     const einsatzHtml = isCounterEnabled ? `
-        <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.3rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+        <div style="background: rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 8px; margin-bottom: 12px; font-weight: bold; font-size: 1.1rem; color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
             ⚖️ Einsatz: ${schlucke} Schlücke
         </div>` : '';
 
     return `
         <div style="width: 100%; text-align: center;">
             ${einsatzHtml}
-            <div style="display: flex; gap: 15px; justify-content: center; align-items: stretch;">
-                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <span style="font-size: 3rem; margin-bottom: 10px;">👍</span>
-                    <p style="font-size: 1.1rem; margin: 0; line-height: 1.3;">${optionA}</p>
+            <div style="display: flex; gap: 10px; justify-content: center; align-items: stretch;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="font-size: 2.2rem; margin-bottom: 5px;">👍</span>
+                    <p style="font-size: 0.95rem; margin: 0; line-height: 1.3;">${optionA}</p>
                 </div>
-                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                    <span style="font-size: 3rem; margin-bottom: 10px;">👎</span>
-                    <p style="font-size: 1.1rem; margin: 0; line-height: 1.3;">${optionB}</p>
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <span style="font-size: 2.2rem; margin-bottom: 5px;">👎</span>
+                    <p style="font-size: 0.95rem; margin: 0; line-height: 1.3;">${optionB}</p>
                 </div>
             </div>
-            <p style="margin-top: 15px; font-size: 0.8rem; opacity: 0.6; font-style: italic;">Stimmt jetzt ab! 👍 vs 👎</p>
+            <p style="margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic;">Stimmt jetzt ab! 👍 vs 👎</p>
         </div>
     `;
 }
@@ -196,9 +196,9 @@ function tribunalErgebnisEintragen(displayId, btnId) {
  */
 function zeigeTribunalAuswahlStandalone(display) {
     display.innerHTML = `
-        <h3 style="margin-bottom:15px; color:#ef4444;">Wer hat verloren? ⚖️</h3>
+        <h3 style="margin-bottom:8px; color:#ef4444;">Wer hat verloren? ⚖️</h3>
         <div id="tribunalVictimGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;"></div>
-        <button class="nav-btn" style="margin-top:20px; width:100%;" onclick="tribunalAuswahlBeenden()">✅ Auswahl beenden</button>
+        <button class="nav-btn btn-cyber-purple" style="margin-top:12px; width:100%; height: 60px;" onclick="tribunalAuswahlBeenden()">✅ FERTIG</button>
     `;
     
     const grid = document.getElementById('tribunalVictimGrid');
@@ -207,8 +207,7 @@ function zeigeTribunalAuswahlStandalone(display) {
     spielerListe.filter(s => s.aktiv !== false).forEach(p => {
         const btn = document.createElement('button');
         btn.className = "strafe-btn";
-        btn.style.padding = "10px";
-        btn.innerHTML = `<div class="avatar-wrapper" style="width: 55px; height: 55px;">${p.emoji}</div>`;
+        btn.innerHTML = `<div class="strafe-avatar-container">${p.emoji}</div>`;
         btn.onclick = function() {
             if (this.classList.contains('selected-for-drink')) return;
 

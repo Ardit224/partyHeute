@@ -104,18 +104,16 @@
             <h1 class="title-glow">Getränke-Tracking</h1>
             <p style="margin-bottom: 30px;">Möchtet ihr die Schlücke und Getränke in der App mitzählen?</p>
             
-            <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 0 auto;">
-                <button class="nav-btn" onclick="setCounterPreference(true)" style="background-color: #10b981; padding: 20px;">
-                    <span style="font-size: 1.2rem;">✅ Ja, bitte!</span><br>
-                    <small>Inkl. Rangliste & Statistik</small>
+            <div style="display: flex; gap: 20px; max-width: 350px; margin: 0 auto; justify-content: center;">
+                <button class="nav-btn btn-cyber-green" onclick="setCounterPreference(true)" style="height: 80px; font-size: 2.5rem; padding: 0;">
+                    ✅
                 </button>
-                <button class="nav-btn" onclick="setCounterPreference(false)" style="background-color: #ef4444; padding: 20px;">
-                    <span style="font-size: 1.2rem;">❌ Nein danke</span><br>
-                    <small>Einfach nur die Spiele spielen</small>
+                <button class="nav-btn btn-cyber-red" onclick="setCounterPreference(false)" style="height: 80px; font-size: 2.5rem; padding: 0;">
+                    ❌
                 </button>
             </div>
             
-            <button onclick="geheZuStartMenue()" style="background-color: #4b5563; margin-top: 30px;">Abbrechen</button>
+            <button class="nav-btn" onclick="geheZuStartMenue()" style="background-color: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); box-shadow: 0 0 5px var(--neon-red); margin-top: 30px; height: 60px;">ABBRECHEN</button>
         </div>
 
         <!-- 3. SPIELAUSWAHL (Welches Spiel?) -->
@@ -232,16 +230,16 @@
             <div class="neon-line"></div>
             <div class="wardrobe-subtitle">- ZEITBOMBE</div>
 
-            <div class="master-game-card" style="border-color: #f97316; box-shadow: 0 0 15px #f97316;">
+            <div class="master-game-card" style="border-color: #f97316; box-shadow: 0 0 15px #f97316; min-height: auto; padding: 20px 15px;">
                 <h1 class="card-title-cyan" style="color: #f97316; text-shadow: 0 0 10px #f97316;">💣 DIE BOMBE</h1>
                 <div id="bombCategoryBox" class="bomb-category-box">Bereit?</div>
-                <div id="bombPlayerDisplay" style="margin: 20px 0; min-height: 150px;"></div>
-                <div id="bombExplosionBox" style="display: none; margin: 20px 0;"></div>
+                <div id="bombPlayerDisplay" style="margin: 5px 0; min-height: 80px;"></div>
+                <div id="bombExplosionBox" style="display: none; margin: 10px 0;"></div>
             </div>
 
-            <div class="main-nav" style="width: 100%;">
+            <div class="main-nav" style="width: 100%; margin-top: 10px; gap: 10px;">
                 <button id="bombStartBtn" class="nav-btn btn-cyber-purple" onclick="startBombLogic()">SPIEL STARTEN! 🔥</button>
-                <button id="bombPassBtn" class="nav-btn btn-cyber-blue" style="display: none; height: 120px; font-size: 1.8rem;" onclick="bombeWeitergeben()">WEITERGEBEN! ➡️</button>
+                <button id="bombPassBtn" class="nav-btn btn-cyber-blue" style="display: none; height: 85px; font-size: 1.5rem;" onclick="bombeWeitergeben()">WEITERGEBEN! ➡️</button>
                 <button id="bombBackBtn" class="nav-btn btn-cyber-green" style="height: 60px;" onclick="zurueckZumHauptMenue()">ZURÜCK ZUR AUSWAHL</button>
             </div>
 

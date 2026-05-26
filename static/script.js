@@ -183,7 +183,7 @@ function zeigeBefreiungsScreen(item, isVirus = false) {
         text = item.text; 
     } else {
         title = item.isGlobal ? "REGEL BEENDET! ⚖️" : "AUFGABE GESCHAFFT! ✅";
-        subtitle = item.isGlobal ? "Die Zeit ist um:" : `${item.spielerEmoji} ${item.spielerName} ist befreit:`;
+        subtitle = item.isGlobal ? "Die Zeit ist um:" : `${item.spielerName} ist befreit:`;
         color = item.isGlobal ? "var(--neon-red)" : "var(--neon-cyan)";
         btnClass = item.isGlobal ? "btn-cyber-red" : "btn-cyber-purple";
         text = item.text;
@@ -398,21 +398,24 @@ style.innerHTML = `
     .explosion-flash { animation: flashScreen 0.2s 5; }
     @keyframes flashScreen { 0%, 100% { background: transparent; } 50% { background: #ef4444; } }
     
-    .bomb-category-box { background: rgba(249, 115, 22, 0.1); border: 2px dashed #f97316; border-radius: 15px; padding: 20px; margin: 20px 0; font-size: 1.2rem; }
+    .bomb-category-box { background: rgba(249, 115, 22, 0.1); border: 2px dashed #f97316; border-radius: 15px; padding: 12px; margin: 10px 0; font-size: 1.1rem; }
+    
+    /* Entfernt Namen in der Explosions-Auswahl */
+    #bombExplosionBox .spieler-name, #bombExplosionBox small { display: none !important; }
 
     /* Handy Wechsel */
     .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: 20px; padding: 40px; text-align: center; }
 
     /* Charakter Selection Mockup Style */
-    .char-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
-    .char-card { background: rgba(0,0,0,0.6); border: 2px solid var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
+    .char-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
+    .char-card { background: rgba(0,0,0,0.6); border: 2px solid var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); border-radius: 22px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
     .char-card.selected { background: rgba(176, 38, 255, 0.15); box-shadow: 0 0 20px var(--neon-purple); transform: translateY(-3px); }
-    .char-portrait { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 12px; background: rgba(255,255,255,0.08); font-size: 3.5rem; border: 2px solid rgba(255,255,255,0.1); }
+    .char-portrait { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 8px; background: rgba(255,255,255,0.08); font-size: 2.5rem; border: 2px solid rgba(255,255,255,0.1); }
     .char-portrait img { width: 100%; height: 100%; object-fit: cover; }
-    .char-name { font-size: 0.9rem; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-    .neon-checkbox { width: 30px; height: 30px; border: 2px solid var(--neon-purple); border-radius: 8px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
+    .char-name { font-size: 0.85rem; color: #fff; font-weight: 700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+    .neon-checkbox { width: 24px; height: 24px; border: 2px solid var(--neon-purple); border-radius: 6px; position: relative; transition: all 0.2s; background: rgba(0,0,0,0.2); }
     .neon-checkbox.checked { background: var(--neon-purple); box-shadow: 0 0 12px var(--neon-purple); }
-    .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -4px; left: 5px; font-size: 22px; color: white; font-weight: bold; }
+    .neon-checkbox.checked::after { content: '✓'; position: absolute; top: -7px; left: 4px; font-size: 18px; color: white; font-weight: bold; }
 
     /* Floating Player Button */
     .floating-gaeste-btn {
@@ -813,6 +816,8 @@ async function karteZiehen() {
     const entscheidung = document.getElementById('entscheidungsBereich');
     const naechsteBtn = document.getElementById('naechsteKarteBtn');
     document.getElementById('werTrinktBereich').style.display = 'none';
+    document.querySelector('.master-game-card').style.display = 'flex';
+    document.querySelector('.navigation-area-cyber').style.display = 'flex';
 
     // Jede neue Karte verringert die Runden der aktiven Aufgaben
     verarbeiteRundenTick();
@@ -886,16 +891,15 @@ async function karteZiehen() {
     aktuelleSchluecke = daten.schluecke;
     
     // Sichtbarkeit anpassen
-    if (!isCounterEnabled) {
-        if (entscheidung) entscheidung.style.display = 'none';
-        if (naechsteBtn) {
-            naechsteBtn.style.display = 'block';
-            naechsteBtn.innerText = "Weiter";
-        }
-    } else {
-        if (entscheidung) entscheidung.style.display = 'flex';
-        if (naechsteBtn) naechsteBtn.style.display = 'none';
+    if (naechsteBtn) {
+        naechsteBtn.style.display = 'block';
+        naechsteBtn.innerText = "WEITER";
+        naechsteBtn.onclick = () => {
+            if (isCounterEnabled && aktuelleKategorie !== 'virus') werMussTrinkenZeigen();
+            else karteZiehen();
+        };
     }
+    if (entscheidung) entscheidung.style.display = 'none';
 
     let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
     
@@ -955,7 +959,7 @@ async function karteZiehen() {
         document.getElementById('failBtn').onclick = () => rundenAufgabeStarten(zufallsSpieler, daten.frage, rundenAnzahl, aktuelleSchluecke);
         document.getElementById('strafeText').innerText = `Herausforderung: ${rundenAnzahl} Runden durchhalten!`;
         if (isCounterEnabled) document.getElementById('entscheidungsBereich').style.display = 'flex';
-        if (isCounterEnabled) document.getElementById('naechsteKarteBtn').style.display = 'block';
+        if (isCounterEnabled) document.getElementById('naechsteKarteBtn').style.display = 'none';
     } else {
         if (isCounterEnabled) {
             let failText = `🍹 Trinken! <br><small>+${aktuelleSchluecke} Schlücke</small>`;
@@ -1131,7 +1135,7 @@ function updateRundenAufgabenUI() {
             <div class="runden-task-card ${totalCount > 1 ? 'compact' : ''}" style="${isGlobal ? 'border-left-color: #ef4444; background: rgba(239, 68, 68, 0.1);' : ''}">
                 <span class="runden-badge" style="${isGlobal ? 'background: #ef4444; color: white;' : ''}">${statusText}</span>
                 <div style="margin-bottom: 5px;">
-                    <strong>${isGlobal ? '🚨 GLOBALE REGEL' : `${task.spielerEmoji} ${task.spielerName}`}</strong>
+                    <strong>${isGlobal ? '🚨 GLOBALE REGEL' : task.spielerName}</strong>
                 </div>
                 <div style="opacity: 0.9; line-height: 1.4;">${task.text}</div>
                 <button class="runden-fail-btn" onclick="${isGlobal ? `rundenTaskGlobalVersagt(${index})` : `rundenTaskFehlgeschlagen(${index})`}">
@@ -1168,13 +1172,18 @@ function triggerVirusPenalty(virusId) {
     const virus = aktiveViren.find(v => v.id == virusId);
     if (!virus) return;
 
-    // Wir nutzen das existierende System für globale Strafen
-    const schluckeMatch = virus.plainText.match(/(\d+)\s*Schlücke/i);
-    aktuelleSchluecke = schluckeMatch ? parseInt(schluckeMatch[1]) : 2;
+    let spielerListe = JSON.parse(localStorage.getItem('partySpieler')) || [];
+    let spieler = spielerListe.find(s => s.name === virus.playerName);
     
-    // Mocking einer "Globalen Aufgabe" für das Trink-Raster
-    taskIndexForDrinkSelection = 999; // Dummy ID
-    werMussTrinkenZeigen();
+    if (spieler) {
+        spieler.schluecke += virus.schluckeCount;
+        localStorage.setItem('partySpieler', JSON.stringify(spielerListe));
+        playSound('shot');
+        if (typeof listeAnzeigen === 'function') listeAnzeigen();
+        
+        // Kleines visuelles Feedback in der Konsole oder UI möglich
+        console.log(`Virus-Strafe gebucht für ${virus.playerName}: ${virus.schluckeCount} Schlücke`);
+    }
 }
 /**
  * Zeigt einen Virus speziell auf der Hauptkarte an (Mixed Mode)
@@ -1242,13 +1251,15 @@ function rundenTaskEntfernen(index) {
 
 function niemandTrinkt() {
     playSound('click');
-    document.getElementById('entscheidungsBereich').style.display = 'none';
-    document.getElementById('naechsteKarteBtn').style.display = 'block';
+    document.getElementById('werTrinktBereich').style.display = 'none';
+    karteZiehen();
 }
 
 function werMussTrinkenZeigen() {
     document.getElementById('entscheidungsBereich').style.display = 'none';
     document.getElementById('werTrinktBereich').style.display = 'block';
+    document.querySelector('.master-game-card').style.display = 'none';
+    document.querySelector('.navigation-area-cyber').style.display = 'none';
     
     const auswahlBereich = document.getElementById('auswahlListe');
     auswahlBereich.innerHTML = ""; 
@@ -1256,39 +1267,42 @@ function werMussTrinkenZeigen() {
     
     spielerListe.forEach((spieler, index) => {
         if (spieler.aktiv !== false) {
-            // Logik wählen: Entweder aus einer Regel, Mehrfachwahl (Ich hab noch nie / Tribunal) oder Einzelwahl
-            let aktion = `strafSchluckeVerteilen(${index})`;
-            if (taskIndexForDrinkSelection !== -1) {
-                aktion = `strafSchluckAusTaskVerteilen(${index})`;
-            } else if (aktuelleKategorie === 'ich_hab_noch_nie' || aktuelleKategorie === 'tribunal') {
-                aktion = `strafSchluckHinzufuegen(${index}, this)`;
-            }
-
             auswahlBereich.innerHTML += `
-                <button class="strafe-btn btn-fail" onclick="${aktion}">
-                    ${spieler.emoji}
+                <button class="strafe-btn" onclick="strafSchluckHinzufuegen(${index}, this)">
+                    <div class="strafe-avatar-container">
+                        ${spieler.emoji}
+                    </div>
                 </button>`;
         }
     });
 
-    // Button zum Beenden der Auswahl (für Mehrfach-Modus, Tribunal oder laufende Regeln)
-    if (aktuelleKategorie === 'ich_hab_noch_nie' || aktuelleKategorie === 'tribunal' || taskIndexForDrinkSelection !== -1) {
-        const fertigBtn = document.createElement('button');
-        fertigBtn.innerHTML = "✅ Auswahl beenden";
-        fertigBtn.className = "nav-btn";
-        fertigBtn.style.gridColumn = "1 / -1";
-        fertigBtn.style.marginTop = "15px";
-        fertigBtn.onclick = () => {
-            document.getElementById('werTrinktBereich').style.display = 'none';
-            if (aktuelleKategorie === 'tribunal' && !isGemischteRunde) {
-                document.getElementById('tribunalNextBtn').style.display = 'inline-block';
-            } else {
-                document.getElementById('naechsteKarteBtn').style.display = 'block';
-            }
-            taskIndexForDrinkSelection = -1;
-        };
-        auswahlBereich.appendChild(fertigBtn);
+    // "Keiner muss" Button
+    if (taskIndexForDrinkSelection === -1) {
+        const skipBtn = document.createElement('button');
+        skipBtn.innerHTML = "🙅‍♂️ Niemand trinkt";
+        skipBtn.className = "nav-btn btn-cyber-red";
+        skipBtn.style.gridColumn = "1 / -1";
+        skipBtn.style.marginTop = "10px";
+        skipBtn.onclick = () => niemandTrinkt();
+        auswahlBereich.appendChild(skipBtn);
     }
+
+    // Bestätigen Button (Immer anzeigen)
+    const fertigBtn = document.createElement('button');
+    fertigBtn.innerHTML = "FERTIG 🚀";
+    fertigBtn.className = "nav-btn btn-cyber-purple";
+    fertigBtn.style.gridColumn = "1 / -1";
+    fertigBtn.style.marginTop = "15px";
+    fertigBtn.onclick = () => {
+        document.getElementById('werTrinktBereich').style.display = 'none';
+        if (aktuelleKategorie === 'tribunal' && !isGemischteRunde) {
+            document.getElementById('tribunalNextBtn').style.display = 'inline-block';
+        } else {
+            karteZiehen();
+        }
+        taskIndexForDrinkSelection = -1;
+    };
+    auswahlBereich.appendChild(fertigBtn);
 }
 
 function strafSchluckeVerteilen(gewaehlterIndex) {
@@ -1299,7 +1313,7 @@ function strafSchluckeVerteilen(gewaehlterIndex) {
     listeAnzeigen(); 
     
     document.getElementById('werTrinktBereich').style.display = 'none';
-    document.getElementById('naechsteKarteBtn').style.display = 'block';
+    karteZiehen();
 }
 
 /**

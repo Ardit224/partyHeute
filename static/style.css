@@ -110,6 +110,11 @@ body::before {
     position: relative;
 }
 
+.theme-tribunal .master-game-card {
+    min-height: auto;
+    padding: 20px 15px;
+}
+
 .card-title-cyan {
     color: var(--neon-cyan);
     font-size: 1.8rem;
@@ -210,7 +215,7 @@ button:active {
 
 .spieler-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     margin-top: 20px;
 }
@@ -403,26 +408,36 @@ button:active {
 .action-btn.edit:hover { background: #3b82f6; }
 
 .strafe-btn {
-
-    width: 90px !important; /* Feste Breite für den Button */
-    height: 90px !important; /* Feste Höhe für den Button */
-    margin: 5px !important;
-   
-    padding: 0 !important; /* Innenabstand entfernen, damit der Inhalt besser passt */
+    position: relative;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 3px solid var(--neon-purple) !important;
+    box-shadow: 0 0 20px rgba(176, 38, 255, 0.5) !important;
+    border-radius: 24px !important;
+    transition: all 0.2s ease;
     display: flex;
-    flex-direction: column; /* Inhalt vertikal anordnen */
-    align-items: center; /* Horizontal zentrieren */
-    justify-content: center; /* Vertikal zentrieren */
-    font-size: 40px; /* Standardgröße für Emojis im Button */
-    line-height: 1; /* Zeilenhöhe für Emojis anpassen */
+    align-items: center;
+    justify-content: center;
 }
 
-.strafe-btn img {
-    width: 70px; /* Feste Größe für Bilder im Button */
-    height: 70px;
-    border-radius: 50%;
+.strafe-avatar-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5.5rem; /* Massive Emojis */
+}
+
+.strafe-avatar-container img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border: 2px solid rgba(255,255,255,0.5); /* Kleiner Rand für Bilder */
 }
 
 .spieler-anzeige {
@@ -487,11 +502,14 @@ button:active {
 
 .main-nav .nav-btn {
     height: auto;
-    aspect-ratio: 1 / 1;
     font-size: 1.1rem;
     margin: 0;
     max-width: none;
     padding: 15px;
+}
+
+#startMenue .main-nav .nav-btn {
+    aspect-ratio: 1 / 1;
 }
 
 /* --- WARDROBE (GARDEROBE) SPECIFIC STYLES --- */
@@ -665,10 +683,10 @@ button:active {
 }
 
 .btn-cyber-green {
-    background: transparent;
+    background: rgba(16, 185, 129, 0.3);
     border: 2px solid #10b981;
     box-shadow: 0 0 15px #10b981;
-    color: #10b981;
+    color: #fff;
 }
 
 .btn-cyber-red {

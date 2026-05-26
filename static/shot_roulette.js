@@ -128,15 +128,11 @@ function sr_zeichneTrinkerAuswahl(pool) {
     pool.forEach(spieler => {
         const btn = document.createElement('button');
         btn.className = "strafe-btn";
-        btn.style.padding = "8px";
-
-        const istFoto = spieler.emoji.includes('<img');
 
         btn.innerHTML = `
-            <div class="avatar-wrapper" style="width: 65px; height: 65px; font-size: 2.2rem;">
+            <div class="strafe-avatar-container">
                 ${spieler.emoji}
             </div>
-            ${istFoto ? '' : `<small style="font-size: 0.7rem; display: block; margin-top: 4px;">${spieler.name}</small>`}
         `;
 
         btn.onclick = (e) => {
@@ -144,9 +140,26 @@ function sr_zeichneTrinkerAuswahl(pool) {
         };
         grid.appendChild(btn);
     });
+
+    // "Fertig" Button zum Bestätigen der Auswahl hinzufügen
+    const fertigBtn = document.createElement('button');
+    fertigBtn.innerHTML = "FERTIG 🚀";
+    fertigBtn.className = "nav-btn btn-cyber-purple";
+    fertigBtn.style.gridColumn = "1 / -1";
+    fertigBtn.style.marginTop = "15px";
+    fertigBtn.onclick = () => {
+        if (isGemischteRunde) {
+            geheZurueckZumMix();
+        } else {
+            naechsteShotRunde();
+        }
+    };
+    grid.appendChild(fertigBtn);
 }
 
 function sr_bucheSchlückeManuell(playerName, btn) {
+    if (btn.classList.contains('selected-for-drink')) return;
+
     let alleSpieler = JSON.parse(localStorage.getItem('partySpieler')) || [];
     let spieler = alleSpieler.find(s => s.name === playerName);
     if (spieler) {
@@ -154,18 +167,10 @@ function sr_bucheSchlückeManuell(playerName, btn) {
         localStorage.setItem('partySpieler', JSON.stringify(alleSpieler));
         if (typeof playSound === 'function') playSound('click');
         
-        // Visuelles Feedback
-        btn.style.background = "#10b981";
-        setTimeout(() => btn.style.background = "", 500);
+        // Spieler als ausgewählt markieren (ausgrauen)
+        btn.classList.add('selected-for-drink');
         
         if (typeof listeAnzeigen === 'function') listeAnzeigen();
-
-        // Im gemischten Modus die Auswahl durch einen "Weiter"-Button ersetzen
-        if (isGemischteRunde) {
-            document.getElementById('shotPlayerGrid').innerHTML = `
-                <button class="nav-btn" style="grid-column: 1 / -1; margin: 20px auto; padding: 15px;" onclick="geheZurueckZumMix()">Weiter</button>
-            `;
-        }
     }
 }
 

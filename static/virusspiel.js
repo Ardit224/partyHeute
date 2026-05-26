@@ -61,7 +61,9 @@ function neuerVirus(isMixed = false) {
         id: Date.now(),
         text: styledText,
         plainText: plainText,
-        runden: runden
+        runden: runden,
+        playerName: p1.name,
+        schluckeCount: schlucke
     };
 
     aktiveViren.push(virus);
