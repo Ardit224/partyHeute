@@ -407,7 +407,8 @@ style.innerHTML = `
     .handy-wechsel-card { background: #1e1b4b; border: 3px solid #6366f1; border-radius: var(--border-radius); padding: calc(var(--padding-standard) * 2); text-align: center; }
 
     /* Charakter Selection Mockup Style */
-    .char-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 500px; margin: 0 auto; padding: 10px; width: 100%; }
+    #charakterSelection { padding-bottom: 100px; }
+    .char-selection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 500px; margin: 0 auto 30px auto; padding: 10px; width: 100%; }
     .char-card { background: rgba(0,0,0,0.6); border: 2px solid var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); border-radius: 22px; padding: 12px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); position: relative; }
     .char-card.selected { background: rgba(176, 38, 255, 0.15); box-shadow: 0 0 20px var(--neon-purple); transform: translateY(-3px); }
     .char-portrait { width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; margin-bottom: 8px; background: rgba(255,255,255,0.08); font-size: 2.5rem; border: 2px solid rgba(255,255,255,0.1); }
@@ -443,17 +444,25 @@ style.innerHTML = `
 
     /* Optimierte Gäste Übersicht (Cyberpunk Style) */
     #gaesteUebersicht { 
-        padding: 20px; 
+        padding: 40px 20px; 
         background: #050505; 
         min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         color: white;
         text-transform: uppercase;
+        box-sizing: border-box;
     }
+    #gaesteUebersicht > div { width: 100%; max-width: 500px; }
     .gaeste-grid { 
         display: grid; 
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
         gap: 15px; 
-        margin-top: 25px; 
+        margin: 25px 0; 
+        width: 100%;
+        max-width: 500px;
     }
     .gaeste-card {
         background: rgba(255, 255, 255, 0.03);
